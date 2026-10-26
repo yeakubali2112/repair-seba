@@ -496,66 +496,117 @@ function renderAdminOrdersTable(orders) {
     return;
   }
 
+  const statusList = [
+    { val: 'PENDING_PICKUP', label: '⏳ পিকআপ বাকি', color: 'bg-amber-50 text-amber-900 border-amber-300' },
+    { val: 'PICKUP_ASSIGNED', label: '🚴 রাইডার নির্ধারিত', color: 'bg-blue-50 text-blue-900 border-blue-300' },
+    { val: 'COLLECTED', label: '📦 ল্যাবের পথে', color: 'bg-indigo-50 text-indigo-900 border-indigo-300' },
+    { val: 'DIAGNOSING', label: '🔬 টেস্ট চলছে', color: 'bg-purple-50 text-purple-900 border-purple-300' },
+    { val: 'QUOTE_PENDING', label: '⚠️ মূল্য অনুমোদন বাকি', color: 'bg-orange-50 text-orange-900 border-orange-300' },
+    { val: 'QUOTE_APPROVED', label: '✅ অনুমোদন সম্পন্ন (Allow)', color: 'bg-emerald-50 text-emerald-900 border-emerald-300' },
+    { val: 'IN_REPAIR', label: '🛠️ মেরামত চলছে', color: 'bg-cyan-50 text-cyan-900 border-cyan-300' },
+    { val: 'OUT_FOR_DELIVERY', label: '🚚 ডেলিভারির পথে', color: 'bg-teal-50 text-teal-900 border-teal-300' },
+    { val: 'COMPLETED', label: '🎉 সম্পন্ন', color: 'bg-emerald-100 text-emerald-950 border-emerald-400' },
+    { val: 'CANCELLED', label: '❌ বাতিল', color: 'bg-rose-50 text-rose-900 border-rose-300' }
+  ];
+
   tbody.innerHTML = orders.map(o => {
-    const st = ADMIN_STATUS_BADGES[o.status] || (typeof STATUS_MAP !== 'undefined' ? STATUS_MAP[o.status] : null) || { bn: o.status, en: o.status, color: 'bg-slate-100 text-slate-700 border-slate-300' };
+    const curStatus = statusList.find(s => s.val === o.status) || { color: 'bg-slate-50 text-slate-800 border-slate-300' };
     const dateFormatted = new Date(o.created_at).toLocaleDateString('bn-BD', { year: 'numeric', month: '2-digit', day: '2-digit' });
 
-    // Status pill style matching reference school dashboard screenshot
-    let statusPill = '';
-    if (o.status === 'COMPLETED' || o.quote_status === 'APPROVED') {
-      statusPill = `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-[11px] font-bold bg-[#ecfdf5] text-emerald-800 border border-emerald-300 shadow-2xs"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> ${st.bn}</span>`;
-    } else if (o.status === 'PENDING_PICKUP' || o.quote_status === 'PENDING') {
-      statusPill = `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-[11px] font-bold bg-[#fffbeb] text-amber-800 border border-amber-300 shadow-2xs"><span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span> ${st.bn}</span>`;
-    } else {
-      statusPill = `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-[11px] font-bold bg-[#eff6ff] text-blue-800 border border-blue-300 shadow-2xs"><span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span> ${st.bn}</span>`;
-    }
+    // Direct status dropdown (No modal/submit needed! Direct 1-click update/allow)
+    const statusWidget = `
+      <div class="flex items-center gap-1.5 flex-nowrap">
+        <select onchange="quickUpdateOrderStatus(${o.id}, this.value)" class="text-[11px] font-bold py-1 px-2 rounded-lg border cursor-pointer transition focus:outline-none focus:ring-1 focus:ring-teal-500 shadow-2xs ${curStatus.color}" title="সরাসরি স্ট্যাটাস পরিবর্তন করুন (সাবমিট বাটন ছাড়া)">
+          ${statusList.map(s => `
+            <option value="${s.val}" ${s.val === o.status ? 'selected' : ''}>${s.label}</option>
+          `).join('')}
+        </select>
+        ${o.status === 'QUOTE_PENDING' ? `
+          <button onclick="quickDirectApprove(${o.id})" class="px-2 py-1 rounded-md text-[10px] font-bold bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs transition shrink-0" title="সরাসরি অনুমোদন করুন (Direct Allow without submit)">
+            ✓ অনুমোদন
+          </button>
+        ` : ''}
+      </div>
+    `;
 
     return `
       <tr class="hover:bg-slate-50/80 transition text-slate-800 text-xs">
-        <td class="py-3 px-4 font-bold font-mono text-[#0f766e]">
+        <td class="py-2.5 px-3 font-bold font-mono text-[#0f766e] whitespace-nowrap">
           ${o.order_number}
         </td>
 
-        <td class="py-3 px-4">
-          <div class="font-bold text-slate-900">${o.customer_name}</div>
-          <div class="text-[10px] text-slate-500 font-normal mt-0.5">📍 ${o.area || 'ঢাকা'}</div>
+        <td class="py-2.5 px-3">
+          <div class="font-bold text-slate-900 truncate max-w-[130px]" title="${o.customer_name}">${o.customer_name}</div>
+          <div class="text-[10px] text-slate-500 truncate max-w-[130px]">📍 ${o.area || 'ঢাকা'}</div>
         </td>
 
-        <td class="py-3 px-4">
-          <div class="font-semibold text-slate-800">${o.brand} ${o.model}</div>
-          <div class="text-[10px] text-slate-500 mt-0.5 truncate max-w-[180px]">⚠️ ${Array.isArray(o.issues) ? o.issues.join(', ') : o.issues}</div>
+        <td class="py-2.5 px-3">
+          <div class="font-semibold text-slate-800 truncate max-w-[160px]" title="${o.brand} ${o.model}">${o.brand} ${o.model}</div>
+          <div class="text-[10px] text-slate-500 truncate max-w-[160px]">⚠️ ${Array.isArray(o.issues) ? o.issues.join(', ') : o.issues}</div>
         </td>
 
-        <td class="py-3 px-4 font-mono">
+        <td class="py-2.5 px-3 font-mono whitespace-nowrap">
           <div class="text-slate-800 text-xs font-semibold">${o.customer_phone}</div>
           <a href="https://wa.me/88${o.customer_phone}?text=${encodeURIComponent(`Assalamu Alaikum, Repair Seba থেকে আপনার অর্ডার ${o.order_number} এর ব্যাপারে যোগাযোগ করছি।`)}" target="_blank" class="text-emerald-600 hover:text-emerald-700 text-[10px] font-bold inline-flex items-center gap-0.5 mt-0.5" title="WhatsApp Chat">
             💬 চ্যাট
           </a>
         </td>
 
-        <td class="py-3 px-4 text-slate-600 whitespace-nowrap">
+        <td class="py-2.5 px-3 text-slate-600 whitespace-nowrap">
           ${dateFormatted}
         </td>
 
-        <td class="py-3 px-4 whitespace-nowrap">
-          ${statusPill}
+        <td class="py-2.5 px-3 whitespace-nowrap">
+          ${statusWidget}
         </td>
 
-        <td class="py-3 px-4 text-right space-x-1.5 whitespace-nowrap">
-          <button onclick="openEditModal(${o.id})" class="px-2.5 py-1 rounded-md bg-[#0f766e] hover:bg-[#115e59] text-white font-bold text-[11px] shadow-2xs transition">
-            📝 কোটেশন ও আপডেট
-          </button>
-          <button onclick="openEditModal(${o.id})" class="px-2.5 py-1 rounded-md bg-teal-50 hover:bg-teal-100 text-teal-800 border border-teal-200 font-bold text-[11px] transition">
-            বিস্তারিত
-          </button>
-          <button onclick="printAdminJobSheet(${o.id})" class="p-1 rounded-md text-slate-500 hover:text-slate-700 hover:bg-slate-100 border border-slate-200 text-xs transition" title="জব-শীট প্রিন্ট">
-            🖨️
+        <td class="py-2.5 px-3 text-right whitespace-nowrap">
+          <button onclick="openEditModal(${o.id})" class="px-2.5 py-1.5 rounded-lg bg-[#0f766e] hover:bg-[#115e59] text-white font-bold text-xs shadow-2xs transition inline-flex items-center gap-1 shrink-0" title="কোটেশন ও বিস্তারিত বিবরণ সম্পাদনা">
+            <span>📝</span> <span>আপডেট</span>
           </button>
         </td>
       </tr>
     `;
   }).join('');
 }
+
+// Direct 1-click status update without submit button or modal popup
+async function quickUpdateOrderStatus(orderId, newStatus) {
+  try {
+    const payload = { status: newStatus };
+    if (newStatus === 'QUOTE_APPROVED') {
+      payload.quote_status = 'APPROVED';
+    } else if (newStatus === 'QUOTE_PENDING') {
+      payload.quote_status = 'PENDING';
+    }
+
+    const res = await fetch(`/api/admin/orders/${orderId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${adminToken}`
+      },
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+    if (data.success) {
+      loadAdminOrders();
+      loadAdminStats();
+    } else {
+      alert(data.error || 'স্ট্যাটাস পরিবর্তন করা যায়নি।');
+    }
+  } catch (err) {
+    console.error('Quick status update error:', err);
+    alert('সার্ভার ত্রুটি।');
+  }
+}
+
+async function quickDirectApprove(orderId) {
+  await quickUpdateOrderStatus(orderId, 'QUOTE_APPROVED');
+}
+
+window.quickUpdateOrderStatus = quickUpdateOrderStatus;
+window.quickDirectApprove = quickDirectApprove;
 
 // -------------------------------------------------------------
 // EDIT ORDER & QUOTATION MANAGEMENT MODAL
