@@ -1105,6 +1105,37 @@
       <form id="order-edit-form" class="space-y-6">
         <input type="hidden" id="edit-order-id">
 
+        <!-- CUSTOMER REPORTED PROBLEM & MEDIA ATTACHMENTS (PHOTO, VIDEO, VOICE) -->
+        <div class="bg-gradient-to-r from-teal-50/70 to-slate-50 p-4 sm:p-5 rounded-2xl border border-teal-200/90 space-y-3.5">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="text-lg">📌</span>
+              <h4 class="text-xs font-bold uppercase tracking-wider text-[#0f766e]">
+                গ্রাহকের সমস্যার বিবরণ ও মিডিয়া ফাইল (Attachments)
+              </h4>
+            </div>
+            <span id="modal-media-badge" class="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-teal-100 text-teal-800 border border-teal-200">
+              ফাইল লোড হচ্ছে...
+            </span>
+          </div>
+
+          <!-- Customer's Written Problem Description -->
+          <div>
+            <div class="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">লিখিত বিবরণ:</div>
+            <div id="modal-customer-desc" class="p-3 bg-white rounded-xl border border-slate-200 text-xs text-slate-800 leading-relaxed font-medium">
+              <!-- Populated by JS -->
+            </div>
+          </div>
+
+          <!-- Attachments Container (Photo, Video, Voice) -->
+          <div>
+            <div class="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">সংযুক্ত মিডিয়া (ছবি, ভিডিও ও ভয়েস):</div>
+            <div id="modal-attachments-container" class="space-y-3">
+              <!-- Populated dynamically by JS -->
+            </div>
+          </div>
+        </div>
+
         <!-- Status Controller -->
         <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200">
           <label class="block text-xs font-bold uppercase tracking-wider text-cyan-700 mb-2">

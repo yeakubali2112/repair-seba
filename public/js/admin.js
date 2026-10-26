@@ -550,6 +550,30 @@ async function loadAdminOrders() {
   }
 }
 
+function formatFileSize(bytes) {
+  if (!bytes || bytes <= 0) return '0 B';
+  const k = 1024;
+  const sizes = ['B', 'KB', 'MB', 'GB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+}
+
+function renderOrderMediaBadges(o) {
+  const hasPhoto = o.photo_url || (typeof o.attachments === 'string' && o.attachments.includes('"photo"'));
+  const hasVideo = o.video_url || (typeof o.attachments === 'string' && o.attachments.includes('"video"'));
+  const hasVoice = o.voice_url || (typeof o.attachments === 'string' && o.attachments.includes('"voice"'));
+
+  if (!hasPhoto && !hasVideo && !hasVoice) return '';
+
+  return `
+    <div class="flex items-center gap-1 mt-1">
+      ${hasPhoto ? `<span class="inline-flex items-center gap-0.5 px-1.5 py-0.2 text-[9px] font-bold bg-sky-50 text-sky-700 border border-sky-200 rounded">📷 ছবি</span>` : ''}
+      ${hasVideo ? `<span class="inline-flex items-center gap-0.5 px-1.5 py-0.2 text-[9px] font-bold bg-purple-50 text-purple-700 border border-purple-200 rounded">🎥 ভিডিও</span>` : ''}
+      ${hasVoice ? `<span class="inline-flex items-center gap-0.5 px-1.5 py-0.2 text-[9px] font-bold bg-amber-50 text-amber-700 border border-amber-200 rounded">🎙️ ভয়েস</span>` : ''}
+    </div>
+  `;
+}
+
 function renderAdminOrdersTable(orders) {
   const tbody = document.getElementById('orders-table-body');
   if (!tbody) return;
@@ -599,6 +623,7 @@ function renderAdminOrdersTable(orders) {
         <td class="py-2.5 px-3">
           <div class="font-semibold text-slate-800 truncate" title="${o.brand} ${o.model}">${o.brand} ${o.model}</div>
           <div class="text-[10px] text-slate-500 truncate">⚠️ ${Array.isArray(o.issues) ? o.issues.join(', ') : o.issues}</div>
+          ${renderOrderMediaBadges(o)}
         </td>
 
         <td class="py-2.5 px-3 font-mono">
@@ -753,6 +778,104 @@ function openEditModal(orderId) {
 
   document.getElementById('edit-order-id').value = order.id;
   document.getElementById('modal-edit-orderno').textContent = `${order.order_number} (${order.brand} ${order.model})`;
+
+  // Populate Customer Reported Issue & Attachments (Photo, Video, Voice)
+  const customerDescEl = document.getElementById('modal-customer-desc');
+  const mediaContainer = document.getElementById('modal-attachments-container');
+  const mediaBadge = document.getElementById('modal-media-badge');
+
+  if (customerDescEl) {
+    customerDescEl.textContent = (order.issue_description && order.issue_description.trim()) ? order.issue_description : 'গ্রাহক কোনো অতিরিক্ত লিখিত বিবরণ দেননি।';
+  }
+
+  // Parse attachments
+  let attList = [];
+  try {
+    if (order.attachments) {
+      attList = typeof order.attachments === 'string' ? JSON.parse(order.attachments) : order.attachments;
+    }
+  } catch (e) {}
+
+  if (!Array.isArray(attList)) attList = [];
+
+  // Fallbacks if individual columns exist
+  if (order.photo_url && !attList.find(a => a.type === 'photo')) {
+    attList.push({ type: 'photo', url: order.photo_url, fileName: 'ডিভাইসের ছবি' });
+  }
+  if (order.video_url && !attList.find(a => a.type === 'video')) {
+    attList.push({ type: 'video', url: order.video_url, fileName: 'সমস্যার ভিডিও' });
+  }
+  if (order.voice_url && !attList.find(a => a.type === 'voice')) {
+    attList.push({ type: 'voice', url: order.voice_url, fileName: 'ভয়েস রেকর্ড' });
+  }
+
+  if (mediaBadge) {
+    mediaBadge.textContent = attList.length > 0 ? `${attList.length}টি মিডিয়া ফাইল সংযুক্ত` : 'কোনো মিডিয়া ফাইল নেই';
+    mediaBadge.className = attList.length > 0
+      ? 'text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-teal-100 text-teal-800 border border-teal-200'
+      : 'text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-500 border border-slate-200';
+  }
+
+  if (mediaContainer) {
+    if (attList.length === 0) {
+      mediaContainer.innerHTML = `<div class="p-3 bg-white rounded-xl border border-slate-200 text-center text-xs text-slate-400 italic">কোনো ছবি, ভিডিও বা ভয়েস রেকর্ড সংযুক্ত নেই।</div>`;
+    } else {
+      mediaContainer.innerHTML = attList.map(item => {
+        if (item.type === 'photo') {
+          return `
+            <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-2xs space-y-2">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                  <span>📷</span> <span>গ্রাহকের পাঠানো ডিভাইসের ছবি</span>
+                  ${item.size ? `<span class="text-[10px] text-slate-400">(${formatFileSize(item.size)})</span>` : ''}
+                </span>
+                <a href="${item.url}" target="_blank" download class="text-[11px] font-bold text-teal-700 hover:text-teal-800 bg-teal-50 hover:bg-teal-100 px-2.5 py-1 rounded-lg border border-teal-200 transition inline-flex items-center gap-1">
+                  🔍 বড় করে দেখুন / ডাউনলোড
+                </a>
+              </div>
+              <div class="rounded-xl overflow-hidden border border-slate-100 max-h-72 bg-slate-50 flex items-center justify-center p-1">
+                <img src="${item.url}" alt="Customer device photo" class="max-h-72 w-auto object-contain rounded-lg cursor-pointer hover:opacity-95 transition" onclick="window.open('${item.url}', '_blank')">
+              </div>
+            </div>
+          `;
+        } else if (item.type === 'video') {
+          return `
+            <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-2xs space-y-2">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                  <span>🎥</span> <span>ডিভাইসের সমস্যার ভিডিও (Video)</span>
+                  ${item.size ? `<span class="text-[10px] text-slate-400">(${formatFileSize(item.size)})</span>` : ''}
+                </span>
+                <a href="${item.url}" target="_blank" download class="text-[11px] font-bold text-purple-700 hover:text-purple-800 bg-purple-50 hover:bg-purple-100 px-2.5 py-1 rounded-lg border border-purple-200 transition inline-flex items-center gap-1">
+                  ⬇️ ডাউনলোড
+                </a>
+              </div>
+              <div class="rounded-xl overflow-hidden bg-black border border-slate-200 shadow-inner">
+                <video src="${item.url}" controls playsinline preload="metadata" class="w-full max-h-72 object-contain bg-black"></video>
+              </div>
+            </div>
+          `;
+        } else if (item.type === 'voice') {
+          return `
+            <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-2xs space-y-2">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                  <span>🎙️</span> <span>গ্রাহকের ভয়েস মেসেজ (Voice Recording)</span>
+                </span>
+                <a href="${item.url}" target="_blank" download class="text-[11px] font-bold text-amber-700 hover:text-amber-800 bg-amber-50 hover:bg-amber-100 px-2.5 py-1 rounded-lg border border-amber-200 transition inline-flex items-center gap-1">
+                  ⬇️ অডিও ডাউনলোড
+                </a>
+              </div>
+              <div class="p-2.5 bg-amber-50/50 rounded-xl border border-amber-200/80">
+                <audio src="${item.url}" controls class="w-full"></audio>
+              </div>
+            </div>
+          `;
+        }
+        return '';
+      }).join('');
+    }
+  }
 
   document.getElementById('edit-status').value = order.status;
   document.getElementById('edit-estimated-cost').value = order.estimated_cost || '';

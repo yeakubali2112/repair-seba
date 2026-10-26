@@ -55,6 +55,10 @@ function initDb() {
       delivery_agent_phone TEXT,
       payment_status TEXT DEFAULT 'UNPAID',
       payment_method TEXT DEFAULT 'CASH_ON_DELIVERY',
+      attachments TEXT,
+      photo_url TEXT,
+      video_url TEXT,
+      voice_url TEXT,
       created_at TEXT NOT NULL,
       updated_at TEXT NOT NULL
     );
@@ -141,6 +145,12 @@ function initDb() {
     } catch (_) {}
   }
 
+  // Safe migration for order media attachments (photo, video up to 500MB, voice)
+  try { db.exec('ALTER TABLE orders ADD COLUMN attachments TEXT;'); } catch (_) {}
+  try { db.exec('ALTER TABLE orders ADD COLUMN photo_url TEXT;'); } catch (_) {}
+  try { db.exec('ALTER TABLE orders ADD COLUMN video_url TEXT;'); } catch (_) {}
+  try { db.exec('ALTER TABLE orders ADD COLUMN voice_url TEXT;'); } catch (_) {}
+
   // Update default admin with name, avatar and permissions if empty
   try {
     const adminCheck = db.prepare('SELECT id, name, avatar, permissions FROM admins WHERE username = ?').get('admin');
@@ -156,6 +166,12 @@ function initDb() {
       }
     }
   } catch (_) {}
+
+  // Safe migration for order media attachments (photo, video up to 500MB, voice)
+  try { db.exec('ALTER TABLE orders ADD COLUMN attachments TEXT;'); } catch (_) {}
+  try { db.exec('ALTER TABLE orders ADD COLUMN photo_url TEXT;'); } catch (_) {}
+  try { db.exec('ALTER TABLE orders ADD COLUMN video_url TEXT;'); } catch (_) {}
+  try { db.exec('ALTER TABLE orders ADD COLUMN voice_url TEXT;'); } catch (_) {}
 
   // Seed default hero banner settings if not present
   try {

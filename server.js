@@ -8,6 +8,13 @@ const { hashPassword } = require('./seed');
 
 const PORT = process.env.PORT || 3000;
 const PUBLIC_DIR = path.join(__dirname, 'public');
+const UPLOADS_DIR = process.env.VERCEL
+  ? path.join('/tmp', 'uploads')
+  : path.join(PUBLIC_DIR, 'uploads');
+
+if (!fs.existsSync(UPLOADS_DIR)) {
+  try { fs.mkdirSync(UPLOADS_DIR, { recursive: true }); } catch (e) {}
+}
 
 // In-memory admin session storage (token -> { adminId, username, role, expiresAt })
 const sessions = new Map();
@@ -37,18 +44,29 @@ const MIME_TYPES = {
   '.gif': 'image/gif',
   '.svg': 'image/svg+xml',
   '.ico': 'image/x-icon',
+  '.webp': 'image/webp',
+  '.mp4': 'video/mp4',
+  '.webm': 'video/webm',
+  '.mov': 'video/quicktime',
+  '.mkv': 'video/x-matroska',
+  '.avi': 'video/x-msvideo',
+  '.mp3': 'audio/mpeg',
+  '.wav': 'audio/wav',
+  '.ogg': 'audio/ogg',
+  '.m4a': 'audio/mp4',
+  '.weba': 'audio/webm',
   '.woff': 'font/woff',
   '.woff2': 'font/woff2',
   '.ttf': 'font/ttf'
 };
 
 // Helper to parse JSON body from request
-function parseBody(req) {
+function parseBody(req, limit = 50 * 1024 * 1024) {
   return new Promise((resolve, reject) => {
     let body = '';
     req.on('data', chunk => {
       body += chunk;
-      if (body.length > 5 * 1024 * 1024) { // 5MB limit
+      if (body.length > limit) {
         reject(new Error('Payload too large'));
       }
     });
@@ -224,6 +242,111 @@ const server = http.createServer(async (req, res) => {
         return jsonResponse(res, 200, { success: true, settings });
       }
 
+      // Media Upload: Chunked Upload (Handles large files including up to 500MB videos reliably)
+      if (pathname === '/api/upload/chunk' && method === 'POST') {
+        const uploadId = req.headers['x-upload-id'] || parsedUrl.query.upload_id;
+        const chunkIndex = parseInt(req.headers['x-chunk-index'] || parsedUrl.query.chunk_index || '0', 10);
+        const totalChunks = parseInt(req.headers['x-total-chunks'] || parsedUrl.query.total_chunks || '1', 10);
+        const rawFileName = req.headers['x-file-name'] || parsedUrl.query.file_name || 'upload.bin';
+        const fileName = decodeURIComponent(rawFileName).replace(/[^a-zA-Z0-9._-]/g, '_');
+        const fileType = req.headers['x-file-type'] || parsedUrl.query.file_type || 'application/octet-stream';
+
+        if (!uploadId) {
+          return errorResponse(res, 400, 'Upload ID is required');
+        }
+
+        const safeUploadId = uploadId.replace(/[^a-zA-Z0-9_-]/g, '');
+        const tempPath = path.join(UPLOADS_DIR, `part_${safeUploadId}.tmp`);
+
+        const writeStream = fs.createWriteStream(tempPath, { flags: chunkIndex === 0 ? 'w' : 'a' });
+        req.pipe(writeStream);
+
+        writeStream.on('finish', () => {
+          if (chunkIndex >= totalChunks - 1) {
+            const ext = path.extname(fileName) || (fileType.includes('video') ? '.mp4' : fileType.includes('image') ? '.jpg' : fileType.includes('audio') ? '.webm' : '.bin');
+            const finalFileName = `order_${Date.now()}_${Math.random().toString(36).substring(2, 8)}${ext}`;
+            const finalPath = path.join(UPLOADS_DIR, finalFileName);
+
+            try {
+              if (fs.existsSync(tempPath)) {
+                fs.renameSync(tempPath, finalPath);
+              }
+              const stats = fs.statSync(finalPath);
+              return jsonResponse(res, 200, {
+                success: true,
+                completed: true,
+                url: `/uploads/${finalFileName}`,
+                fileName: finalFileName,
+                originalName: fileName,
+                fileType,
+                size: stats.size
+              });
+            } catch (err) {
+              console.error('Finalize file error:', err);
+              return errorResponse(res, 500, 'Failed to finalize uploaded file');
+            }
+          } else {
+            return jsonResponse(res, 200, {
+              success: true,
+              completed: false,
+              chunkIndex,
+              totalChunks
+            });
+          }
+        });
+
+        writeStream.on('error', (err) => {
+          console.error('Chunk write error:', err);
+          return errorResponse(res, 500, 'Chunk write error');
+        });
+        return;
+      }
+
+      // Media Upload: Direct Single Upload (for photo base64, voice recording blob, or files)
+      if (pathname === '/api/upload' && method === 'POST') {
+        const body = await parseBody(req, 50 * 1024 * 1024);
+        const { fileName = 'file', fileType = 'application/octet-stream', data } = body;
+        if (!data) return errorResponse(res, 400, 'File data is required');
+
+        let buffer;
+        if (typeof data === 'string' && data.startsWith('data:')) {
+          const matches = data.match(/^data:([A-Za-z-+/0-9]+);base64,(.+)$/);
+          if (matches && matches[2]) {
+            buffer = Buffer.from(matches[2], 'base64');
+          } else {
+            buffer = Buffer.from(data);
+          }
+        } else if (typeof data === 'string') {
+          buffer = Buffer.from(data, 'base64');
+        } else {
+          buffer = Buffer.from(data);
+        }
+
+        const ext = path.extname(fileName) || (fileType.includes('video') ? '.mp4' : fileType.includes('image') ? '.jpg' : fileType.includes('audio') ? '.webm' : '.bin');
+        const finalFileName = `order_${Date.now()}_${Math.random().toString(36).substring(2, 8)}${ext}`;
+        const finalPath = path.join(UPLOADS_DIR, finalFileName);
+
+        try {
+          fs.writeFileSync(finalPath, buffer);
+          return jsonResponse(res, 200, {
+            success: true,
+            url: `/uploads/${finalFileName}`,
+            fileName: finalFileName,
+            fileType,
+            size: buffer.length
+          });
+        } catch (err) {
+          console.error('Upload write error:', err);
+          return jsonResponse(res, 200, {
+            success: true,
+            url: data,
+            fileName: finalFileName,
+            fileType,
+            size: buffer.length
+          });
+        }
+      }
+
       // 3. Create New Order (Customer Booking)
       if (pathname === '/api/orders' && method === 'POST') {
         const body = await parseBody(req);
@@ -240,7 +363,11 @@ const server = http.createServer(async (req, res) => {
           issues = [],
           issue_description = '',
           preferred_date = '',
-          preferred_time_slot = ''
+          preferred_time_slot = '',
+          attachments = [],
+          photo_url = '',
+          video_url = '',
+          voice_url = ''
         } = body;
 
         // Validation
@@ -269,19 +396,33 @@ const server = http.createServer(async (req, res) => {
         const now = new Date().toISOString();
         const issuesJson = JSON.stringify(Array.isArray(issues) ? issues : [issues]);
 
+        const attachmentsJson = typeof attachments === 'string' ? attachments : JSON.stringify(Array.isArray(attachments) ? attachments : []);
+        let photo = photo_url || '';
+        let video = video_url || '';
+        let voice = voice_url || '';
+        if (Array.isArray(attachments)) {
+          attachments.forEach(att => {
+            if (att.type === 'photo' && !photo) photo = att.url;
+            if (att.type === 'video' && !video) video = att.url;
+            if (att.type === 'voice' && !voice) voice = att.url;
+          });
+        }
+
         const insertStmt = db.prepare(`
           INSERT INTO orders (
             order_number, customer_name, customer_phone, customer_alt_phone,
             address, area, city, device_type, brand, model,
             issues, issue_description, preferred_date, preferred_time_slot,
             status, estimated_cost, final_cost, quote_status,
-            payment_status, created_at, updated_at
+            payment_status, created_at, updated_at,
+            attachments, photo_url, video_url, voice_url
           ) VALUES (
             ?, ?, ?, ?,
             ?, ?, ?, ?, ?, ?,
             ?, ?, ?, ?,
             'PENDING_PICKUP', 0, 0, 'NOT_ISSUED',
-            'UNPAID', ?, ?
+            'UNPAID', ?, ?,
+            ?, ?, ?, ?
           )
         `);
 
@@ -289,12 +430,16 @@ const server = http.createServer(async (req, res) => {
           orderNumber, customer_name.trim(), cleanPhone, customer_alt_phone.trim(),
           address.trim(), area.trim(), city.trim(), device_type, brand.trim(), model.trim(),
           issuesJson, issue_description.trim(), preferred_date, preferred_time_slot,
-          now, now
+          now, now,
+          attachmentsJson, photo, video, voice
         );
 
         const newOrder = db.prepare('SELECT * FROM orders WHERE order_number = ?').get(orderNumber);
         if (newOrder && newOrder.issues) {
           try { newOrder.issues = JSON.parse(newOrder.issues); } catch {}
+        }
+        if (newOrder && newOrder.attachments) {
+          try { newOrder.attachments = JSON.parse(newOrder.attachments); } catch {}
         }
 
         // Auto-register or link customer profile if not already present
@@ -1189,12 +1334,32 @@ const server = http.createServer(async (req, res) => {
     if (safePath === '/track' || safePath === '/track/') safePath = '/index.html';
     if (safePath === '/favicon.ico') safePath = '/favicon.svg';
 
-    let filePath = path.join(PUBLIC_DIR, safePath);
+    let filePath;
+    const isUploadPath = safePath.startsWith('/uploads/') || safePath.startsWith('uploads/') || safePath.startsWith('\\uploads\\');
 
-    // Security check: ensure path is within PUBLIC_DIR
-    if (!filePath.startsWith(PUBLIC_DIR)) {
-      res.writeHead(403, { 'Content-Type': 'text/plain; charset=utf-8' });
-      return res.end('Access Denied');
+    if (isUploadPath) {
+      const uploadFileName = path.basename(safePath);
+      const possibleUploadPaths = [
+        path.join(UPLOADS_DIR, uploadFileName),
+        path.join(PUBLIC_DIR, 'uploads', uploadFileName),
+        path.join('/tmp', 'uploads', uploadFileName)
+      ];
+      for (const p of possibleUploadPaths) {
+        if (fs.existsSync(p)) {
+          filePath = p;
+          break;
+        }
+      }
+      if (!filePath) {
+        filePath = path.join(UPLOADS_DIR, uploadFileName);
+      }
+    } else {
+      filePath = path.join(PUBLIC_DIR, safePath);
+      // Security check: ensure path is within PUBLIC_DIR
+      if (!filePath.startsWith(PUBLIC_DIR)) {
+        res.writeHead(403, { 'Content-Type': 'text/plain; charset=utf-8' });
+        return res.end('Access Denied');
+      }
     }
 
     fs.stat(filePath, (err, stats) => {
@@ -1214,14 +1379,34 @@ const server = http.createServer(async (req, res) => {
 
       const ext = path.extname(filePath).toLowerCase();
       const contentType = MIME_TYPES[ext] || 'application/octet-stream';
+      const range = req.headers.range;
 
-      res.writeHead(200, {
-        'Content-Type': contentType,
-        'Cache-Control': 'no-cache'
-      });
+      // Range requests for video/audio streaming (e.g. 500MB videos or voice notes)
+      if (range && stats.size > 0) {
+        const parts = range.replace(/bytes=/, "").split("-");
+        const start = parseInt(parts[0], 10);
+        const end = parts[1] ? parseInt(parts[1], 10) : stats.size - 1;
+        const chunksize = (end - start) + 1;
 
-      const readStream = fs.createReadStream(filePath);
-      readStream.pipe(res);
+        res.writeHead(206, {
+          'Content-Range': `bytes ${start}-${end}/${stats.size}`,
+          'Accept-Ranges': 'bytes',
+          'Content-Length': chunksize,
+          'Content-Type': contentType,
+          'Cache-Control': 'no-cache'
+        });
+        const readStream = fs.createReadStream(filePath, { start, end });
+        readStream.pipe(res);
+      } else {
+        res.writeHead(200, {
+          'Content-Type': contentType,
+          'Content-Length': stats.size,
+          'Accept-Ranges': 'bytes',
+          'Cache-Control': 'no-cache'
+        });
+        const readStream = fs.createReadStream(filePath);
+        readStream.pipe(res);
+      }
     });
 
   } catch (error) {

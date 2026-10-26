@@ -1231,6 +1231,70 @@
               </label>
               <textarea id="desc-input" rows="2" placeholder="ফোনে কি সমস্যা হচ্ছে বা কিভাবে নষ্ট হয়েছে সংক্ষেপে লিখুন..." data-i18n-placeholder="desc_placeholder" class="w-full px-4 py-3 rounded-xl border border-slate-300 bg-white text-sm focus:ring-2 focus:ring-cyan-500 focus:outline-none"></textarea>
             </div>
+
+            <!-- Media Attachments (Photo, Video up to 500MB, Voice Recording) -->
+            <div class="mt-3.5 p-4 bg-slate-50 border border-slate-200/90 rounded-2xl">
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-3">
+                <span class="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                  <span>📎</span> <span>সমস্যার ছবি, ভিডিও বা ভয়েস রেকর্ড যুক্ত করুন (ঐচ্ছিক)</span>
+                </span>
+                <span class="text-[11px] text-teal-700 bg-teal-50 px-2 py-0.5 rounded-full border border-teal-200 font-semibold self-start sm:self-auto">
+                  সর্বোচ্চ ৫০০MB ভিডিও সাপোর্ট
+                </span>
+              </div>
+
+              <!-- Media Option Action Buttons -->
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                <!-- 1. Photo Picker -->
+                <label class="flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl bg-white border border-slate-200 hover:border-teal-500 hover:bg-teal-50/40 cursor-pointer transition text-xs font-bold text-slate-700 shadow-2xs group">
+                  <span class="text-base group-hover:scale-110 transition">📷</span>
+                  <span>ছবি যোগ করুন</span>
+                  <input type="file" id="media-photo-input" accept="image/*" class="hidden" onchange="handleOrderPhotoSelect(event)">
+                </label>
+
+                <!-- 2. Video Picker (Up to 500MB) -->
+                <label class="flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl bg-white border border-slate-200 hover:border-teal-500 hover:bg-teal-50/40 cursor-pointer transition text-xs font-bold text-slate-700 shadow-2xs group">
+                  <span class="text-base group-hover:scale-110 transition">🎥</span>
+                  <span>ভিডিও যোগ করুন</span>
+                  <span class="text-[9px] px-1 py-0.2 bg-teal-100 text-teal-800 rounded font-bold">500MB</span>
+                  <input type="file" id="media-video-input" accept="video/*" class="hidden" onchange="handleOrderVideoSelect(event)">
+                </label>
+
+                <!-- 3. Voice Record Button -->
+                <button type="button" id="btn-voice-record" onclick="toggleOrderVoiceRecording()" class="flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl bg-white border border-slate-200 hover:border-rose-500 hover:bg-rose-50/40 cursor-pointer transition text-xs font-bold text-slate-700 shadow-2xs group">
+                  <span id="voice-record-icon" class="text-base group-hover:scale-110 transition">🎙️</span>
+                  <span id="voice-record-label">ভয়েস রেকর্ড</span>
+                </button>
+              </div>
+
+              <!-- Live Voice Recording Pulse Bar -->
+              <div id="voice-recording-bar" class="hidden mt-3 p-3 bg-rose-50 border border-rose-200 rounded-xl flex items-center justify-between animate-pulse">
+                <div class="flex items-center gap-2">
+                  <span class="w-2.5 h-2.5 rounded-full bg-rose-600 animate-ping"></span>
+                  <span class="text-xs font-bold text-rose-800">কথা বলুন, রেকর্ড হচ্ছে...</span>
+                  <span id="voice-recording-timer" class="text-xs font-mono font-black text-rose-900 bg-rose-100 px-2 py-0.5 rounded">00:00</span>
+                </div>
+                <button type="button" onclick="stopOrderVoiceRecording()" class="px-3 py-1 bg-rose-600 hover:bg-rose-700 text-white rounded-lg text-xs font-bold shadow-xs cursor-pointer">
+                  ⏹️ রেকর্ড থামান
+                </button>
+              </div>
+
+              <!-- Video/File Upload Progress Bar -->
+              <div id="media-upload-progress-box" class="hidden mt-3 p-3 bg-teal-50 border border-teal-200 rounded-xl">
+                <div class="flex items-center justify-between text-xs font-bold text-teal-900 mb-1">
+                  <span id="upload-progress-title">ফাইল আপলোড হচ্ছে...</span>
+                  <span id="upload-progress-pct" class="font-mono">0%</span>
+                </div>
+                <div class="w-full bg-teal-100 rounded-full h-2 overflow-hidden">
+                  <div id="upload-progress-fill" class="bg-[#0f766e] h-2 rounded-full transition-all duration-200" style="width: 0%"></div>
+                </div>
+              </div>
+
+              <!-- Media Previews List (Photo, Video, Voice) -->
+              <div id="media-previews-list" class="mt-3 space-y-2.5 hidden">
+                <!-- Preview items inserted here by JS -->
+              </div>
+            </div>
           </div>
 
           <!-- Customer Address & Contact Info -->

@@ -571,10 +571,397 @@ function setupEventListeners() {
 }
 
 // -------------------------------------------------------------
+// ORDER MEDIA ATTACHMENTS (PHOTO, VIDEO UP TO 500MB, VOICE NOTE)
+// -------------------------------------------------------------
+let currentOrderAttachments = [];
+let voiceMediaRecorder = null;
+let voiceAudioChunks = [];
+let voiceTimerInterval = null;
+let voiceRecordingSeconds = 0;
+let isMediaUploading = false;
+
+function formatFileSize(bytes) {
+  if (!bytes || bytes <= 0) return '0 B';
+  const k = 1024;
+  const sizes = ['B', 'KB', 'MB', 'GB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+}
+
+async function uploadFileInChunks(file, onProgress) {
+  const chunkSize = 3 * 1024 * 1024; // 3MB chunks (bypasses serverless 4.5MB limit)
+  const totalChunks = Math.ceil(file.size / chunkSize);
+  const uploadId = 'up_' + Date.now() + '_' + Math.random().toString(36).substring(2, 8);
+  
+  for (let i = 0; i < totalChunks; i++) {
+    const start = i * chunkSize;
+    const end = Math.min(file.size, start + chunkSize);
+    const chunkBlob = file.slice(start, end);
+
+    const headers = {
+      'x-upload-id': uploadId,
+      'x-chunk-index': i.toString(),
+      'x-total-chunks': totalChunks.toString(),
+      'x-file-name': encodeURIComponent(file.name),
+      'x-file-type': file.type || 'application/octet-stream',
+      'Content-Type': 'application/octet-stream'
+    };
+
+    const res = await fetch('/api/upload/chunk', {
+      method: 'POST',
+      headers,
+      body: chunkBlob
+    });
+
+    if (!res.ok) {
+      throw new Error(`Chunk ${i + 1}/${totalChunks} upload failed`);
+    }
+
+    const data = await res.json();
+    if (onProgress) {
+      const pct = Math.round(((i + 1) / totalChunks) * 100);
+      onProgress(pct, end, file.size);
+    }
+
+    if (i === totalChunks - 1 && data.completed) {
+      return data;
+    }
+  }
+}
+
+async function handleOrderPhotoSelect(e) {
+  const file = e.target.files && e.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = async (event) => {
+    const dataUrl = event.target.result;
+    
+    // Add local preview immediately
+    const tempItem = {
+      type: 'photo',
+      url: dataUrl,
+      fileName: file.name,
+      size: file.size,
+      uploading: true
+    };
+
+    // Replace existing photo or add
+    currentOrderAttachments = currentOrderAttachments.filter(a => a.type !== 'photo');
+    currentOrderAttachments.push(tempItem);
+    renderOrderMediaPreviews();
+
+    // Upload to server
+    try {
+      const res = await fetch('/api/upload', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          fileName: file.name,
+          fileType: file.type || 'image/jpeg',
+          data: dataUrl
+        })
+      });
+      const result = await res.json();
+      if (result.success && result.url) {
+        tempItem.url = result.url;
+        tempItem.uploading = false;
+        renderOrderMediaPreviews();
+      }
+    } catch (err) {
+      console.warn('Direct upload photo fallback to dataUrl:', err);
+      tempItem.uploading = false;
+      renderOrderMediaPreviews();
+    }
+  };
+  reader.readAsDataURL(file);
+}
+
+async function handleOrderVideoSelect(e) {
+  const file = e.target.files && e.target.files[0];
+  if (!file) return;
+
+  const maxBytes = 500 * 1024 * 1024; // 500 MB limit
+  if (file.size > maxBytes) {
+    alert(`ভিডিওটির সাইজ (${formatFileSize(file.size)}) অতিরিক্ত বড়। অনুগ্রহ করে সর্বোচ্চ ৫০০MB এর ভিডিও সিলেক্ট করুন।`);
+    e.target.value = '';
+    return;
+  }
+
+  const localVideoUrl = URL.createObjectURL(file);
+  const tempItem = {
+    type: 'video',
+    url: localVideoUrl,
+    fileName: file.name,
+    size: file.size,
+    uploading: true,
+    progress: 0
+  };
+
+  currentOrderAttachments = currentOrderAttachments.filter(a => a.type !== 'video');
+  currentOrderAttachments.push(tempItem);
+  renderOrderMediaPreviews();
+
+  // Show progress box
+  const progressBox = document.getElementById('media-upload-progress-box');
+  const progressTitle = document.getElementById('upload-progress-title');
+  const progressPct = document.getElementById('upload-progress-pct');
+  const progressFill = document.getElementById('upload-progress-fill');
+
+  if (progressBox) progressBox.classList.remove('hidden');
+  isMediaUploading = true;
+
+  try {
+    const uploadResult = await uploadFileInChunks(file, (pct, loaded, total) => {
+      tempItem.progress = pct;
+      if (progressTitle) progressTitle.textContent = `ভিডিও আপলোড হচ্ছে (${formatFileSize(loaded)} / ${formatFileSize(total)})...`;
+      if (progressPct) progressPct.textContent = `${pct}%`;
+      if (progressFill) progressFill.style.width = `${pct}%`;
+    });
+
+    if (uploadResult && uploadResult.url) {
+      tempItem.url = uploadResult.url;
+      tempItem.uploading = false;
+      if (progressBox) progressBox.classList.add('hidden');
+      renderOrderMediaPreviews();
+    }
+  } catch (err) {
+    console.error('Video upload error:', err);
+    alert('ভিডিও আপলোড করতে সমস্যা হয়েছে। ইন্টারনেট সংযোগ চেক করে আবার চেষ্টা করুন।');
+    currentOrderAttachments = currentOrderAttachments.filter(a => a !== tempItem);
+    if (progressBox) progressBox.classList.add('hidden');
+    renderOrderMediaPreviews();
+  } finally {
+    isMediaUploading = false;
+  }
+}
+
+async function toggleOrderVoiceRecording() {
+  if (voiceMediaRecorder && voiceMediaRecorder.state === 'recording') {
+    stopOrderVoiceRecording();
+  } else {
+    startOrderVoiceRecording();
+  }
+}
+
+async function startOrderVoiceRecording() {
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    alert('আপনার ডিভাইসে বা ব্রাউজারে ভয়েস রেকর্ডিং সমর্থিত নয়।');
+    return;
+  }
+
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    voiceAudioChunks = [];
+    voiceRecordingSeconds = 0;
+
+    let mimeType = 'audio/webm';
+    if (window.MediaRecorder && MediaRecorder.isTypeSupported('audio/webm;codecs=opus')) {
+      mimeType = 'audio/webm;codecs=opus';
+    } else if (window.MediaRecorder && MediaRecorder.isTypeSupported('audio/ogg;codecs=opus')) {
+      mimeType = 'audio/ogg;codecs=opus';
+    } else if (window.MediaRecorder && MediaRecorder.isTypeSupported('audio/mp4')) {
+      mimeType = 'audio/mp4';
+    }
+
+    voiceMediaRecorder = new MediaRecorder(stream, { mimeType });
+
+    voiceMediaRecorder.ondataavailable = (event) => {
+      if (event.data && event.data.size > 0) {
+        voiceAudioChunks.push(event.data);
+      }
+    };
+
+    voiceMediaRecorder.onstop = async () => {
+      stream.getTracks().forEach(t => t.stop());
+      const audioBlob = new Blob(voiceAudioChunks, { type: mimeType });
+      const localAudioUrl = URL.createObjectURL(audioBlob);
+
+      const tempItem = {
+        type: 'voice',
+        url: localAudioUrl,
+        fileName: `voice_note_${Date.now()}.${mimeType.includes('mp4') ? 'm4a' : 'webm'}`,
+        size: audioBlob.size,
+        uploading: true
+      };
+
+      currentOrderAttachments = currentOrderAttachments.filter(a => a.type !== 'voice');
+      currentOrderAttachments.push(tempItem);
+      renderOrderMediaPreviews();
+
+      // Convert blob to base64 and upload to server
+      const reader = new FileReader();
+      reader.onloadend = async () => {
+        try {
+          const res = await fetch('/api/upload', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              fileName: tempItem.fileName,
+              fileType: mimeType,
+              data: reader.result
+            })
+          });
+          const result = await res.json();
+          if (result.success && result.url) {
+            tempItem.url = result.url;
+            tempItem.uploading = false;
+            renderOrderMediaPreviews();
+          }
+        } catch (err) {
+          console.warn('Voice upload fallback to dataUrl:', err);
+          tempItem.uploading = false;
+          renderOrderMediaPreviews();
+        }
+      };
+      reader.readAsDataURL(audioBlob);
+    };
+
+    voiceMediaRecorder.start(250);
+
+    const recordBar = document.getElementById('voice-recording-bar');
+    const recordBtnLabel = document.getElementById('voice-record-label');
+    const recordBtnIcon = document.getElementById('voice-record-icon');
+    const timerEl = document.getElementById('voice-recording-timer');
+
+    if (recordBar) recordBar.classList.remove('hidden');
+    if (recordBtnLabel) recordBtnLabel.textContent = 'রেকর্ড থামান';
+    if (recordBtnIcon) recordBtnIcon.textContent = '⏹️';
+
+    voiceTimerInterval = setInterval(() => {
+      voiceRecordingSeconds++;
+      const mins = String(Math.floor(voiceRecordingSeconds / 60)).padStart(2, '0');
+      const secs = String(voiceRecordingSeconds % 60).padStart(2, '0');
+      if (timerEl) timerEl.textContent = `${mins}:${secs}`;
+      if (voiceRecordingSeconds >= 300) { // Max 5 mins
+        stopOrderVoiceRecording();
+      }
+    }, 1000);
+
+  } catch (err) {
+    console.error('Mic access error:', err);
+    alert('মাইক্রোফোন চালু করা সম্ভব হয়নি। অনুগ্রহ করে ব্রাউজার পারমিশন দিন।');
+  }
+}
+
+function stopOrderVoiceRecording() {
+  if (voiceMediaRecorder && voiceMediaRecorder.state !== 'inactive') {
+    voiceMediaRecorder.stop();
+  }
+  if (voiceTimerInterval) {
+    clearInterval(voiceTimerInterval);
+    voiceTimerInterval = null;
+  }
+  const recordBar = document.getElementById('voice-recording-bar');
+  const recordBtnLabel = document.getElementById('voice-record-label');
+  const recordBtnIcon = document.getElementById('voice-record-icon');
+
+  if (recordBar) recordBar.classList.add('hidden');
+  if (recordBtnLabel) recordBtnLabel.textContent = 'ভয়েস রেকর্ড';
+  if (recordBtnIcon) recordBtnIcon.textContent = '🎙️';
+}
+
+function removeOrderAttachment(type) {
+  currentOrderAttachments = currentOrderAttachments.filter(a => a.type !== type);
+  if (type === 'photo') {
+    const input = document.getElementById('media-photo-input');
+    if (input) input.value = '';
+  }
+  if (type === 'video') {
+    const input = document.getElementById('media-video-input');
+    if (input) input.value = '';
+  }
+  renderOrderMediaPreviews();
+}
+
+function renderOrderMediaPreviews() {
+  const container = document.getElementById('media-previews-list');
+  if (!container) return;
+
+  if (currentOrderAttachments.length === 0) {
+    container.classList.add('hidden');
+    container.innerHTML = '';
+    return;
+  }
+
+  container.classList.remove('hidden');
+  container.innerHTML = currentOrderAttachments.map(item => {
+    if (item.type === 'photo') {
+      return `
+        <div class="flex items-center justify-between p-2.5 bg-white border border-slate-200 rounded-xl shadow-2xs">
+          <div class="flex items-center gap-3 min-w-0">
+            <img src="${item.url}" alt="Preview" class="w-12 h-12 object-cover rounded-lg border border-slate-200 shrink-0">
+            <div class="min-w-0">
+              <div class="text-xs font-bold text-slate-800 truncate">${item.fileName || 'ছবি (Photo)'}</div>
+              <div class="text-[10px] text-slate-400 font-semibold">${item.uploading ? '⏳ আপলোড হচ্ছে...' : '✅ ছবি যুক্ত হয়েছে'} • ${formatFileSize(item.size)}</div>
+            </div>
+          </div>
+          <button type="button" onclick="removeOrderAttachment('photo')" class="w-7 h-7 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-600 flex items-center justify-center text-xs font-bold transition shrink-0 cursor-pointer" title="ছবি মুছুন">
+            ✕
+          </button>
+        </div>
+      `;
+    } else if (item.type === 'video') {
+      return `
+        <div class="p-3 bg-white border border-slate-200 rounded-xl shadow-2xs space-y-2">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2 min-w-0">
+              <span class="text-base shrink-0">🎥</span>
+              <div class="min-w-0">
+                <div class="text-xs font-bold text-slate-800 truncate">${item.fileName || 'ভিডিও (Video)'}</div>
+                <div class="text-[10px] text-teal-700 font-semibold">${item.uploading ? `⏳ আপলোড হচ্ছে (${item.progress || 0}%)...` : '✅ ভিডিও যুক্ত হয়েছে'} • ${formatFileSize(item.size)}</div>
+              </div>
+            </div>
+            <button type="button" onclick="removeOrderAttachment('video')" class="w-7 h-7 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-600 flex items-center justify-center text-xs font-bold transition shrink-0 cursor-pointer" title="ভিডিও মুছুন">
+              ✕
+            </button>
+          </div>
+          <div class="rounded-lg overflow-hidden bg-black max-h-48 border border-slate-200">
+            <video src="${item.url}" controls playsinline preload="metadata" class="w-full max-h-48 object-contain bg-black"></video>
+          </div>
+        </div>
+      `;
+    } else if (item.type === 'voice') {
+      return `
+        <div class="p-3 bg-white border border-slate-200 rounded-xl shadow-2xs space-y-2">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2 min-w-0">
+              <span class="text-base shrink-0">🎙️</span>
+              <div class="min-w-0">
+                <div class="text-xs font-bold text-slate-800 truncate">ভয়েস মেসেজ (Voice Recording)</div>
+                <div class="text-[10px] text-amber-700 font-semibold">${item.uploading ? '⏳ সেভ হচ্ছে...' : '✅ অডিও রেকর্ড সংযুক্ত হয়েছে'}</div>
+              </div>
+            </div>
+            <button type="button" onclick="removeOrderAttachment('voice')" class="w-7 h-7 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-600 flex items-center justify-center text-xs font-bold transition shrink-0 cursor-pointer" title="ভয়েস রেকর্ড মুছুন">
+              ✕
+            </button>
+          </div>
+          <audio src="${item.url}" controls class="w-full"></audio>
+        </div>
+      `;
+    }
+    return '';
+  }).join('');
+}
+
+window.handleOrderPhotoSelect = handleOrderPhotoSelect;
+window.handleOrderVideoSelect = handleOrderVideoSelect;
+window.toggleOrderVoiceRecording = toggleOrderVoiceRecording;
+window.startOrderVoiceRecording = startOrderVoiceRecording;
+window.stopOrderVoiceRecording = stopOrderVoiceRecording;
+window.removeOrderAttachment = removeOrderAttachment;
+
+// -------------------------------------------------------------
 // HANDLE NEW ORDER SUBMIT
 // -------------------------------------------------------------
 async function handleOrderSubmit(form) {
   const submitBtn = form.querySelector('button[type="submit"]');
+
+  if (isMediaUploading) {
+    alert('ভিডিও আপলোড এখনও চলছে। অনুগ্রহ করে কয়েক সেকেন্ড অপেক্ষা করে আপলোড সম্পন্ন হতে দিন।');
+    return;
+  }
+
   submitBtn.disabled = true;
   submitBtn.innerHTML = `
     <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -588,6 +975,13 @@ async function handleOrderSubmit(form) {
   const selectedIssues = [];
   form.querySelectorAll('input[name="issues"]:checked').forEach(cb => selectedIssues.push(cb.value));
 
+  const cleanAttachments = currentOrderAttachments.map(a => ({
+    type: a.type,
+    url: a.url,
+    fileName: a.fileName,
+    size: a.size
+  }));
+
   const payload = {
     device_type: form.querySelector('input[name="device_type"]:checked')?.value || 'phone',
     brand: document.getElementById('brand-select').value,
@@ -600,7 +994,11 @@ async function handleOrderSubmit(form) {
     area: document.getElementById('area-select').value,
     address: document.getElementById('address-input').value,
     preferred_date: document.getElementById('pickup-date').value,
-    preferred_time_slot: document.getElementById('time-slot-select').value
+    preferred_time_slot: document.getElementById('time-slot-select').value,
+    attachments: cleanAttachments,
+    photo_url: cleanAttachments.find(a => a.type === 'photo')?.url || '',
+    video_url: cleanAttachments.find(a => a.type === 'video')?.url || '',
+    voice_url: cleanAttachments.find(a => a.type === 'voice')?.url || ''
   };
 
   try {
@@ -615,6 +1013,8 @@ async function handleOrderSubmit(form) {
       // Show Success Modal
       showOrderSuccessModal(data.order);
       form.reset();
+      currentOrderAttachments = [];
+      renderOrderMediaPreviews();
       setupBookingForm();
     } else {
       alert(data.error || 'অর্ডার সাবমিট করতে সমস্যা হয়েছে। অনুগ্রহ করে সব তথ্য সঠিকভাবে পূরণ করুন।');
