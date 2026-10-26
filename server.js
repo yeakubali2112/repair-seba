@@ -849,6 +849,10 @@ const server = http.createServer(async (req, res) => {
         const completed = db.prepare("SELECT count(*) as c FROM orders WHERE status = 'COMPLETED'").get().c;
         const quoteRejected = db.prepare("SELECT count(*) as c FROM orders WHERE status = 'QUOTE_REJECTED'").get().c;
 
+        const totalContacts = db.prepare("SELECT count(*) as c FROM contacts").get().c;
+        const totalServices = db.prepare("SELECT count(*) as c FROM services WHERE is_active = 1").get().c;
+        const totalCustomers = db.prepare("SELECT count(*) as c FROM users").get().c;
+
         const revenueRow = db.prepare("SELECT SUM(final_cost) as total FROM orders WHERE payment_status = 'PAID'").get();
         const totalRevenue = revenueRow && revenueRow.total ? revenueRow.total : 0;
 
@@ -863,6 +867,9 @@ const server = http.createServer(async (req, res) => {
             out_for_delivery: outForDelivery,
             completed: completed,
             quote_rejected: quoteRejected,
+            total_contacts: totalContacts,
+            total_services: totalServices,
+            total_customers: totalCustomers,
             total_revenue: totalRevenue
           }
         });
@@ -997,6 +1004,23 @@ const server = http.createServer(async (req, res) => {
           message_bn: 'অর্ডার তথ্য সফলভাবে আপডেট হয়েছে।',
           message_en: 'Order updated successfully.',
           order: updated
+        });
+      }
+
+      // Admin Delete Order
+      if (adminOrderMatch && method === 'DELETE') {
+        const orderId = parseInt(adminOrderMatch[1], 10);
+        const order = db.prepare('SELECT id, order_number FROM orders WHERE id = ?').get(orderId);
+        if (!order) {
+          return errorResponse(res, 404, 'অর্ডারটি পাওয়া যায়নি (Order not found)');
+        }
+
+        db.prepare('DELETE FROM orders WHERE id = ?').run(orderId);
+
+        return jsonResponse(res, 200, {
+          success: true,
+          message_bn: `অর্ডার ${order.order_number} সফলভাবে মুছে ফেলা হয়েছে।`,
+          message_en: `Order ${order.order_number} deleted successfully.`
         });
       }
 

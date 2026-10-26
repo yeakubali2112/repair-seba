@@ -1010,6 +1010,22 @@ async function handleOrderSubmit(form) {
     const data = await res.json();
 
     if (data.success) {
+      // Broadcast to admin panel for zero-latency instant live update
+      try {
+        if (typeof BroadcastChannel !== 'undefined') {
+          const bc = new BroadcastChannel('repair_seba_realtime_orders');
+          bc.postMessage({ type: 'NEW_ORDER', order: data.order });
+          bc.close();
+        }
+      } catch (_) {}
+      try {
+        localStorage.setItem('repair_seba_last_order_ping', JSON.stringify({
+          time: Date.now(),
+          order_number: data.order?.order_number,
+          customer_name: data.order?.customer_name
+        }));
+      } catch (_) {}
+
       // Show Success Modal
       showOrderSuccessModal(data.order);
       form.reset();

@@ -374,6 +374,7 @@ async function loadAdminDashboardData() {
   await loadAdminStats();
   await loadOverviewOrders();
   await loadAdminOrders();
+  startAdminLivePolling();
 }
 
 async function loadAdminStats() {
@@ -411,8 +412,8 @@ function renderAdminStats(s) {
         <span class="text-xs shrink-0">👥</span>
       </div>
       <div class="flex items-baseline gap-1">
-        <span class="text-base sm:text-lg font-black text-slate-900 leading-none">${s.total_orders}</span>
-        <span class="text-[10px] font-bold text-slate-600">জন</span>
+        <span class="text-base sm:text-lg font-black text-slate-900 leading-none">${s.total_orders || 0}</span>
+        <span class="text-[10px] font-bold text-slate-600">টি</span>
         <span class="px-1 py-0.2 text-[8px] font-bold rounded bg-emerald-200/70 text-emerald-900 border border-emerald-300">রিয়েল</span>
       </div>
     </div>
@@ -424,9 +425,9 @@ function renderAdminStats(s) {
         <span class="text-xs shrink-0">📦</span>
       </div>
       <div class="flex items-baseline gap-1">
-        <span class="text-base sm:text-lg font-black text-slate-900 leading-none">${s.pending_pickup}</span>
+        <span class="text-base sm:text-lg font-black text-slate-900 leading-none">${s.pending_pickup || 0}</span>
         <span class="text-[10px] font-bold text-slate-600">টি</span>
-        <span class="px-1 py-0.2 text-[8px] font-bold rounded bg-amber-200/70 text-amber-900 border border-amber-300">১ নতুন</span>
+        ${s.pending_pickup > 0 ? `<span class="px-1 py-0.2 text-[8px] font-bold rounded bg-amber-200/70 text-amber-900 border border-amber-300 animate-pulse">${s.pending_pickup} নতুন</span>` : ''}
       </div>
     </div>
 
@@ -437,8 +438,8 @@ function renderAdminStats(s) {
         <span class="text-xs shrink-0">🔬</span>
       </div>
       <div class="flex items-baseline gap-1">
-        <span class="text-base sm:text-lg font-black text-slate-900 leading-none">${s.in_repair + (s.in_lab || 0)}</span>
-        <span class="text-[10px] font-bold text-slate-600">জন</span>
+        <span class="text-base sm:text-lg font-black text-slate-900 leading-none">${(s.in_repair || 0) + (s.in_lab || 0)}</span>
+        <span class="text-[10px] font-bold text-slate-600">টি</span>
       </div>
     </div>
 
@@ -449,7 +450,7 @@ function renderAdminStats(s) {
         <span class="text-xs shrink-0">🔔</span>
       </div>
       <div class="flex items-baseline gap-1">
-        <span class="text-base sm:text-lg font-black text-slate-900 leading-none">${s.quote_pending}</span>
+        <span class="text-base sm:text-lg font-black text-slate-900 leading-none">${s.quote_pending || 0}</span>
         <span class="text-[10px] font-bold text-slate-600">টি</span>
       </div>
     </div>
@@ -461,7 +462,7 @@ function renderAdminStats(s) {
         <span class="text-xs shrink-0">💬</span>
       </div>
       <div class="flex items-baseline gap-1">
-        <span class="text-base sm:text-lg font-black text-slate-900 leading-none" id="stat-card-inq-count">২</span>
+        <span class="text-base sm:text-lg font-black text-slate-900 leading-none" id="stat-card-inq-count">${s.total_contacts !== undefined ? s.total_contacts : 0}</span>
         <span class="text-[10px] font-bold text-slate-600">টি</span>
       </div>
     </div>
@@ -473,8 +474,8 @@ function renderAdminStats(s) {
         <span class="text-xs shrink-0">🎓</span>
       </div>
       <div class="flex items-baseline gap-1">
-        <span class="text-base sm:text-lg font-black text-slate-900 leading-none">${s.completed}</span>
-        <span class="text-[10px] font-bold text-slate-600">জন</span>
+        <span class="text-base sm:text-lg font-black text-slate-900 leading-none">${s.completed || 0}</span>
+        <span class="text-[10px] font-bold text-slate-600">টি</span>
       </div>
     </div>
 
@@ -485,7 +486,7 @@ function renderAdminStats(s) {
         <span class="text-xs shrink-0">🛠️</span>
       </div>
       <div class="flex items-baseline gap-1">
-        <span class="text-base sm:text-lg font-black text-slate-900 leading-none" id="stat-card-serv-count">৯</span>
+        <span class="text-base sm:text-lg font-black text-slate-900 leading-none" id="stat-card-serv-count">${s.total_services !== undefined ? s.total_services : 0}</span>
         <span class="text-[10px] font-bold text-slate-600">টি</span>
       </div>
     </div>
@@ -497,7 +498,7 @@ function renderAdminStats(s) {
         <span class="text-xs shrink-0">💰</span>
       </div>
       <div class="flex items-baseline gap-1">
-        <span class="text-sm sm:text-base font-black text-slate-900 leading-none truncate">৳${s.total_revenue.toLocaleString()}</span>
+        <span class="text-sm sm:text-base font-black text-slate-900 leading-none truncate">৳${(s.total_revenue || 0).toLocaleString()}</span>
       </div>
     </div>
   `;
@@ -642,9 +643,14 @@ function renderAdminOrdersTable(orders) {
         </td>
 
         <td class="py-2.5 px-2 text-center whitespace-nowrap">
-          <button onclick="openEditModal(${o.id})" class="w-7 h-7 rounded-lg bg-teal-50 hover:bg-teal-100 text-[#0f766e] border border-teal-200/90 flex items-center justify-center text-xs transition shadow-2xs hover:scale-105 cursor-pointer mx-auto" title="অর্ডার কোটেশন ও বিবরণ এডিট করুন">
-            ✏️
-          </button>
+          <div class="flex items-center justify-center gap-1.5">
+            <button onclick="openEditModal(${o.id})" class="w-7 h-7 rounded-lg bg-teal-50 hover:bg-teal-100 text-[#0f766e] border border-teal-200/90 flex items-center justify-center text-xs transition shadow-2xs hover:scale-105 cursor-pointer" title="অর্ডার কোটেশন ও বিবরণ এডিট করুন">
+              ✏️
+            </button>
+            <button onclick="deleteAdminOrder(${o.id}, '${o.order_number}')" class="w-7 h-7 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200/90 flex items-center justify-center text-xs transition shadow-2xs hover:scale-105 cursor-pointer" title="অর্ডার ডিলিট করুন">
+              🗑️
+            </button>
+          </div>
         </td>
       </tr>
     `;
@@ -940,6 +946,221 @@ async function handleOrderUpdate() {
     alert('সার্ভার এরর।');
   }
 }
+
+// -------------------------------------------------------------
+// DELETE ORDER (ADMIN)
+// -------------------------------------------------------------
+async function deleteAdminOrder(orderId, orderNumber) {
+  if (!confirm(`আপনি কি নিশ্চিত যে আপনি অর্ডার "${orderNumber}" স্থায়ীভাবে মুছে ফেলতে চান?\n\nমুছে ফেললে এই অর্ডারের সমস্ত তথ্য ডেটাবেস থেকে সম্পূর্ণ মুছে যাবে।`)) {
+    return;
+  }
+
+  try {
+    const res = await fetch(`/api/admin/orders/${orderId}`, {
+      method: 'DELETE',
+      headers: { 'Authorization': `Bearer ${adminToken}` }
+    });
+    const data = await res.json();
+    if (data.success) {
+      alert(data.message_bn || 'অর্ডারটি সফলভাবে মুছে ফেলা হয়েছে');
+      await loadAdminStats();
+      await loadOverviewOrders();
+      await loadAdminOrders();
+      if (typeof loadAdminCustomers === 'function') loadAdminCustomers();
+    } else {
+      alert(data.error || 'অর্ডার মুছতে সমস্যা হয়েছে');
+    }
+  } catch (err) {
+    console.error('Delete order error:', err);
+    alert('সার্ভার এরর: অর্ডার মোছা যায়নি');
+  }
+}
+window.deleteAdminOrder = deleteAdminOrder;
+
+async function deleteCurrentEditOrder() {
+  if (!currentEditOrderId) return;
+  const num = document.getElementById('edit-modal-order-num')?.textContent?.trim() || `#${currentEditOrderId}`;
+  closeEditModal();
+  await deleteAdminOrder(currentEditOrderId, num);
+}
+window.deleteCurrentEditOrder = deleteCurrentEditOrder;
+
+// -------------------------------------------------------------
+// LIVE REAL-TIME AUTO-SYNC & NOTIFICATION SYSTEM
+// -------------------------------------------------------------
+let livePollingTimer = null;
+let isPollingActive = false;
+let lastKnownTotalOrders = null;
+let lastKnownLatestOrderId = null;
+let lastKnownPendingPickupCount = null;
+
+function playNewOrderChime() {
+  try {
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    if (!AudioCtx) return;
+    const ctx = new AudioCtx();
+
+    // Bell chime 1: High crisp tone
+    const osc1 = ctx.createOscillator();
+    const gain1 = ctx.createGain();
+    osc1.type = 'sine';
+    osc1.frequency.setValueAtTime(659.25, ctx.currentTime);
+    gain1.gain.setValueAtTime(0.18, ctx.currentTime);
+    gain1.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.35);
+    osc1.connect(gain1);
+    gain1.connect(ctx.destination);
+    osc1.start(ctx.currentTime);
+    osc1.stop(ctx.currentTime + 0.35);
+
+    // Bell chime 2: Clear chime tone
+    const osc2 = ctx.createOscillator();
+    const gain2 = ctx.createGain();
+    osc2.type = 'sine';
+    osc2.frequency.setValueAtTime(880, ctx.currentTime + 0.12);
+    gain2.gain.setValueAtTime(0.22, ctx.currentTime + 0.12);
+    gain2.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.7);
+    osc2.connect(gain2);
+    gain2.connect(ctx.destination);
+    osc2.start(ctx.currentTime + 0.12);
+    osc2.stop(ctx.currentTime + 0.7);
+  } catch (_) {}
+}
+
+function showAdminLiveToast(order) {
+  let toastContainer = document.getElementById('admin-live-toast-container');
+  if (!toastContainer) {
+    toastContainer = document.createElement('div');
+    toastContainer.id = 'admin-live-toast-container';
+    toastContainer.className = 'fixed top-5 right-5 z-[99999] flex flex-col gap-2 pointer-events-none max-w-sm w-full px-3';
+    document.body.appendChild(toastContainer);
+  }
+
+  const toast = document.createElement('div');
+  toast.className = 'pointer-events-auto bg-gradient-to-r from-teal-900 to-slate-900 text-white p-3.5 rounded-2xl shadow-2xl border-2 border-teal-400/60 transform translate-y-[-20px] opacity-0 transition-all duration-300 flex items-start gap-3';
+  toast.innerHTML = `
+    <div class="w-9 h-9 rounded-xl bg-teal-500/20 border border-teal-400/40 flex items-center justify-center shrink-0 text-lg animate-bounce">
+      🔔
+    </div>
+    <div class="flex-1 min-w-0">
+      <div class="flex items-center justify-between">
+        <h4 class="text-[11px] font-black text-teal-300 uppercase tracking-wider">নতুন অর্ডার আবেদন এসেছে!</h4>
+        <span class="text-[9px] text-slate-300 font-mono">এখনই</span>
+      </div>
+      <p class="text-xs font-bold text-white truncate mt-0.5">${order.customer_name || 'নতুন কাস্টমার'}</p>
+      <div class="text-[11px] text-slate-300 flex items-center gap-1.5 mt-0.5">
+        <span class="font-mono text-teal-200 font-bold">${order.order_number || ''}</span>
+        <span>•</span>
+        <span class="truncate">${order.brand || ''} ${order.model || ''}</span>
+      </div>
+    </div>
+    <button onclick="this.parentElement.remove()" class="text-slate-400 hover:text-white text-sm leading-none p-1 cursor-pointer">✕</button>
+  `;
+
+  toastContainer.appendChild(toast);
+  requestAnimationFrame(() => {
+    toast.classList.remove('translate-y-[-20px]', 'opacity-0');
+    toast.classList.add('translate-y-0', 'opacity-100');
+  });
+
+  setTimeout(() => {
+    toast.classList.add('opacity-0', 'translate-y-[-10px]');
+    setTimeout(() => toast.remove(), 300);
+  }, 6000);
+}
+
+async function pollNewOrdersQuietly() {
+  if (!adminToken || isPollingActive) return;
+  isPollingActive = true;
+  try {
+    const res = await fetch('/api/admin/orders?status=ALL', {
+      headers: { 'Authorization': `Bearer ${adminToken}` }
+    });
+    if (!res.ok) {
+      if (res.status === 401) adminLogout();
+      return;
+    }
+    const data = await res.json();
+    if (data.success && Array.isArray(data.orders)) {
+      const orders = data.orders;
+      const count = orders.length;
+      const latestOrder = orders[0];
+      const latestId = latestOrder ? latestOrder.id : null;
+      const pendingCount = orders.filter(o => o.status === 'PENDING_PICKUP').length;
+
+      if (lastKnownTotalOrders === null) {
+        lastKnownTotalOrders = count;
+        lastKnownLatestOrderId = latestId;
+        lastKnownPendingPickupCount = pendingCount;
+        return;
+      }
+
+      const isNewOrder = (count > lastKnownTotalOrders) || (latestId !== null && latestId !== lastKnownLatestOrderId);
+      const isPendingChanged = pendingCount !== lastKnownPendingPickupCount;
+
+      if (isNewOrder) {
+        lastKnownTotalOrders = count;
+        lastKnownLatestOrderId = latestId;
+        lastKnownPendingPickupCount = pendingCount;
+
+        playNewOrderChime();
+        if (latestOrder) showAdminLiveToast(latestOrder);
+
+        await loadAdminStats();
+        await loadOverviewOrders();
+        await loadAdminOrders();
+        if (typeof loadAdminCustomers === 'function') loadAdminCustomers();
+      } else if (isPendingChanged) {
+        lastKnownPendingPickupCount = pendingCount;
+        await loadAdminStats();
+        await loadOverviewOrders();
+      }
+    }
+  } catch (err) {
+    // quiet polling
+  } finally {
+    isPollingActive = false;
+  }
+}
+
+function startAdminLivePolling() {
+  if (livePollingTimer) clearInterval(livePollingTimer);
+  pollNewOrdersQuietly();
+  livePollingTimer = setInterval(pollNewOrdersQuietly, 3500);
+}
+
+// Cross-tab zero-latency sync with BroadcastChannel and storage events
+try {
+  if (typeof BroadcastChannel !== 'undefined') {
+    const bc = new BroadcastChannel('repair_seba_realtime_orders');
+    bc.onmessage = async (evt) => {
+      if (evt.data && evt.data.type === 'NEW_ORDER') {
+        const order = evt.data.order;
+        playNewOrderChime();
+        if (order) showAdminLiveToast(order);
+        await loadAdminStats();
+        await loadOverviewOrders();
+        await loadAdminOrders();
+        if (typeof loadAdminCustomers === 'function') loadAdminCustomers();
+      }
+    };
+  }
+} catch (_) {}
+
+window.addEventListener('storage', async (e) => {
+  if (e.key === 'repair_seba_last_order_ping') {
+    try {
+      const parsed = JSON.parse(e.newValue || '{}');
+      playNewOrderChime();
+      if (parsed.order_number) {
+        showAdminLiveToast({ order_number: parsed.order_number, customer_name: parsed.customer_name });
+      }
+    } catch (_) {}
+    await loadAdminStats();
+    await loadOverviewOrders();
+    await loadAdminOrders();
+    if (typeof loadAdminCustomers === 'function') loadAdminCustomers();
+  }
+});
 
 // -------------------------------------------------------------
 // TABS & SERVICES & INQUIRIES
