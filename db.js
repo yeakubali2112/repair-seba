@@ -90,7 +90,12 @@ function initDb() {
       username TEXT UNIQUE NOT NULL,
       password_hash TEXT NOT NULL,
       name TEXT NOT NULL,
-      role TEXT DEFAULT 'admin'
+      role TEXT DEFAULT 'admin',
+      avatar TEXT DEFAULT '',
+      phone TEXT DEFAULT '',
+      email TEXT DEFAULT '',
+      permissions TEXT DEFAULT '["orders","services","inquiries","hero","footer","users"]',
+      created_at TEXT DEFAULT ''
     );
 
     CREATE TABLE IF NOT EXISTS site_settings (
@@ -110,6 +115,36 @@ function initDb() {
       updated_at TEXT NOT NULL
     );
   `);
+
+  // Migrate admins table columns safely if they do not exist
+  const adminCols = [
+    { name: 'avatar', def: "TEXT DEFAULT ''" },
+    { name: 'phone', def: "TEXT DEFAULT ''" },
+    { name: 'email', def: "TEXT DEFAULT ''" },
+    { name: 'permissions', def: "TEXT DEFAULT '[\"orders\",\"services\",\"inquiries\",\"hero\",\"footer\",\"users\"]'" },
+    { name: 'created_at', def: "TEXT DEFAULT ''" }
+  ];
+  for (const c of adminCols) {
+    try {
+      db.exec(`ALTER TABLE admins ADD COLUMN ${c.name} ${c.def};`);
+    } catch (_) {}
+  }
+
+  // Update default admin with name, avatar and permissions if empty
+  try {
+    const adminCheck = db.prepare('SELECT id, name, avatar, permissions FROM admins WHERE username = ?').get('admin');
+    if (adminCheck) {
+      if (!adminCheck.name || adminCheck.name === 'Super Admin') {
+        db.prepare(`UPDATE admins SET name = 'Yeakub Ali', role = 'superadmin' WHERE username = 'admin'`).run();
+      }
+      if (!adminCheck.avatar) {
+        db.prepare(`UPDATE admins SET avatar = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&auto=format&fit=crop&q=80' WHERE username = 'admin'`).run();
+      }
+      if (!adminCheck.permissions || adminCheck.permissions === '') {
+        db.prepare(`UPDATE admins SET permissions = '["orders","services","inquiries","hero","footer","users"]' WHERE username = 'admin'`).run();
+      }
+    }
+  } catch (_) {}
 
   // Seed default hero banner settings if not present
   try {

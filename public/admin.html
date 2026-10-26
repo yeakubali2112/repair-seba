@@ -85,19 +85,20 @@
         <!-- Right: Admin User Profile Card & Logout Button -->
         <div class="flex items-center gap-3">
           
-          <!-- User Profile Capsule (Matching Screenshot) -->
-          <div class="hidden sm:flex items-center gap-2.5 px-3 py-1.5 rounded-xl bg-slate-50 border border-slate-200/80 shadow-2xs">
-            <div class="w-7 h-7 rounded-lg bg-[#0f766e] text-white flex items-center justify-center font-black text-xs shrink-0 shadow-xs">
-              প্র
+          <!-- User Profile Capsule (Interactive with Dynamic Photo & Name) -->
+          <button onclick="openAdminProfileModal()" type="button" class="hidden sm:flex items-center gap-2.5 px-3 py-1.5 rounded-xl bg-slate-50 hover:bg-slate-100/90 border border-slate-200/90 shadow-2xs transition group text-left cursor-pointer" title="ক্লিক করে প্রোফাইল ও ছবি পরিবর্তন করুন">
+            <div class="relative w-8 h-8 rounded-full overflow-hidden bg-[#0f766e] text-white flex items-center justify-center font-black text-xs shrink-0 shadow-xs border border-teal-400">
+              <img id="header-admin-avatar" src="" alt="Profile" class="w-full h-full object-cover hidden">
+              <span id="header-admin-initial">প্র</span>
             </div>
             <div class="text-left">
               <div class="flex items-center gap-1.5">
-                <span class="text-xs font-bold text-slate-900 leading-none">প্রধান সুপার অ্যাডমিন</span>
-                <span class="px-1 py-0.2 text-[9px] font-black rounded bg-emerald-100 text-emerald-800 border border-emerald-200">সুপার</span>
+                <span id="header-admin-name" class="text-xs font-bold text-slate-900 leading-none">প্রধান সুপার অ্যাডমিন</span>
+                <span id="header-admin-role" class="px-1.5 py-0.2 text-[9px] font-black rounded bg-emerald-100 text-emerald-800 border border-emerald-200">সুপার</span>
               </div>
-              <p class="text-[10px] text-slate-500 leading-tight mt-0.5">সুপার অ্যাডমিন (Super Admin) • @yeakubali</p>
+              <p id="header-admin-sub" class="text-[10px] text-slate-500 leading-tight mt-0.5 truncate max-w-[140px]">সুপার অ্যাডমিন • @yeakubali</p>
             </div>
-          </div>
+          </button>
 
           <!-- Logout Button (Pink/Red Pill matching screenshot) -->
           <button onclick="adminLogout()" class="px-3.5 py-1.5 rounded-xl bg-[#e11d48] hover:bg-[#be123c] text-white text-xs font-bold transition flex items-center gap-1.5 shadow-xs">
@@ -181,13 +182,13 @@
                 <span class="px-2 py-0.5 text-[10px] font-bold rounded-md bg-slate-100 text-slate-600">সেটিংস</span>
               </button>
 
-              <!-- 7. Tech & Riders -->
-              <button onclick="alert('রাইডার ও টেকনিশিয়ান নেটওয়ার্ক: ঢাকা শহরের ১৫টি এরিয়ায় ফিল্ড টিম সক্রিয় রয়েছে।')" class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-medium text-slate-700 hover:bg-slate-100 transition-all text-left">
+              <!-- 7. Admin & User Roles Tab -->
+              <button onclick="switchTab('users')" id="tab-btn-users" class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-medium text-slate-700 hover:bg-slate-100 transition-all text-left">
                 <div class="flex items-center gap-2.5">
-                  <span class="text-sm">👥</span>
-                  <span>টেকনিশিয়ান ও স্টাফ</span>
+                  <span class="text-sm">🛡️</span>
+                  <span>অ্যাডমিন ও রোল কন্ট্রোল</span>
                 </div>
-                <span class="px-2 py-0.5 text-[10px] font-bold rounded-md bg-teal-100 text-teal-800 border border-teal-200">সক্রিয়</span>
+                <span class="px-2 py-0.5 text-[10px] font-bold rounded-md bg-teal-100 text-teal-800 border border-teal-200">কন্ট্রোল</span>
               </button>
 
               <!-- 8. Reports & Print -->
@@ -785,6 +786,54 @@
           </form>
         </section>
 
+        <!-- TAB 6: ADMIN USER PROFILES & ROLE-BASED ACCESS CONTROL -->
+        <section id="tab-users" class="hidden space-y-6">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white border border-slate-200/90 p-5 sm:p-6 rounded-2xl shadow-sm">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="text-xl">🛡️</span>
+                <h2 class="text-lg sm:text-xl font-bold text-slate-900">অ্যাডমিন ও স্টাফ রোল কন্ট্রোল</h2>
+              </div>
+              <p class="text-xs text-slate-500 mt-1">
+                নতুন ইউজার তৈরি করুন এবং নির্ধারণ করুন তারা কোন কোন ফিচার (অর্ডার, সার্ভিস, মেসেজ, ফুটার ইত্যাদি) ব্যবহার করতে পারবে।
+              </p>
+            </div>
+            <button onclick="openCreateUserModal()" type="button" class="px-4 py-2.5 rounded-xl bg-[#0f766e] hover:bg-[#115e59] text-white font-bold text-xs shadow-md shadow-teal-700/20 transition flex items-center gap-2 shrink-0">
+              <span>+ নতুন প্রোফাইল তৈরি</span>
+            </button>
+          </div>
+
+          <!-- Users List Card -->
+          <div class="bg-white border border-slate-200/90 rounded-2xl shadow-sm overflow-hidden">
+            <div class="p-4 border-b border-slate-200/80 flex items-center justify-between bg-slate-50/50">
+              <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2">
+                <span>👥 নিবন্ধিত অ্যাডমিন ও টিম মেম্বারদের তালিকা</span>
+                <span id="badge-users-count" class="px-2 py-0.5 text-[10px] font-bold rounded-md bg-teal-100 text-teal-800 border border-teal-200">১ জন</span>
+              </h3>
+              <button onclick="loadAdminUsers()" class="p-1.5 rounded-lg text-slate-500 hover:text-slate-800 hover:bg-slate-200 transition text-xs flex items-center gap-1" title="রিফ্রেশ">
+                <span>🔄</span> <span>রিফ্রেশ</span>
+              </button>
+            </div>
+            
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-xs">
+                <thead class="bg-slate-50 text-slate-600 font-bold uppercase tracking-wider border-b border-slate-200">
+                  <tr>
+                    <th class="py-3 px-4">প্রোফাইল ছবি ও নাম</th>
+                    <th class="py-3 px-4">ইউজারনেম</th>
+                    <th class="py-3 px-4">রোল / পদবী</th>
+                    <th class="py-3 px-4">অনুমোদিত ফিচার পারমিশন</th>
+                    <th class="py-3 px-4 text-right">অ্যাকশন</th>
+                  </tr>
+                </thead>
+                <tbody id="admin-users-table-body" class="divide-y divide-slate-100 text-slate-800">
+                  <!-- Populated by admin.js -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
       </main>
 
     </div>
@@ -903,6 +952,211 @@
           </button>
           <button type="submit" class="px-6 py-2.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold transition shadow-md shadow-cyan-600/20">
             সংরক্ষণ করুন (Save Changes)
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+
+  <!-- ADMIN OWN PROFILE MODAL -->
+  <div id="admin-profile-modal" class="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs hidden flex items-center justify-center p-4">
+    <div class="bg-white border border-slate-200 rounded-3xl max-w-md w-full p-6 shadow-2xl overflow-y-auto max-h-[90vh] text-slate-800">
+      
+      <div class="flex items-center justify-between pb-3 border-b border-slate-200 mb-5">
+        <div>
+          <span class="text-xs uppercase font-bold tracking-wider text-[#0f766e]">Account Settings</span>
+          <h3 class="text-lg font-black text-slate-900">আমার প্রোফাইল ও ছবি</h3>
+        </div>
+        <button onclick="closeAdminProfileModal()" class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-800 flex items-center justify-center text-lg transition">
+          ✕
+        </button>
+      </div>
+
+      <form id="admin-profile-form" onsubmit="handleSaveOwnProfile(event); return false;" class="space-y-4">
+        
+        <!-- Avatar Preview & Selector -->
+        <div class="flex flex-col items-center justify-center gap-2 p-3 bg-slate-50 rounded-2xl border border-slate-200">
+          <div class="relative w-16 h-16 rounded-full overflow-hidden bg-[#0f766e] text-white flex items-center justify-center font-black text-xl shadow-md border-2 border-teal-500">
+            <img id="my-profile-avatar-preview" src="" alt="Preview" class="w-full h-full object-cover hidden">
+            <span id="my-profile-initial-preview">প্র</span>
+          </div>
+          <span class="text-[11px] font-bold text-slate-600">প্রোফাইল ছবি পরিবর্তন</span>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">প্রোফাইল ছবির লিংক (Image URL)</label>
+          <input type="url" id="my-profile-avatar-url" placeholder="https://example.com/photo.jpg" oninput="previewMyProfileAvatar(this.value)" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-300 text-xs focus:bg-white focus:border-teal-600 focus:outline-none transition">
+          <div class="flex items-center gap-2 mt-1.5">
+            <span class="text-[10px] text-slate-500">ডিফল্ট ছবি বাছাই করুন:</span>
+            <button type="button" onclick="setMyAvatarPreset('https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&auto=format&fit=crop&q=80')" class="w-5 h-5 rounded-full overflow-hidden border border-slate-300 hover:scale-110 transition">
+              <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&auto=format&fit=crop&q=80" class="w-full h-full object-cover">
+            </button>
+            <button type="button" onclick="setMyAvatarPreset('https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120&auto=format&fit=crop&q=80')" class="w-5 h-5 rounded-full overflow-hidden border border-slate-300 hover:scale-110 transition">
+              <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120&auto=format&fit=crop&q=80" class="w-full h-full object-cover">
+            </button>
+            <button type="button" onclick="setMyAvatarPreset('https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=120&auto=format&fit=crop&q=80')" class="w-5 h-5 rounded-full overflow-hidden border border-slate-300 hover:scale-110 transition">
+              <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=120&auto=format&fit=crop&q=80" class="w-full h-full object-cover">
+            </button>
+            <button type="button" onclick="setMyAvatarPreset('')" class="text-[10px] text-teal-700 font-bold hover:underline">
+              রিমুভ
+            </button>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">পূর্ণ নাম (Full Name)*</label>
+          <input type="text" id="my-profile-name" required placeholder="যেমন: Yeakub Ali" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-300 text-xs focus:bg-white focus:border-teal-600 focus:outline-none transition">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">মোবাইল ফোন (Phone)</label>
+          <input type="tel" id="my-profile-phone" placeholder="০১৭XX-XXXXXX" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-300 text-xs focus:bg-white focus:border-teal-600 focus:outline-none transition">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">নতুন পাসওয়ার্ড (ঐচ্ছিক / Leave blank to keep current)</label>
+          <input type="password" id="my-profile-new-password" placeholder="কমপক্ষে ৬ অক্ষর" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-300 text-xs focus:bg-white focus:border-teal-600 focus:outline-none transition">
+        </div>
+
+        <div class="pt-3 border-t border-slate-200 flex items-center justify-end gap-2">
+          <button type="button" onclick="closeAdminProfileModal()" class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-xs font-semibold text-slate-700 transition">
+            বাতিল
+          </button>
+          <button type="submit" id="btn-save-my-profile" class="px-5 py-2 rounded-xl bg-[#0f766e] hover:bg-[#115e59] text-white text-xs font-bold transition shadow-md shadow-teal-700/20">
+            পরিবর্তন সংরক্ষণ করুন
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+
+  <!-- USER CREATE & ROLE PERMISSIONS MANAGEMENT MODAL -->
+  <div id="admin-user-modal" class="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs hidden flex items-center justify-center p-4">
+    <div class="bg-white border border-slate-200 rounded-3xl max-w-xl w-full p-6 sm:p-7 shadow-2xl overflow-y-auto max-h-[92vh] text-slate-800">
+      
+      <div class="flex items-center justify-between pb-3 border-b border-slate-200 mb-5">
+        <div>
+          <span class="text-xs uppercase font-bold tracking-wider text-[#0f766e]">User Role & Permissions</span>
+          <h3 id="user-modal-title" class="text-lg font-black text-slate-900">নতুন প্রোফাইল তৈরি ও অ্যাক্সেস কন্ট্রোল</h3>
+        </div>
+        <button onclick="closeUserModal()" class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-800 flex items-center justify-center text-lg transition">
+          ✕
+        </button>
+      </div>
+
+      <form id="admin-user-form" onsubmit="handleSaveAdminUser(event); return false;" class="space-y-4 text-xs">
+        <input type="hidden" id="manage-user-id">
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">পূর্ণ নাম (Full Name)*</label>
+            <input type="text" id="manage-user-name" required placeholder="যেমন: তানভীর আহমেদ" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-300 focus:bg-white focus:border-teal-600 focus:outline-none transition">
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">ইউজারনেম (Username)*</label>
+            <input type="text" id="manage-user-username" required placeholder="যেমন: tanvir" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-300 focus:bg-white focus:border-teal-600 focus:outline-none transition">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">পদবী / রোল (Role)*</label>
+            <select id="manage-user-role" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-300 focus:bg-white focus:border-teal-600 focus:outline-none transition">
+              <option value="superadmin">সুপার অ্যাডমিন (Super Admin - সর্বময় ক্ষমতা)</option>
+              <option value="manager" selected>অপারেশন ম্যানেজার (Manager)</option>
+              <option value="technician">ল্যাব টেকনিশিয়ান (Lab Technician)</option>
+              <option value="support">কাস্টমার সাপোর্ট ও রাইডার (Support)</option>
+            </select>
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">পাসওয়ার্ড (Password)*</label>
+            <input type="password" id="manage-user-password" placeholder="কমপক্ষে ৬ অক্ষর" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-300 focus:bg-white focus:border-teal-600 focus:outline-none transition">
+            <span id="manage-user-pwd-hint" class="text-[10px] text-slate-400 hidden">সম্পাদনার সময় পরিবর্তন না চাইলে খালি রাখুন</span>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">মোবাইল ফোন (Phone)</label>
+            <input type="tel" id="manage-user-phone" placeholder="০১৭XX-XXXXXX" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-300 focus:bg-white focus:border-teal-600 focus:outline-none transition">
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">প্রোফাইল ছবির লিংক (Avatar URL)</label>
+            <input type="url" id="manage-user-avatar" placeholder="https://..." class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-300 focus:bg-white focus:border-teal-600 focus:outline-none transition">
+          </div>
+        </div>
+
+        <!-- Role-Based Permissions Checklist (CORE REQUEST) -->
+        <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-2.5">
+          <div class="flex items-center justify-between">
+            <label class="font-bold text-slate-800 text-xs flex items-center gap-1.5">
+              <span>🔐</span> এই ইউজার কি কি অপশন ব্যবহার করতে পারবে?
+            </label>
+            <button type="button" onclick="toggleAllPermissions(true)" class="text-[11px] text-teal-700 font-bold hover:underline">
+              সব সিলেক্ট করুন
+            </button>
+          </div>
+          <p class="text-[11px] text-slate-500">যে অপশনগুলোতে টিক চিহ্ন থাকবে, এই ইউজার লগইন করলে শুধু সেই মেনুগুলো সাইডবারে দেখতে পাবে।</p>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
+            <label class="flex items-center gap-2 p-2.5 rounded-xl bg-white border border-slate-200 cursor-pointer hover:border-teal-400 transition">
+              <input type="checkbox" id="perm-orders" value="orders" class="user-perm-checkbox w-4 h-4 text-teal-600 rounded" checked>
+              <div>
+                <div class="font-bold text-slate-900">📦 অর্ডার ম্যানেজমেন্ট</div>
+                <div class="text-[10px] text-slate-500">অর্ডার দেখা, কোটেশন দেওয়া ও স্ট্যাটাস পরিবর্তন</div>
+              </div>
+            </label>
+
+            <label class="flex items-center gap-2 p-2.5 rounded-xl bg-white border border-slate-200 cursor-pointer hover:border-teal-400 transition">
+              <input type="checkbox" id="perm-services" value="services" class="user-perm-checkbox w-4 h-4 text-teal-600 rounded" checked>
+              <div>
+                <div class="font-bold text-slate-900">🛠️ সার্ভিস ব্যবস্থাপনা</div>
+                <div class="text-[10px] text-slate-500">রিপেয়ার সার্ভিস ও মূল্য তালিকা পরিচালনা</div>
+              </div>
+            </label>
+
+            <label class="flex items-center gap-2 p-2.5 rounded-xl bg-white border border-slate-200 cursor-pointer hover:border-teal-400 transition">
+              <input type="checkbox" id="perm-inquiries" value="inquiries" class="user-perm-checkbox w-4 h-4 text-teal-600 rounded" checked>
+              <div>
+                <div class="font-bold text-slate-900">💬 গ্রাহক বার্তা ও মেসেজ</div>
+                <div class="text-[10px] text-slate-500">কন্টাক্ট ফর্মের মেসেজ দেখা ও যোগাযোগ</div>
+              </div>
+            </label>
+
+            <label class="flex items-center gap-2 p-2.5 rounded-xl bg-white border border-slate-200 cursor-pointer hover:border-teal-400 transition">
+              <input type="checkbox" id="perm-hero" value="hero" class="user-perm-checkbox w-4 h-4 text-teal-600 rounded">
+              <div>
+                <div class="font-bold text-slate-900">🎨 হিরো ব্যানার ও বাইক</div>
+                <div class="text-[10px] text-slate-500">হোমপেজ ব্যানার, বাইক স্পিড ও টেক্সট পরিবর্তন</div>
+              </div>
+            </label>
+
+            <label class="flex items-center gap-2 p-2.5 rounded-xl bg-white border border-slate-200 cursor-pointer hover:border-teal-400 transition">
+              <input type="checkbox" id="perm-footer" value="footer" class="user-perm-checkbox w-4 h-4 text-teal-600 rounded">
+              <div>
+                <div class="font-bold text-slate-900">🏢 অফিস ঠিকানা ও ফুটার</div>
+                <div class="text-[10px] text-slate-500">ফোন, হোয়াটসঅ্যাপ ও অফিশিয়াল তথ্য পরিবর্তন</div>
+              </div>
+            </label>
+
+            <label class="flex items-center gap-2 p-2.5 rounded-xl bg-white border border-slate-200 cursor-pointer hover:border-teal-400 transition">
+              <input type="checkbox" id="perm-users" value="users" class="user-perm-checkbox w-4 h-4 text-teal-600 rounded">
+              <div>
+                <div class="font-bold text-slate-900">🛡️ রোল ও পারমিশন কন্ট্রোল</div>
+                <div class="text-[10px] text-slate-500">নতুন প্রোফাইল তৈরি ও পারমিশন কন্ট্রোল</div>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <div class="pt-3 border-t border-slate-200 flex items-center justify-end gap-2.5">
+          <button type="button" onclick="closeUserModal()" class="px-5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-xs font-semibold text-slate-700 transition">
+            বাতিল
+          </button>
+          <button type="submit" id="btn-save-admin-user" class="px-6 py-2.5 rounded-xl bg-[#0f766e] hover:bg-[#115e59] text-white text-xs font-bold transition shadow-md shadow-teal-700/20">
+            সংরক্ষণ করুন (Save Profile)
           </button>
         </div>
 

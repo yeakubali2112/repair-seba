@@ -632,7 +632,27 @@ const server = http.createServer(async (req, res) => {
         if (!session) {
           return errorResponse(res, 401, 'Unauthorized or session expired');
         }
-        return jsonResponse(res, 200, { success: true, admin: session });
+        const admin = db.prepare('SELECT id, username, name, role, avatar, phone, email, permissions FROM admins WHERE id = ?').get(session.adminId);
+        if (!admin) {
+          return jsonResponse(res, 200, { success: true, admin: session });
+        }
+        let perms = ["orders","services","inquiries","hero","footer","users"];
+        try {
+          if (admin.permissions) perms = JSON.parse(admin.permissions);
+        } catch (_) {}
+        return jsonResponse(res, 200, {
+          success: true,
+          admin: {
+            id: admin.id,
+            username: admin.username,
+            name: admin.name || session.name,
+            role: admin.role || session.role,
+            avatar: admin.avatar || '',
+            phone: admin.phone || '',
+            email: admin.email || '',
+            permissions: perms
+          }
+        });
       }
 
       // ALL REMAINING ADMIN ROUTES REQUIRE AUTH
@@ -917,6 +937,142 @@ const server = http.createServer(async (req, res) => {
         `).run(JSON.stringify(updatedSettings));
 
         return jsonResponse(res, 200, { success: true, message: 'Footer and contact settings updated', settings: updatedSettings });
+      }
+
+      // Admin Update Own Profile
+      if (pathname === '/api/admin/profile' && method === 'PUT') {
+        const body = await parseBody(req);
+        const { name, avatar, phone, password } = body;
+
+        let query = 'UPDATE admins SET name = ?, avatar = ?, phone = ?';
+        let params = [name || adminSession.name, avatar || '', phone || ''];
+
+        if (password && password.trim().length >= 6) {
+          query += ', password_hash = ?';
+          params.push(hashPassword(password.trim()));
+        }
+        query += ' WHERE id = ?';
+        params.push(adminSession.adminId);
+
+        db.prepare(query).run(...params);
+
+        const updated = db.prepare('SELECT id, username, name, role, avatar, phone, email, permissions FROM admins WHERE id = ?').get(adminSession.adminId);
+        let perms = ["orders","services","inquiries","hero","footer","users"];
+        try {
+          if (updated.permissions) perms = JSON.parse(updated.permissions);
+        } catch (_) {}
+
+        return jsonResponse(res, 200, {
+          success: true,
+          admin: {
+            ...updated,
+            permissions: perms
+          }
+        });
+      }
+
+      // Get All Admin Users
+      if (pathname === '/api/admin/users' && method === 'GET') {
+        const rows = db.prepare('SELECT id, username, name, role, avatar, phone, email, permissions, created_at FROM admins ORDER BY id ASC').all();
+        const users = rows.map(u => {
+          let perms = ["orders","services","inquiries","hero","footer","users"];
+          try {
+            if (u.permissions) perms = JSON.parse(u.permissions);
+          } catch (_) {}
+          return {
+            ...u,
+            permissions: perms
+          };
+        });
+        return jsonResponse(res, 200, { success: true, users });
+      }
+
+      // Create New Admin Profile
+      if (pathname === '/api/admin/users' && method === 'POST') {
+        const body = await parseBody(req);
+        const { username, password, name, role, avatar, phone, permissions } = body;
+
+        if (!username || !password || !name) {
+          return errorResponse(res, 400, 'ইউজারনেম, পাসওয়ার্ড এবং পূর্ণ নাম আবশ্যক (Username, password, and name required)');
+        }
+
+        const cleanUsername = username.trim().toLowerCase();
+        const existing = db.prepare('SELECT id FROM admins WHERE username = ?').get(cleanUsername);
+        if (existing) {
+          return errorResponse(res, 409, 'এই ইউজারনেম ইতিমধ্যে ব্যবহৃত হয়েছে (Username already exists)');
+        }
+
+        const hashed = hashPassword(password.trim());
+        const permsStr = JSON.stringify(Array.isArray(permissions) ? permissions : ["orders"]);
+        const createdAt = new Date().toISOString();
+
+        const result = db.prepare(`
+          INSERT INTO admins (username, password_hash, name, role, avatar, phone, permissions, created_at)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        `).run(
+          cleanUsername,
+          hashed,
+          name.trim(),
+          role || 'admin',
+          avatar || '',
+          phone || '',
+          permsStr,
+          createdAt
+        );
+
+        return jsonResponse(res, 201, {
+          success: true,
+          message: 'নতুন অ্যাডমিন প্রোফাইল সফলভাবে তৈরি হয়েছে',
+          user: {
+            id: Number(result.lastInsertRowid),
+            username: cleanUsername,
+            name: name.trim(),
+            role: role || 'admin',
+            avatar: avatar || '',
+            phone: phone || '',
+            permissions: Array.isArray(permissions) ? permissions : ["orders"],
+            created_at: createdAt
+          }
+        });
+      }
+
+      // Update Admin User by ID
+      if (pathname.startsWith('/api/admin/users/') && method === 'PUT') {
+        const userId = parseInt(pathname.split('/')[4], 10);
+        if (!userId) return errorResponse(res, 400, 'Invalid user ID');
+
+        const body = await parseBody(req);
+        const { name, role, avatar, phone, permissions, password } = body;
+
+        let query = 'UPDATE admins SET name = ?, role = ?, avatar = ?, phone = ?, permissions = ?';
+        let permsStr = JSON.stringify(Array.isArray(permissions) ? permissions : ["orders"]);
+        let params = [name, role, avatar || '', phone || '', permsStr];
+
+        if (password && password.trim().length >= 6) {
+          query += ', password_hash = ?';
+          params.push(hashPassword(password.trim()));
+        }
+        query += ' WHERE id = ?';
+        params.push(userId);
+
+        db.prepare(query).run(...params);
+
+        return jsonResponse(res, 200, { success: true, message: 'প্রোফাইল আপডেট হয়েছে' });
+      }
+
+      // Delete Admin User by ID
+      if (pathname.startsWith('/api/admin/users/') && method === 'DELETE') {
+        const userId = parseInt(pathname.split('/')[4], 10);
+        if (!userId) return errorResponse(res, 400, 'Invalid user ID');
+
+        const target = db.prepare('SELECT username FROM admins WHERE id = ?').get(userId);
+        if (!target) return errorResponse(res, 404, 'User not found');
+        if (target.username === 'admin' || userId === 1) {
+          return errorResponse(res, 403, 'প্রধান সুপার অ্যাডমিন অ্যাকাউন্ট মুছে ফেলা যাবে না (Cannot delete main Super Admin)');
+        }
+
+        db.prepare('DELETE FROM admins WHERE id = ?').run(userId);
+        return jsonResponse(res, 200, { success: true, message: 'প্রোফাইল মুছে ফেলা হয়েছে' });
       }
 
       return errorResponse(res, 404, 'API endpoint not found: ' + pathname);

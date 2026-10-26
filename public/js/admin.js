@@ -20,7 +20,8 @@ const TAB_TITLES = {
   'services': '<span>⚙️</span> রিপেয়ার সার্ভিস ও মূল্য তালিকা কনফিগ',
   'inquiries': '<span>💬</span> গ্রাহকদের মেসেজ ও যোগাযোগ তালিকা',
   'hero': '<span>🎨</span> হিরো ব্যানার ও বাইক অ্যানিমেশন কন্ট্রোল',
-  'footer': '<span>🏢</span> অফিস ঠিকানা ও ফুটার সেটিংস'
+  'footer': '<span>🏢</span> অফিস ঠিকানা ও ফুটার সেটিংস',
+  'users': '<span>🛡️</span> অ্যাডমিন ও ইউজার রোল কন্ট্রোল'
 };
 
 function toggleAdminSidebar(open) {
@@ -60,6 +61,75 @@ if (document.readyState === 'loading') {
   setupAdminListeners();
 }
 
+let currentAdminProfile = null;
+let currentAdminPermissions = ["orders","services","inquiries","hero","footer","users"];
+
+function updateHeaderProfileUI(admin) {
+  if (!admin) return;
+  currentAdminProfile = admin;
+  currentAdminPermissions = Array.isArray(admin.permissions) ? admin.permissions : ["orders","services","inquiries","hero","footer","users"];
+
+  const nameEl = document.getElementById('header-admin-name');
+  const roleEl = document.getElementById('header-admin-role');
+  const subEl = document.getElementById('header-admin-sub');
+  const avatarEl = document.getElementById('header-admin-avatar');
+  const initialEl = document.getElementById('header-admin-initial');
+
+  if (nameEl) nameEl.textContent = admin.name || 'Yeakub Ali';
+  
+  const roleMap = {
+    'superadmin': { label: 'সুপার', color: 'bg-emerald-100 text-emerald-800 border-emerald-200' },
+    'manager': { label: 'ম্যানেজার', color: 'bg-blue-100 text-blue-800 border-blue-200' },
+    'technician': { label: 'টেকনিশিয়ান', color: 'bg-amber-100 text-amber-800 border-amber-200' },
+    'support': { label: 'সাপোর্ট', color: 'bg-purple-100 text-purple-800 border-purple-200' },
+    'admin': { label: 'অ্যাডমিন', color: 'bg-teal-100 text-teal-800 border-teal-200' }
+  };
+  const roleInfo = roleMap[admin.role] || { label: admin.role, color: 'bg-slate-100 text-slate-800 border-slate-200' };
+
+  if (roleEl) {
+    roleEl.textContent = roleInfo.label;
+    roleEl.className = `px-1.5 py-0.2 text-[9px] font-black rounded ${roleInfo.color} border`;
+  }
+  if (subEl) subEl.textContent = `${admin.role === 'superadmin' ? 'সুপার অ্যাডমিন' : admin.name} • @${admin.username}`;
+
+  if (admin.avatar && admin.avatar.trim() !== '') {
+    if (avatarEl) {
+      avatarEl.src = admin.avatar;
+      avatarEl.classList.remove('hidden');
+    }
+    if (initialEl) initialEl.classList.add('hidden');
+  } else {
+    if (avatarEl) avatarEl.classList.add('hidden');
+    if (initialEl) {
+      initialEl.textContent = (admin.name || admin.username || 'প্র')[0].toUpperCase();
+      initialEl.classList.remove('hidden');
+    }
+  }
+
+  // Apply RBAC to sidebar tabs
+  applyRolePermissions(currentAdminPermissions, admin.role === 'superadmin');
+}
+
+function applyRolePermissions(perms, isSuper) {
+  const tabMap = {
+    'orders': document.getElementById('tab-btn-orders'),
+    'services': document.getElementById('tab-btn-services'),
+    'inquiries': document.getElementById('tab-btn-inquiries'),
+    'hero': document.getElementById('tab-btn-hero'),
+    'footer': document.getElementById('tab-btn-footer'),
+    'users': document.getElementById('tab-btn-users')
+  };
+
+  Object.entries(tabMap).forEach(([key, btn]) => {
+    if (!btn) return;
+    if (isSuper || perms.includes(key) || perms.includes('*')) {
+      btn.style.display = 'flex';
+    } else {
+      btn.style.display = 'none';
+    }
+  });
+}
+
 // -------------------------------------------------------------
 // AUTHENTICATION
 // -------------------------------------------------------------
@@ -76,6 +146,7 @@ async function initAdminAuth() {
     const data = await res.json();
     if (data.success) {
       showDashboardScreen();
+      updateHeaderProfileUI(data.admin);
       loadAdminDashboardData();
     } else {
       adminLogout();
@@ -153,6 +224,7 @@ async function handleAdminLoginSubmit(e) {
       adminToken = data.token;
       localStorage.setItem('repair_seba_admin_token', adminToken);
       showDashboardScreen();
+      updateHeaderProfileUI(data.admin);
       loadAdminDashboardData();
     } else {
       alert(data.error || 'ভুল ইউজারনেম বা পাসওয়ার্ড। সঠিক তথ্য দিন।');
@@ -530,8 +602,14 @@ async function handleOrderUpdate() {
 // TABS & SERVICES & INQUIRIES
 // -------------------------------------------------------------
 function switchTab(tab) {
+  if (currentAdminProfile && currentAdminProfile.role !== 'superadmin') {
+    if (!currentAdminPermissions.includes(tab) && !currentAdminPermissions.includes('*')) {
+      alert('আপনার এই সেকশনে প্রবেশের অনুমতি নেই।');
+      return;
+    }
+  }
   currentAdminTab = tab;
-  ['orders', 'services', 'inquiries', 'hero', 'footer'].forEach(t => {
+  ['orders', 'services', 'inquiries', 'hero', 'footer', 'users'].forEach(t => {
     const sec = document.getElementById(`tab-${t}`);
     const btn = document.getElementById(`tab-btn-${t}`);
     
@@ -555,6 +633,7 @@ function switchTab(tab) {
   if (tab === 'inquiries') loadAdminContacts();
   if (tab === 'hero') loadAdminHeroSettings();
   if (tab === 'footer') loadAdminFooterSettings();
+  if (tab === 'users') loadAdminUsers();
 }
 
 async function createNewDemoOrder() {
@@ -1065,5 +1144,368 @@ function resetAdminFooterSettings() {
 
   saveAdminFooterSettings();
 }
+
+// -------------------------------------------------------------
+// ADMIN PROFILE (TOP HEADER CAPSULE) MANAGEMENT
+// -------------------------------------------------------------
+function openAdminProfileModal() {
+  if (!currentAdminProfile) return;
+  const nameInp = document.getElementById('my-profile-name');
+  const avatarInp = document.getElementById('my-profile-avatar-url');
+  const phoneInp = document.getElementById('my-profile-phone');
+  const pwdInp = document.getElementById('my-profile-new-password');
+
+  if (nameInp) nameInp.value = currentAdminProfile.name || '';
+  if (avatarInp) avatarInp.value = currentAdminProfile.avatar || '';
+  if (phoneInp) phoneInp.value = currentAdminProfile.phone || '';
+  if (pwdInp) pwdInp.value = '';
+
+  previewMyProfileAvatar(currentAdminProfile.avatar || '');
+  document.getElementById('admin-profile-modal')?.classList.remove('hidden');
+}
+
+function closeAdminProfileModal() {
+  document.getElementById('admin-profile-modal')?.classList.add('hidden');
+}
+
+function previewMyProfileAvatar(url) {
+  const img = document.getElementById('my-profile-avatar-preview');
+  const initial = document.getElementById('my-profile-initial-preview');
+  if (url && url.trim() !== '') {
+    if (img) {
+      img.src = url.trim();
+      img.classList.remove('hidden');
+    }
+    if (initial) initial.classList.add('hidden');
+  } else {
+    if (img) img.classList.add('hidden');
+    if (initial) {
+      initial.textContent = (currentAdminProfile?.name || 'প্র')[0].toUpperCase();
+      initial.classList.remove('hidden');
+    }
+  }
+}
+
+function setMyAvatarPreset(url) {
+  const inp = document.getElementById('my-profile-avatar-url');
+  if (inp) inp.value = url;
+  previewMyProfileAvatar(url);
+}
+
+async function handleSaveOwnProfile(e) {
+  if (e && e.preventDefault) e.preventDefault();
+  const name = document.getElementById('my-profile-name')?.value.trim();
+  const avatar = document.getElementById('my-profile-avatar-url')?.value.trim();
+  const phone = document.getElementById('my-profile-phone')?.value.trim();
+  const password = document.getElementById('my-profile-new-password')?.value.trim();
+  const btn = document.getElementById('btn-save-my-profile');
+
+  if (!name) {
+    alert('অনুগ্রহ করে আপনার নাম দিন।');
+    return false;
+  }
+  if (password && password.length < 6) {
+    alert('পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের হতে হবে।');
+    return false;
+  }
+
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = 'সংরক্ষণ হচ্ছে...';
+  }
+
+  try {
+    const res = await fetch('/api/admin/profile', {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${adminToken}`
+      },
+      body: JSON.stringify({ name, avatar, phone, password })
+    });
+    const data = await res.json();
+    if (data.success) {
+      alert('আপনার প্রোফাইল সফলভাবে আপডেট হয়েছে!');
+      updateHeaderProfileUI(data.admin);
+      closeAdminProfileModal();
+    } else {
+      alert(data.error || 'প্রোফাইল আপডেট ব্যর্থ হয়েছে।');
+    }
+  } catch (err) {
+    console.error('Update profile error:', err);
+    alert('সার্ভার এরর। আবার চেষ্টা করুন।');
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = 'পরিবর্তন সংরক্ষণ করুন';
+    }
+  }
+  return false;
+}
+
+// -------------------------------------------------------------
+// USER ROLES & PERMISSIONS MANAGEMENT (TAB-USERS)
+// -------------------------------------------------------------
+let cachedAdminUsers = [];
+
+async function loadAdminUsers() {
+  const tbody = document.getElementById('admin-users-table-body');
+  if (!tbody) return;
+
+  tbody.innerHTML = `<tr><td colspan="5" class="text-center py-6 text-slate-500">ইউজার তালিকা লোড হচ্ছে...</td></tr>`;
+
+  try {
+    const res = await fetch('/api/admin/users', {
+      headers: { 'Authorization': `Bearer ${adminToken}` }
+    });
+    const data = await res.json();
+    if (data.success) {
+      cachedAdminUsers = data.users;
+      renderAdminUsersTable(data.users);
+      const badge = document.getElementById('badge-users-count');
+      if (badge) badge.textContent = `${data.users.length} জন`;
+    } else {
+      tbody.innerHTML = `<tr><td colspan="5" class="text-center py-6 text-rose-500">${data.error}</td></tr>`;
+    }
+  } catch (err) {
+    console.error('Error loading users:', err);
+    tbody.innerHTML = `<tr><td colspan="5" class="text-center py-6 text-rose-500">ইউজার লোড করতে সমস্যা হয়েছে।</td></tr>`;
+  }
+}
+
+function renderAdminUsersTable(users) {
+  const tbody = document.getElementById('admin-users-table-body');
+  if (!tbody) return;
+
+  if (users.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="5" class="text-center py-8 text-slate-500 font-medium">কোনো ইউজার পাওয়া যায়নি।</td></tr>`;
+    return;
+  }
+
+  const roleLabels = {
+    'superadmin': { label: 'সুপার অ্যাডমিন', color: 'bg-emerald-100 text-emerald-800 border-emerald-300' },
+    'manager': { label: 'অপারেশন ম্যানেজার', color: 'bg-blue-100 text-blue-800 border-blue-300' },
+    'technician': { label: 'ল্যাব টেকনিশিয়ান', color: 'bg-amber-100 text-amber-800 border-amber-300' },
+    'support': { label: 'সাপোর্ট ও রাইডার', color: 'bg-purple-100 text-purple-800 border-purple-300' },
+    'admin': { label: 'অ্যাডমিন', color: 'bg-teal-100 text-teal-800 border-teal-300' }
+  };
+
+  const permBadges = {
+    'orders': { label: '📦 অর্ডার', color: 'bg-teal-50 text-teal-700 border-teal-200' },
+    'services': { label: '🛠️ সার্ভিস', color: 'bg-cyan-50 text-cyan-700 border-cyan-200' },
+    'inquiries': { label: '💬 মেসেজ', color: 'bg-rose-50 text-rose-700 border-rose-200' },
+    'hero': { label: '🎨 হিরো', color: 'bg-indigo-50 text-indigo-700 border-indigo-200' },
+    'footer': { label: '🏢 ফুটার', color: 'bg-slate-100 text-slate-700 border-slate-300' },
+    'users': { label: '🛡️ রোল', color: 'bg-emerald-50 text-emerald-800 border-emerald-200' }
+  };
+
+  tbody.innerHTML = users.map(u => {
+    const rInfo = roleLabels[u.role] || { label: u.role, color: 'bg-slate-100 text-slate-700 border-slate-300' };
+    const avatarHtml = u.avatar && u.avatar.trim() !== ''
+      ? `<img src="${u.avatar}" alt="${u.name}" class="w-8 h-8 rounded-full object-cover border border-slate-200 shrink-0">`
+      : `<div class="w-8 h-8 rounded-full bg-[#0f766e] text-white flex items-center justify-center font-bold text-xs shrink-0">${(u.name || u.username)[0].toUpperCase()}</div>`;
+
+    const permsList = Array.isArray(u.permissions) ? u.permissions : [];
+    const permsPills = u.role === 'superadmin' || permsList.includes('*')
+      ? `<span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">⭐ সর্বময় অ্যাক্সেস (All Access)</span>`
+      : permsList.map(p => {
+          const pb = permBadges[p] || { label: p, color: 'bg-slate-100 text-slate-700 border-slate-200' };
+          return `<span class="px-2 py-0.5 rounded-md text-[10px] font-semibold ${pb.color} border">${pb.label}</span>`;
+        }).join(' ');
+
+    const canDelete = u.username !== 'admin' && u.id !== 1;
+
+    return `
+      <tr class="hover:bg-slate-50/80 transition text-xs">
+        <td class="py-3 px-4">
+          <div class="flex items-center gap-2.5">
+            ${avatarHtml}
+            <div>
+              <div class="font-bold text-slate-900">${u.name}</div>
+              <div class="text-[10px] text-slate-500">${u.phone || 'ফোন নেই'}</div>
+            </div>
+          </div>
+        </td>
+        <td class="py-3 px-4 font-mono font-bold text-slate-700">
+          @${u.username}
+        </td>
+        <td class="py-3 px-4">
+          <span class="inline-flex px-2 py-0.5 rounded-md text-[10px] font-bold ${rInfo.color} border">
+            ${rInfo.label}
+          </span>
+        </td>
+        <td class="py-3 px-4">
+          <div class="flex flex-wrap gap-1 max-w-[280px]">
+            ${permsPills || '<span class="text-slate-400 text-[10px]">কোনো পারমিশন নেই</span>'}
+          </div>
+        </td>
+        <td class="py-3 px-4 text-right space-x-1.5 whitespace-nowrap">
+          <button onclick="openEditUserModal(${u.id})" class="px-2.5 py-1 rounded-md bg-teal-50 hover:bg-teal-100 text-teal-800 border border-teal-200 font-bold text-[11px] transition">
+            ✏️ এডিট
+          </button>
+          ${canDelete ? `
+            <button onclick="deleteAdminUser(${u.id}, '${u.username}')" class="px-2.5 py-1 rounded-md bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-bold text-[11px] transition">
+              🗑️ ডিলিট
+            </button>
+          ` : `
+            <span class="px-2 py-1 text-[10px] text-slate-400 font-medium">সুরক্ষিত</span>
+          `}
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+function openCreateUserModal() {
+  document.getElementById('manage-user-id').value = '';
+  document.getElementById('user-modal-title').textContent = 'নতুন প্রোফাইল তৈরি ও অ্যাক্সেস কন্ট্রোল';
+  document.getElementById('manage-user-name').value = '';
+  document.getElementById('manage-user-username').value = '';
+  document.getElementById('manage-user-username').disabled = false;
+  document.getElementById('manage-user-password').value = '';
+  document.getElementById('manage-user-password').required = true;
+  document.getElementById('manage-user-pwd-hint').classList.add('hidden');
+  document.getElementById('manage-user-phone').value = '';
+  document.getElementById('manage-user-avatar').value = '';
+  document.getElementById('manage-user-role').value = 'manager';
+
+  toggleAllPermissions(false);
+  document.getElementById('perm-orders').checked = true;
+  document.getElementById('perm-services').checked = true;
+  document.getElementById('perm-inquiries').checked = true;
+
+  document.getElementById('admin-user-modal')?.classList.remove('hidden');
+}
+
+function openEditUserModal(userId) {
+  const u = cachedAdminUsers.find(x => x.id === userId);
+  if (!u) return;
+
+  document.getElementById('manage-user-id').value = u.id;
+  document.getElementById('user-modal-title').textContent = `প্রোফাইল ও পারমিশন সম্পাদনা (@${u.username})`;
+  document.getElementById('manage-user-name').value = u.name || '';
+  document.getElementById('manage-user-username').value = u.username;
+  document.getElementById('manage-user-username').disabled = true; // username cannot change
+  document.getElementById('manage-user-password').value = '';
+  document.getElementById('manage-user-password').required = false;
+  document.getElementById('manage-user-pwd-hint').classList.remove('hidden');
+  document.getElementById('manage-user-phone').value = u.phone || '';
+  document.getElementById('manage-user-avatar').value = u.avatar || '';
+  document.getElementById('manage-user-role').value = u.role || 'manager';
+
+  const perms = Array.isArray(u.permissions) ? u.permissions : [];
+  ['orders', 'services', 'inquiries', 'hero', 'footer', 'users'].forEach(p => {
+    const chk = document.getElementById(`perm-${p}`);
+    if (chk) chk.checked = perms.includes(p) || perms.includes('*') || u.role === 'superadmin';
+  });
+
+  document.getElementById('admin-user-modal')?.classList.remove('hidden');
+}
+
+function closeUserModal() {
+  document.getElementById('admin-user-modal')?.classList.add('hidden');
+}
+
+function toggleAllPermissions(checked) {
+  document.querySelectorAll('.user-perm-checkbox').forEach(chk => {
+    chk.checked = checked;
+  });
+}
+
+async function handleSaveAdminUser(e) {
+  if (e && e.preventDefault) e.preventDefault();
+  const userId = document.getElementById('manage-user-id')?.value;
+  const name = document.getElementById('manage-user-name')?.value.trim();
+  const username = document.getElementById('manage-user-username')?.value.trim();
+  const password = document.getElementById('manage-user-password')?.value.trim();
+  const role = document.getElementById('manage-user-role')?.value;
+  const phone = document.getElementById('manage-user-phone')?.value.trim();
+  const avatar = document.getElementById('manage-user-avatar')?.value.trim();
+  const btn = document.getElementById('btn-save-admin-user');
+
+  const selectedPerms = [];
+  document.querySelectorAll('.user-perm-checkbox:checked').forEach(chk => {
+    selectedPerms.push(chk.value);
+  });
+
+  if (!name || (!userId && !username)) {
+    alert('অনুগ্রহ করে নাম এবং ইউজারনেম পূরণ করুন।');
+    return false;
+  }
+  if (!userId && (!password || password.length < 6)) {
+    alert('নতুন ইউজারের পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের হতে হবে।');
+    return false;
+  }
+
+  const payload = {
+    name,
+    username,
+    role,
+    phone,
+    avatar,
+    permissions: selectedPerms
+  };
+  if (password && password.length >= 6) {
+    payload.password = password;
+  }
+
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = 'সংরক্ষণ হচ্ছে...';
+  }
+
+  try {
+    const url = userId ? `/api/admin/users/${userId}` : '/api/admin/users';
+    const method = userId ? 'PUT' : 'POST';
+
+    const res = await fetch(url, {
+      method,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${adminToken}`
+      },
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+    if (data.success) {
+      alert(userId ? 'ইউজার প্রোফাইল ও পারমিশন সফলভাবে আপডেট হয়েছে!' : 'নতুন প্রোফাইল সফলভাবে তৈরি হয়েছে!');
+      closeUserModal();
+      loadAdminUsers();
+    } else {
+      alert(data.error || 'সংরক্ষণ ব্যর্থ হয়েছে।');
+    }
+  } catch (err) {
+    console.error('Save user error:', err);
+    alert('সার্ভার এরর। আবার চেষ্টা করুন।');
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = 'সংরক্ষণ করুন (Save Profile)';
+    }
+  }
+  return false;
+}
+
+async function deleteAdminUser(userId, username) {
+  if (!confirm(`আপনি কি নিশ্চিত যে @${username} ইউজার অ্যাকাউন্টটি মুছে ফেলতে চান?`)) return;
+
+  try {
+    const res = await fetch(`/api/admin/users/${userId}`, {
+      method: 'DELETE',
+      headers: { 'Authorization': `Bearer ${adminToken}` }
+    });
+    const data = await res.json();
+    if (data.success) {
+      alert('ইউজার প্রোফাইল মুছে ফেলা হয়েছে।');
+      loadAdminUsers();
+    } else {
+      alert(data.error || 'মুছে ফেলা যায়নি।');
+    }
+  } catch (err) {
+    console.error('Delete user error:', err);
+    alert('সার্ভার এরর।');
+  }
+}
+
 
 
