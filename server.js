@@ -866,26 +866,28 @@ const server = http.createServer(async (req, res) => {
         const {
           code, device_type = 'all', title_bn, title_en,
           description_bn, description_en, starting_price,
-          estimated_time_bn, estimated_time_en, warranty_bn, warranty_en, icon = 'wrench'
+          estimated_time_bn, estimated_time_en, warranty_bn, warranty_en, icon = 'wrench',
+          is_active = 1
         } = body;
 
-        if (!title_bn || !title_en || !starting_price) {
-          return errorResponse(res, 400, 'Title and starting price are required');
+        if (!title_bn || starting_price === undefined || starting_price === '') {
+          return errorResponse(res, 400, 'সার্ভিসের নাম এবং প্রারম্ভিক ফি আবশ্যক');
         }
 
-        const finalCode = code || 'service-' + Date.now();
+        const finalTitleEn = title_en || title_bn;
+        const finalCode = (code && code.trim()) ? code.trim() : 'service-' + Date.now();
         db.prepare(`
           INSERT INTO services (
             code, device_type, title_bn, title_en, description_bn, description_en,
-            starting_price, estimated_time_bn, estimated_time_en, warranty_bn, warranty_en, icon
-          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            starting_price, estimated_time_bn, estimated_time_en, warranty_bn, warranty_en, icon, is_active
+          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `).run(
-          finalCode, device_type, title_bn, title_en, description_bn || '', description_en || '',
+          finalCode, device_type, title_bn, finalTitleEn, description_bn || '', description_en || description_bn || '',
           parseFloat(starting_price) || 0, estimated_time_bn || '', estimated_time_en || '',
-          warranty_bn || '', warranty_en || '', icon
+          warranty_bn || '', warranty_en || warranty_bn || '', icon, is_active ? 1 : 0
         );
 
-        return jsonResponse(res, 201, { success: true, message: 'Service added' });
+        return jsonResponse(res, 201, { success: true, message: 'সার্ভিস সফলভাবে তৈরি করা হয়েছে' });
       }
 
       const serviceIdMatch = pathname.match(/^\/api\/admin\/services\/(\d+)$/);
@@ -899,23 +901,36 @@ const server = http.createServer(async (req, res) => {
           UPDATE services
           SET title_bn = ?, title_en = ?, description_bn = ?, description_en = ?,
               starting_price = ?, estimated_time_bn = ?, estimated_time_en = ?,
-              warranty_bn = ?, warranty_en = ?, is_active = ?
+              warranty_bn = ?, warranty_en = ?, is_active = ?,
+              device_type = ?, icon = ?
           WHERE id = ?
         `).run(
-          body.title_bn || s.title_bn,
-          body.title_en || s.title_en,
+          body.title_bn !== undefined ? body.title_bn : s.title_bn,
+          body.title_en !== undefined ? body.title_en : s.title_en,
           body.description_bn !== undefined ? body.description_bn : s.description_bn,
           body.description_en !== undefined ? body.description_en : s.description_en,
           body.starting_price !== undefined ? parseFloat(body.starting_price) : s.starting_price,
-          body.estimated_time_bn || s.estimated_time_bn,
-          body.estimated_time_en || s.estimated_time_en,
-          body.warranty_bn || s.warranty_bn,
-          body.warranty_en || s.warranty_en,
+          body.estimated_time_bn !== undefined ? body.estimated_time_bn : s.estimated_time_bn,
+          body.estimated_time_en !== undefined ? body.estimated_time_en : s.estimated_time_en,
+          body.warranty_bn !== undefined ? body.warranty_bn : s.warranty_bn,
+          body.warranty_en !== undefined ? body.warranty_en : s.warranty_en,
           body.is_active !== undefined ? (body.is_active ? 1 : 0) : s.is_active,
+          body.device_type !== undefined ? body.device_type : s.device_type,
+          body.icon !== undefined ? body.icon : s.icon,
           serviceId
         );
 
-        return jsonResponse(res, 200, { success: true, message: 'Service updated' });
+        const updated = db.prepare('SELECT * FROM services WHERE id = ?').get(serviceId);
+        return jsonResponse(res, 200, { success: true, message: 'সার্ভিস সফলভাবে আপডেট করা হয়েছে', service: updated });
+      }
+
+      if (serviceIdMatch && method === 'DELETE') {
+        const serviceId = parseInt(serviceIdMatch[1], 10);
+        const s = db.prepare('SELECT * FROM services WHERE id = ?').get(serviceId);
+        if (!s) return errorResponse(res, 404, 'Service not found');
+
+        db.prepare('DELETE FROM services WHERE id = ?').run(serviceId);
+        return jsonResponse(res, 200, { success: true, message: 'সার্ভিস সফলভাবে মুছে ফেলা হয়েছে' });
       }
 
       // Admin Inquiries / Contacts

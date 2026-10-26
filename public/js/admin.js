@@ -101,9 +101,7 @@ function toggleAdminSidebar(open) {
   }
 }
 
-function openAddServiceModal() {
-  alert('নতুন সার্ভিস কনফিগ ফিচার: সার্ভিসের নাম, ক্যাটাগরি এবং প্রারম্ভিক ফি শীঘ্রই কাস্টমাইজ করা যাবে। বর্তমান সার্ভিস তালিকা নিচে প্রদর্শিত হচ্ছে।');
-}
+let adminServicesCache = [];
 
 let adminToken = localStorage.getItem('repair_seba_admin_token');
 let currentAdminTab = 'overview';
@@ -919,6 +917,210 @@ function toggleMobileSidebar() {
 window.toggleMobileSidebar = toggleMobileSidebar;
 
 
+function openAddServiceModal() {
+  const form = document.getElementById('admin-service-form');
+  if (form) form.reset();
+  const idEl = document.getElementById('service-id');
+  const codeEl = document.getElementById('service-code');
+  if (idEl) idEl.value = '';
+  if (codeEl) codeEl.value = '';
+
+  const titleEl = document.getElementById('service-modal-title');
+  if (titleEl) titleEl.textContent = 'নতুন সার্ভিস যোগ করুন';
+
+  const btnTextEl = document.getElementById('btn-save-service-text');
+  if (btnTextEl) btnTextEl.textContent = 'সার্ভিস সংরক্ষণ করুন';
+
+  const activeEl = document.getElementById('service-is-active');
+  if (activeEl) activeEl.checked = true;
+
+  const modal = document.getElementById('admin-service-modal');
+  if (modal) {
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+  }
+}
+
+function openEditServiceModal(serviceId) {
+  const service = adminServicesCache.find(s => s.id === serviceId);
+  if (!service) {
+    showCenterPopup('ত্রুটি', 'সার্ভিস খুঁজে পাওয়া যায়নি!', '⚠️');
+    return;
+  }
+
+  const idEl = document.getElementById('service-id');
+  const codeEl = document.getElementById('service-code');
+  const titleBnEl = document.getElementById('service-title-bn');
+  const titleEnEl = document.getElementById('service-title-en');
+  const deviceEl = document.getElementById('service-device-type');
+  const iconEl = document.getElementById('service-icon');
+  const priceEl = document.getElementById('service-price');
+  const warrantyEl = document.getElementById('service-warranty-bn');
+  const timeEl = document.getElementById('service-time-bn');
+  const descBnEl = document.getElementById('service-desc-bn');
+  const descEnEl = document.getElementById('service-desc-en');
+  const activeEl = document.getElementById('service-is-active');
+
+  if (idEl) idEl.value = service.id;
+  if (codeEl) codeEl.value = service.code || '';
+  if (titleBnEl) titleBnEl.value = service.title_bn || '';
+  if (titleEnEl) titleEnEl.value = service.title_en || '';
+  if (deviceEl) deviceEl.value = service.device_type || 'all';
+  if (iconEl) iconEl.value = service.icon || 'wrench';
+  if (priceEl) priceEl.value = service.starting_price || 0;
+  if (warrantyEl) warrantyEl.value = service.warranty_bn || '';
+  if (timeEl) timeEl.value = service.estimated_time_bn || '';
+  if (descBnEl) descBnEl.value = service.description_bn || '';
+  if (descEnEl) descEnEl.value = service.description_en || '';
+  if (activeEl) activeEl.checked = service.is_active === 1 || service.is_active === true;
+
+  const titleModalEl = document.getElementById('service-modal-title');
+  if (titleModalEl) titleModalEl.textContent = 'সার্ভিস সম্পাদনা করুন';
+
+  const btnTextEl = document.getElementById('btn-save-service-text');
+  if (btnTextEl) btnTextEl.textContent = 'পরিবর্তন সংরক্ষণ করুন';
+
+  const modal = document.getElementById('admin-service-modal');
+  if (modal) {
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+  }
+}
+
+function closeServiceModal() {
+  const modal = document.getElementById('admin-service-modal');
+  if (modal) {
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+  }
+}
+
+async function handleSaveService(event) {
+  if (event) event.preventDefault();
+
+  const id = document.getElementById('service-id')?.value;
+  const code = document.getElementById('service-code')?.value;
+  const title_bn = document.getElementById('service-title-bn')?.value.trim();
+  const title_en = document.getElementById('service-title-en')?.value.trim();
+  const device_type = document.getElementById('service-device-type')?.value || 'all';
+  const icon = document.getElementById('service-icon')?.value || 'wrench';
+  const starting_price = parseFloat(document.getElementById('service-price')?.value);
+  const warranty_bn = document.getElementById('service-warranty-bn')?.value.trim();
+  const estimated_time_bn = document.getElementById('service-time-bn')?.value.trim();
+  const description_bn = document.getElementById('service-desc-bn')?.value.trim();
+  const description_en = document.getElementById('service-desc-en')?.value.trim();
+  const is_active = document.getElementById('service-is-active')?.checked ? 1 : 0;
+
+  if (!title_bn) {
+    showCenterPopup('অসম্পূর্ণ তথ্য', 'অনুগ্রহ করে সার্ভিসের বাংলা নাম লিখুন।', '⚠️');
+    return;
+  }
+  if (isNaN(starting_price) || starting_price < 0) {
+    showCenterPopup('অসম্পূর্ণ তথ্য', 'অনুগ্রহ করে সঠিক প্রারম্ভিক মূল্য দিন।', '⚠️');
+    return;
+  }
+
+  const payload = {
+    code,
+    title_bn,
+    title_en: title_en || title_bn,
+    device_type,
+    icon,
+    starting_price,
+    warranty_bn: warranty_bn || '৯০ দিনের ওয়ারেন্টি',
+    warranty_en: warranty_bn || '90 Days Warranty',
+    estimated_time_bn: estimated_time_bn || '২-৪ ঘন্টা',
+    estimated_time_en: estimated_time_bn || '2-4 Hours',
+    description_bn,
+    description_en: description_en || description_bn,
+    is_active
+  };
+
+  const btn = document.getElementById('btn-save-service');
+  const originalHtml = btn ? btn.innerHTML : '';
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = '<span>⏳</span> <span>সংরক্ষণ হচ্ছে...</span>';
+  }
+
+  try {
+    const isEdit = Boolean(id);
+    const url = isEdit ? `/api/admin/services/${id}` : '/api/admin/services';
+    const method = isEdit ? 'PUT' : 'POST';
+
+    const res = await fetch(url, {
+      method,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${adminToken}`
+      },
+      body: JSON.stringify(payload)
+    });
+
+    const data = await res.json();
+    if (res.ok && data.success) {
+      closeServiceModal();
+      await loadAdminServices();
+      showCenterPopup('সফল!', isEdit ? 'সার্ভিসটি সফলভাবে আপডেট করা হয়েছে।' : 'নতুন সার্ভিস সফলভাবে যুক্ত করা হয়েছে।', '🎉');
+    } else {
+      showCenterPopup('ব্যর্থ!', data.message || 'সার্ভিস সংরক্ষণ করতে সমস্যা হয়েছে।', '⚠️');
+    }
+  } catch (err) {
+    console.error('Error saving service:', err);
+    showCenterPopup('সার্ভার ত্রুটি', 'সার্ভারে সংযোগ করা সম্ভব হয়নি। আবার চেষ্টা করুন।', '⚠️');
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = originalHtml;
+    }
+  }
+}
+
+async function deleteAdminService(serviceId, serviceTitle) {
+  if (!confirm(`আপনি কি নিশ্চিত যে "${serviceTitle || 'এই সার্ভিসটি'}" মুছে ফেলতে চান?\nমুছে ফেললে এটি হোমপেজ ও বুকিং ফর্ম থেকেও বাদ পড়বে।`)) {
+    return;
+  }
+
+  try {
+    const res = await fetch(`/api/admin/services/${serviceId}`, {
+      method: 'DELETE',
+      headers: { 'Authorization': `Bearer ${adminToken}` }
+    });
+    const data = await res.json();
+    if (res.ok && data.success) {
+      await loadAdminServices();
+      showCenterPopup('মুছে ফেলা হয়েছে', 'সার্ভিসটি সফলভাবে মুছে ফেলা হয়েছে।', '🗑️');
+    } else {
+      showCenterPopup('ব্যর্থ', data.message || 'সার্ভিস মুছে ফেলা সম্ভব হয়নি।', '⚠️');
+    }
+  } catch (err) {
+    console.error('Error deleting service:', err);
+    showCenterPopup('সার্ভার ত্রুটি', 'সার্ভারে সংযোগ করা সম্ভব হয়নি।', '⚠️');
+  }
+}
+
+async function toggleServiceStatus(serviceId, currentActive) {
+  try {
+    const nextStatus = currentActive ? 0 : 1;
+    const res = await fetch(`/api/admin/services/${serviceId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${adminToken}`
+      },
+      body: JSON.stringify({ is_active: nextStatus })
+    });
+    const data = await res.json();
+    if (res.ok && data.success) {
+      await loadAdminServices();
+    } else {
+      showCenterPopup('ব্যর্থ', data.message || 'স্ট্যাটাস পরিবর্তন করা যায়নি।', '⚠️');
+    }
+  } catch (err) {
+    console.error('Error toggling service status:', err);
+  }
+}
+
 async function loadAdminServices() {
   const container = document.getElementById('admin-services-list');
   if (!container) return;
@@ -929,37 +1131,85 @@ async function loadAdminServices() {
     });
     const data = await res.json();
     if (data.success) {
+      adminServicesCache = data.services || [];
       const servBadge = document.getElementById('badge-tab-services');
-      if (servBadge && data.services) servBadge.textContent = `${data.services.length}টি`;
-      container.innerHTML = data.services.map(s => {
-        const iconMap = {
-          'smartphone': '📱', 'battery-charging': '🔋', 'zap': '⚡', 'cpu': '🔬',
-          'droplets': '💧', 'camera': '📷', 'volume-2': '🔊', 'tablet': '💻',
-          'hard-drive': '💾', 'wrench': '🛠️'
-        };
+      if (servBadge) servBadge.textContent = `${adminServicesCache.length}টি`;
+
+      if (adminServicesCache.length === 0) {
+        container.innerHTML = `
+          <div class="col-span-full bg-white border border-slate-200 rounded-3xl p-12 text-center shadow-xs">
+            <div class="text-4xl mb-3">🛠️</div>
+            <h3 class="text-base font-bold text-slate-800 mb-1">কোনো রিপেয়ার সার্ভিস নেই</h3>
+            <p class="text-xs text-slate-500 mb-4">হোমপেজে প্রদর্শনের জন্য নতুন সার্ভিস তৈরি করুন</p>
+            <button type="button" onclick="openAddServiceModal()" class="px-5 py-2.5 rounded-xl bg-[#0f766e] hover:bg-[#115e59] text-white font-bold text-xs shadow-md transition cursor-pointer">
+              + নতুন সার্ভিস যোগ করুন
+            </button>
+          </div>
+        `;
+        return;
+      }
+
+      const iconMap = {
+        'smartphone': '📱', 'battery-charging': '🔋', 'zap': '⚡', 'cpu': '🔬',
+        'droplets': '💧', 'camera': '📷', 'volume-2': '🔊', 'tablet': '💻',
+        'hard-drive': '💾', 'wrench': '🛠️'
+      };
+
+      container.innerHTML = adminServicesCache.map(s => {
         const ico = iconMap[s.icon] || '🛠️';
+        const deviceLabel = s.device_type === 'phone' ? '📱 মোবাইল' : s.device_type === 'tablet' ? '💻 ট্যাবলেট' : '📱 ফোন ও ট্যাব';
+        const safeTitle = (s.title_bn || '').replace(/'/g, "\\'");
+
         return `
-          <div class="bg-white border border-slate-200 p-5 rounded-2xl shadow-xs flex flex-col justify-between hover:border-cyan-500 hover:shadow-md transition">
+          <div class="bg-white border border-slate-200 p-5 rounded-2xl shadow-xs flex flex-col justify-between hover:border-teal-500 hover:shadow-md transition group">
             <div>
-              <div class="flex items-center justify-between mb-3">
-                <span class="text-xs uppercase font-bold px-2.5 py-0.5 rounded-lg bg-slate-100 text-cyan-800 border border-slate-200">${s.device_type}</span>
-                <span class="text-xs ${s.is_active ? 'text-emerald-700 bg-emerald-50 border border-emerald-200' : 'text-slate-500 bg-slate-100'} px-2 py-0.5 rounded-lg font-bold">
-                  ${s.is_active ? 'Active' : 'Disabled'}
+              <!-- Top Category & Status Toggle -->
+              <div class="flex items-center justify-between mb-3.5">
+                <span class="text-[10px] uppercase font-black px-2.5 py-1 rounded-lg bg-teal-50 text-teal-800 border border-teal-200">
+                  ${deviceLabel}
                 </span>
+                <button type="button" onclick="toggleServiceStatus(${s.id}, ${s.is_active ? 1 : 0})" title="ক্লিক করে স্ট্যাটাস পরিবর্তন করুন" class="text-xs px-2.5 py-1 rounded-full font-bold transition flex items-center gap-1.5 cursor-pointer ${s.is_active ? 'bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100' : 'bg-slate-100 text-slate-500 border border-slate-200 hover:bg-slate-200'}">
+                  <span class="w-2 h-2 rounded-full ${s.is_active ? 'bg-emerald-500' : 'bg-slate-400'}"></span>
+                  <span>${s.is_active ? 'সক্রিয় (Active)' : 'নিষ্ক্রিয় (Off)'}</span>
+                </button>
               </div>
-              <div class="flex items-start gap-3 mb-2">
-                <div class="w-10 h-10 rounded-xl bg-cyan-50 border border-cyan-200 text-cyan-700 flex items-center justify-center font-bold text-lg flex-shrink-0 shadow-xs">
+
+              <!-- Icon & Titles -->
+              <div class="flex items-start gap-3 mb-3">
+                <div class="w-11 h-11 rounded-xl bg-teal-50 border border-teal-200 text-[#0f766e] flex items-center justify-center font-bold text-xl shrink-0 shadow-2xs">
                   ${ico}
                 </div>
-                <div>
-                  <h4 class="font-bold text-slate-900 text-base">${s.title_bn}</h4>
-                  <p class="text-xs text-slate-600 mt-1 line-clamp-2 leading-relaxed">${s.description_bn}</p>
+                <div class="min-w-0 flex-1">
+                  <h4 class="font-bold text-slate-900 text-base leading-snug">${s.title_bn}</h4>
+                  ${s.title_en ? `<p class="text-[11px] text-slate-400 font-medium truncate">${s.title_en}</p>` : ''}
+                  <p class="text-xs text-slate-600 mt-1 line-clamp-2 leading-relaxed">${s.description_bn || s.description_en || 'কোনো বিবরণ যোগ করা হয়নি'}</p>
                 </div>
               </div>
             </div>
-            <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
-              <span class="text-cyan-700 font-black text-base">৳${s.starting_price.toLocaleString()}</span>
-              <span class="text-xs text-slate-500">🛡️ ${s.warranty_bn || '৯০ দিন'}</span>
+
+            <div>
+              <!-- Price & Warranty Bar -->
+              <div class="mt-2 pt-3 border-t border-slate-100 flex items-center justify-between">
+                <div>
+                  <span class="text-[10px] text-slate-400 block font-semibold leading-tight">প্রারম্ভিক ফি</span>
+                  <span class="text-[#0f766e] font-black text-lg">৳${(s.starting_price || 0).toLocaleString()}</span>
+                </div>
+                <div class="text-right">
+                  <span class="text-[10px] text-slate-400 block font-semibold leading-tight">${s.estimated_time_bn ? `⏱️ ${s.estimated_time_bn}` : 'ওয়ারেন্টি'}</span>
+                  <span class="font-bold text-slate-700 text-xs">🛡️ ${s.warranty_bn || '৯০ দিন'}</span>
+                </div>
+              </div>
+
+              <!-- Action Buttons -->
+              <div class="mt-3 pt-3 border-t border-slate-100 flex items-center gap-2">
+                <button type="button" onclick="openEditServiceModal(${s.id})" class="flex-1 py-2 px-3 rounded-xl bg-teal-50 hover:bg-[#0f766e] hover:text-white border border-teal-200 text-[#0f766e] font-bold text-xs transition flex items-center justify-center gap-1.5 shadow-2xs group/btn cursor-pointer">
+                  <span>✏️</span>
+                  <span>সম্পাদনা করুন</span>
+                </button>
+                <button type="button" onclick="deleteAdminService(${s.id}, '${safeTitle}')" title="সার্ভিস মুছুন" class="p-2 rounded-xl bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-600 font-bold text-xs transition flex items-center justify-center shadow-2xs cursor-pointer">
+                  <span>🗑️</span>
+                </button>
+              </div>
             </div>
           </div>
         `;
@@ -969,6 +1219,14 @@ async function loadAdminServices() {
     console.error('Error loading services:', err);
   }
 }
+
+window.openAddServiceModal = openAddServiceModal;
+window.openEditServiceModal = openEditServiceModal;
+window.closeServiceModal = closeServiceModal;
+window.handleSaveService = handleSaveService;
+window.deleteAdminService = deleteAdminService;
+window.toggleServiceStatus = toggleServiceStatus;
+window.loadAdminServices = loadAdminServices;
 
 async function loadAdminContacts() {
   const container = document.getElementById('admin-contacts-list');
