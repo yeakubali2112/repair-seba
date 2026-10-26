@@ -381,18 +381,27 @@
 
               </div>
 
-              <!-- Orders Management Table: Contains current status select & action buttons -->
-              <div class="w-full overflow-x-auto">
-                <table class="w-full text-left text-xs table-auto">
+              <!-- Orders Management Table: Fixed 100% width, No Horizontal Scrollbar -->
+              <div class="w-full overflow-hidden">
+                <table class="w-full text-left text-xs table-fixed">
+                  <colgroup>
+                    <col style="width: 13%;">
+                    <col style="width: 17%;">
+                    <col style="width: 20%;">
+                    <col style="width: 15%;">
+                    <col style="width: 10%;">
+                    <col style="width: 18%;">
+                    <col style="width: 7%;">
+                  </colgroup>
                   <thead class="bg-slate-50/80 text-slate-600 font-bold uppercase tracking-wider border-b border-slate-200/90">
                     <tr>
-                      <th class="py-2.5 px-3 whitespace-nowrap">ট্র্যাকিং আইডি</th>
+                      <th class="py-2.5 px-3">ট্র্যাকিং আইডি</th>
                       <th class="py-2.5 px-3">গ্রাহকের নাম</th>
                       <th class="py-2.5 px-3">ডিভাইস ও সমস্যা</th>
-                      <th class="py-2.5 px-3 whitespace-nowrap">মোবাইল</th>
-                      <th class="py-2.5 px-3 whitespace-nowrap">তারিখ</th>
-                      <th class="py-2.5 px-3 whitespace-nowrap">বর্তমান অবস্থা</th>
-                      <th class="py-2.5 px-3 text-center whitespace-nowrap">অ্যাকশন</th>
+                      <th class="py-2.5 px-3">মোবাইল</th>
+                      <th class="py-2.5 px-3">তারিখ</th>
+                      <th class="py-2.5 px-3">বর্তমান অবস্থা</th>
+                      <th class="py-2.5 px-2 text-center">অ্যাকশন</th>
                     </tr>
                   </thead>
                   <tbody id="orders-table-body" class="divide-y divide-slate-100 text-slate-800">

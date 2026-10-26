@@ -580,14 +580,14 @@ function renderAdminOrdersTable(orders) {
 
     // Direct status dropdown (No modal/submit needed! Direct 1-click update/allow)
     const statusWidget = `
-      <div class="flex items-center gap-1 flex-nowrap">
-        <select onchange="quickUpdateOrderStatus(${o.id}, this.value)" class="text-[11px] font-bold py-1 px-1.5 rounded-lg border cursor-pointer transition focus:outline-none focus:ring-1 focus:ring-teal-500 shadow-2xs max-w-[130px] ${curStatus.color}" title="সরাসরি স্ট্যাটাস পরিবর্তন">
+      <div class="flex items-center gap-1 min-w-0">
+        <select onchange="quickUpdateOrderStatus(${o.id}, this.value)" class="text-[11px] font-bold py-1 px-1 rounded-lg border cursor-pointer transition focus:outline-none focus:ring-1 focus:ring-teal-500 shadow-2xs w-full truncate ${curStatus.color}" title="সরাসরি স্ট্যাটাস পরিবর্তন">
           ${statusList.map(s => `
             <option value="${s.val}" ${s.val === o.status ? 'selected' : ''}>${s.label}</option>
           `).join('')}
         </select>
         ${o.status === 'QUOTE_PENDING' ? `
-          <button onclick="quickDirectApprove(${o.id})" class="px-1.5 py-1 rounded-md text-[10px] font-bold bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs transition shrink-0" title="সরাসরি অনুমোদন (Direct Allow)">
+          <button onclick="quickDirectApprove(${o.id})" class="px-1.5 py-1 rounded-md text-[10px] font-bold bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs transition shrink-0" title="সরাসরি কোটেশন অনুমোদন">
             ✓ অনুমোদন
           </button>
         ` : ''}
@@ -596,22 +596,22 @@ function renderAdminOrdersTable(orders) {
 
     return `
       <tr class="hover:bg-slate-50/80 transition text-slate-800 text-xs">
-        <td class="py-2.5 px-3 font-bold font-mono text-[#0f766e] whitespace-nowrap">
+        <td class="py-2.5 px-3 font-bold font-mono text-[#0f766e] truncate">
           ${o.order_number}
         </td>
 
         <td class="py-2.5 px-3">
-          <div class="font-bold text-slate-900 truncate max-w-[120px]" title="${o.customer_name}">${o.customer_name}</div>
-          <div class="text-[10px] text-slate-500 truncate max-w-[120px]">📍 ${o.area || 'ঢাকা'}</div>
+          <div class="font-bold text-slate-900 truncate" title="${o.customer_name}">${o.customer_name}</div>
+          <div class="text-[10px] text-slate-500 truncate">📍 ${o.area || 'ঢাকা'}</div>
         </td>
 
         <td class="py-2.5 px-3">
-          <div class="font-semibold text-slate-800 truncate max-w-[135px]" title="${o.brand} ${o.model}">${o.brand} ${o.model}</div>
-          <div class="text-[10px] text-slate-500 truncate max-w-[135px]">⚠️ ${Array.isArray(o.issues) ? o.issues.join(', ') : o.issues}</div>
+          <div class="font-semibold text-slate-800 truncate" title="${o.brand} ${o.model}">${o.brand} ${o.model}</div>
+          <div class="text-[10px] text-slate-500 truncate">⚠️ ${Array.isArray(o.issues) ? o.issues.join(', ') : o.issues}</div>
         </td>
 
-        <td class="py-2.5 px-3 font-mono whitespace-nowrap">
-          <div class="text-slate-800 text-xs font-semibold">${o.customer_phone}</div>
+        <td class="py-2.5 px-3 font-mono">
+          <div class="text-slate-800 text-xs font-semibold truncate">${o.customer_phone}</div>
           <a href="https://wa.me/88${o.customer_phone}?text=${encodeURIComponent(`Assalamu Alaikum, Repair Seba থেকে আপনার অর্ডার ${o.order_number} এর ব্যাপারে যোগাযোগ করছি।`)}" target="_blank" class="text-emerald-600 hover:text-emerald-700 text-[10px] font-bold inline-flex items-center gap-0.5 mt-0.5" title="WhatsApp Chat">
             💬 চ্যাট
           </a>
@@ -621,13 +621,13 @@ function renderAdminOrdersTable(orders) {
           ${dateFormatted}
         </td>
 
-        <td class="py-2.5 px-3 whitespace-nowrap">
+        <td class="py-2.5 px-3">
           ${statusWidget}
         </td>
 
-        <td class="py-2.5 px-3 text-center whitespace-nowrap">
-          <button onclick="openEditModal(${o.id})" class="px-3 py-1.5 rounded-lg bg-[#0f766e] hover:bg-[#115e59] text-white font-bold text-xs shadow-2xs transition inline-flex items-center justify-center gap-1 shrink-0" title="কোটেশন ও বিস্তারিত বিবরণ সম্পাদনা">
-            <span>📝</span> <span>আপডেট</span>
+        <td class="py-2.5 px-2 text-center whitespace-nowrap">
+          <button onclick="openEditModal(${o.id})" class="w-7 h-7 rounded-lg bg-teal-50 hover:bg-teal-100 text-[#0f766e] border border-teal-200/90 flex items-center justify-center text-xs transition shadow-2xs hover:scale-105 cursor-pointer mx-auto" title="অর্ডার কোটেশন ও বিবরণ এডিট করুন">
+            ✏️
           </button>
         </td>
       </tr>
