@@ -16,7 +16,7 @@ const ADMIN_STATUS_BADGES = {
 };
 
 const TAB_TITLES = {
-  'orders': '<span>📦</span> অর্ডার ম্যানেজমেন্ট ড্যাশবোর্ড',
+  'orders': 'ড্যাশবোর্ড ওভারভিউ',
   'services': '<span>⚙️</span> রিপেয়ার সার্ভিস ও মূল্য তালিকা কনফিগ',
   'inquiries': '<span>💬</span> গ্রাহকদের মেসেজ ও যোগাযোগ তালিকা',
   'hero': '<span>🎨</span> হিরো ব্যানার ও বাইক অ্যানিমেশন কন্ট্রোল',
@@ -237,140 +237,140 @@ function renderAdminStats(s) {
 
   container.innerHTML = `
     <!-- Card 1: মোট অর্ডার (নিবন্ধিত) - Mint Green -->
-    <div class="bg-[#ecfdf5] border border-[#a7f3d0] rounded-2xl p-4 shadow-2xs flex flex-col justify-between">
+    <div class="bg-[#ecfdf5] border border-[#a7f3d0] rounded-xl p-2.5 sm:p-3 shadow-2xs flex flex-col justify-between">
       <div>
-        <div class="flex items-center justify-between text-xs font-bold text-emerald-800 mb-2">
+        <div class="flex items-center justify-between text-[11px] font-bold text-emerald-800 mb-1">
           <span>মোট অর্ডার (নিবন্ধিত)</span>
-          <span class="text-sm">👥</span>
+          <span class="text-xs">👥</span>
         </div>
-        <div class="flex items-baseline gap-2">
-          <span class="text-2xl font-black text-slate-900">${s.total_orders} জন</span>
-          <span class="px-2 py-0.5 text-[10px] font-bold rounded-md bg-emerald-200/70 text-emerald-900 border border-emerald-300">রিয়েল ডাটা</span>
+        <div class="flex items-baseline gap-1.5">
+          <span class="text-lg sm:text-xl font-black text-slate-900 leading-tight">${s.total_orders} জন</span>
+          <span class="px-1.5 py-0.2 text-[9px] font-bold rounded bg-emerald-200/70 text-emerald-900 border border-emerald-300">রিয়েল ডাটা</span>
         </div>
-        <div class="text-[11px] text-slate-600 mt-1">পিকআপ: ${s.pending_pickup} জন • ল্যাব: ${s.in_lab || 1} জন</div>
+        <div class="text-[10px] text-slate-600 mt-0.5 truncate">পিকআপ: ${s.pending_pickup} জন • ল্যাব: ${s.in_lab || 1} জন</div>
       </div>
-      <div class="text-[10px] text-emerald-700 font-semibold mt-3 pt-2 border-t border-emerald-200/60">
+      <div class="text-[9px] text-emerald-700 font-semibold mt-1.5 pt-1 border-t border-emerald-200/60 truncate">
         (অগ্রাধিকার লক্ষ্যমাত্রা: ১০০%)
       </div>
     </div>
 
     <!-- Card 2: পিকআপ অপেক্ষমাণ (অনলাইন) - Amber/Cream -->
-    <div class="bg-[#fffbeb] border border-[#fde68a] rounded-2xl p-4 shadow-2xs flex flex-col justify-between">
+    <div class="bg-[#fffbeb] border border-[#fde68a] rounded-xl p-2.5 sm:p-3 shadow-2xs flex flex-col justify-between">
       <div>
-        <div class="flex items-center justify-between text-xs font-bold text-amber-800 mb-2">
+        <div class="flex items-center justify-between text-[11px] font-bold text-amber-800 mb-1">
           <span>পিকআপ অপেক্ষমাণ (অনলাইন)</span>
-          <span class="text-sm">📦</span>
+          <span class="text-xs">📦</span>
         </div>
-        <div class="flex items-baseline gap-2">
-          <span class="text-2xl font-black text-slate-900">${s.pending_pickup} টি</span>
-          <span class="px-2 py-0.5 text-[10px] font-bold rounded-md bg-amber-200/70 text-amber-900 border border-amber-300">১ নতুন</span>
+        <div class="flex items-baseline gap-1.5">
+          <span class="text-lg sm:text-xl font-black text-slate-900 leading-tight">${s.pending_pickup} টি</span>
+          <span class="px-1.5 py-0.2 text-[9px] font-bold rounded bg-amber-200/70 text-amber-900 border border-amber-300">১ নতুন</span>
         </div>
-        <div class="text-[11px] text-slate-600 mt-1">${s.pending_pickup}টি অপেক্ষমাণ • রাইডার নির্ধারিত</div>
+        <div class="text-[10px] text-slate-600 mt-0.5 truncate">${s.pending_pickup}টি অপেক্ষমাণ • রাইডার নির্ধারিত</div>
       </div>
-      <div class="mt-3 pt-2 border-t border-amber-200/60">
-        <a href="javascript:void(0)" onclick="filterOrders('PENDING_PICKUP')" class="text-[11px] text-amber-800 font-bold hover:underline">অনলাইন আবেদন যাচাই করুন →</a>
+      <div class="mt-1.5 pt-1 border-t border-amber-200/60">
+        <a href="javascript:void(0)" onclick="filterOrders('PENDING_PICKUP')" class="text-[10px] text-amber-800 font-bold hover:underline block truncate">অনলাইন আবেদন যাচাই করুন →</a>
       </div>
     </div>
 
     <!-- Card 3: মেরামত ও ল্যাব পরীক্ষা - Soft Blue -->
-    <div class="bg-[#eff6ff] border border-[#bfdbfe] rounded-2xl p-4 shadow-2xs flex flex-col justify-between">
+    <div class="bg-[#eff6ff] border border-[#bfdbfe] rounded-xl p-2.5 sm:p-3 shadow-2xs flex flex-col justify-between">
       <div>
-        <div class="flex items-center justify-between text-xs font-bold text-blue-800 mb-2">
+        <div class="flex items-center justify-between text-[11px] font-bold text-blue-800 mb-1">
           <span>মেরামত ও কোয়ালিটি টেস্ট</span>
-          <span class="text-sm">🔬</span>
+          <span class="text-xs">🔬</span>
         </div>
-        <div class="flex items-baseline gap-2">
-          <span class="text-2xl font-black text-slate-900">${s.in_repair + (s.in_lab || 0)} জন</span>
+        <div class="flex items-baseline gap-1.5">
+          <span class="text-lg sm:text-xl font-black text-slate-900 leading-tight">${s.in_repair + (s.in_lab || 0)} জন</span>
         </div>
-        <div class="text-[11px] text-slate-600 mt-1">মেরামত: ${s.in_repair} জন • ল্যাব টেস্ট: ${s.in_lab || 0} জন</div>
+        <div class="text-[10px] text-slate-600 mt-0.5 truncate">মেরামত: ${s.in_repair} জন • ল্যাব: ${s.in_lab || 0} জন</div>
       </div>
-      <div class="mt-3 pt-2 border-t border-blue-200/60">
-        <a href="javascript:void(0)" onclick="filterOrders('IN_REPAIR')" class="text-[11px] text-blue-800 font-bold hover:underline">ল্যাব মেরামত তালিকা দেখুন →</a>
+      <div class="mt-1.5 pt-1 border-t border-blue-200/60">
+        <a href="javascript:void(0)" onclick="filterOrders('IN_REPAIR')" class="text-[10px] text-blue-800 font-bold hover:underline block truncate">ল্যাব মেরামত তালিকা দেখুন →</a>
       </div>
     </div>
 
     <!-- Card 4: মূল্য অনুমোদন অপেক্ষমাণ - Soft Purple -->
-    <div class="bg-[#faf5ff] border border-[#e9d5ff] rounded-2xl p-4 shadow-2xs flex flex-col justify-between">
+    <div class="bg-[#faf5ff] border border-[#e9d5ff] rounded-xl p-2.5 sm:p-3 shadow-2xs flex flex-col justify-between">
       <div>
-        <div class="flex items-center justify-between text-xs font-bold text-purple-800 mb-2">
+        <div class="flex items-center justify-between text-[11px] font-bold text-purple-800 mb-1">
           <span>মূল্য অনুমোদন অপেক্ষমাণ</span>
-          <span class="text-sm">🔔</span>
+          <span class="text-xs">🔔</span>
         </div>
-        <div class="flex items-baseline gap-2">
-          <span class="text-2xl font-black text-slate-900">${s.quote_pending} টি</span>
+        <div class="flex items-baseline gap-1.5">
+          <span class="text-lg sm:text-xl font-black text-slate-900 leading-tight">${s.quote_pending} টি</span>
         </div>
-        <div class="text-[11px] text-slate-600 mt-1">গ্রাহকের সম্মতির জন্য ${s.quote_pending}টি অর্ডার</div>
+        <div class="text-[10px] text-slate-600 mt-0.5 truncate">সম্মতির জন্য ${s.quote_pending}টি অর্ডার</div>
       </div>
-      <div class="mt-3 pt-2 border-t border-purple-200/60">
-        <a href="javascript:void(0)" onclick="filterOrders('QUOTE_PENDING')" class="text-[11px] text-purple-800 font-bold hover:underline">কোটেশন ও অনুমোদন দেখুন →</a>
+      <div class="mt-1.5 pt-1 border-t border-purple-200/60">
+        <a href="javascript:void(0)" onclick="filterOrders('QUOTE_PENDING')" class="text-[10px] text-purple-800 font-bold hover:underline block truncate">কোটেশন ও অনুমোদন দেখুন →</a>
       </div>
     </div>
 
     <!-- Card 5: প্রাপ্ত বার্তা ও ইনকোয়ারি - Soft Rose -->
-    <div class="bg-[#fff1f2] border border-[#fecdd3] rounded-2xl p-4 shadow-2xs flex flex-col justify-between">
+    <div class="bg-[#fff1f2] border border-[#fecdd3] rounded-xl p-2.5 sm:p-3 shadow-2xs flex flex-col justify-between">
       <div>
-        <div class="flex items-center justify-between text-xs font-bold text-rose-800 mb-2">
+        <div class="flex items-center justify-between text-[11px] font-bold text-rose-800 mb-1">
           <span>প্রাপ্ত বার্তা ও ইনকোয়ারি</span>
-          <span class="text-sm">💬</span>
+          <span class="text-xs">💬</span>
         </div>
-        <div class="flex items-baseline gap-2">
-          <span class="text-2xl font-black text-slate-900" id="stat-card-inq-count">২ টি</span>
+        <div class="flex items-baseline gap-1.5">
+          <span class="text-lg sm:text-xl font-black text-slate-900 leading-tight" id="stat-card-inq-count">২ টি</span>
         </div>
-        <div class="text-[11px] text-rose-700 font-semibold mt-1">সকল বার্তা পর্যালোচনা সম্পন্ন</div>
+        <div class="text-[10px] text-rose-700 font-semibold mt-0.5 truncate">সকল বার্তা পর্যালোচনা সম্পন্ন</div>
       </div>
-      <div class="mt-3 pt-2 border-t border-rose-200/60">
-        <a href="javascript:void(0)" onclick="switchTab('inquiries')" class="text-[11px] text-rose-800 font-bold hover:underline">গ্রাহকদের মেসেজ পড়ুন →</a>
+      <div class="mt-1.5 pt-1 border-t border-rose-200/60">
+        <a href="javascript:void(0)" onclick="switchTab('inquiries')" class="text-[10px] text-rose-800 font-bold hover:underline block truncate">গ্রাহকদের মেসেজ পড়ুন →</a>
       </div>
     </div>
 
-    <!-- Card 6: ডেলিভারি ও সমাপ্ত (Alumni) - Soft Teal -->
-    <div class="bg-[#f0fdfa] border border-[#99f6e4] rounded-2xl p-4 shadow-2xs flex flex-col justify-between">
+    <!-- Card 6: পুরাতন ডিভাইস (Alumni) - Soft Teal -->
+    <div class="bg-[#f0fdfa] border border-[#99f6e4] rounded-xl p-2.5 sm:p-3 shadow-2xs flex flex-col justify-between">
       <div>
-        <div class="flex items-center justify-between text-xs font-bold text-teal-800 mb-2">
+        <div class="flex items-center justify-between text-[11px] font-bold text-teal-800 mb-1">
           <span>পুরাতন ডিভাইস (Alumni)</span>
-          <span class="text-sm">🎓</span>
+          <span class="text-xs">🎓</span>
         </div>
-        <div class="flex items-baseline gap-2">
-          <span class="text-2xl font-black text-slate-900">${s.completed} জন</span>
+        <div class="flex items-baseline gap-1.5">
+          <span class="text-lg sm:text-xl font-black text-slate-900 leading-tight">${s.completed} জন</span>
         </div>
-        <div class="text-[11px] text-teal-700 font-semibold mt-1">ওয়ারেন্টি সম্পন্ন ডিভাইস রেজিস্ট্রি</div>
+        <div class="text-[10px] text-teal-700 font-semibold mt-0.5 truncate">ওয়ারেন্টি সম্পন্ন ডিভাইস রেজিস্ট্রি</div>
       </div>
-      <div class="mt-3 pt-2 border-t border-teal-200/60">
-        <a href="javascript:void(0)" onclick="filterOrders('COMPLETED')" class="text-[11px] text-teal-800 font-bold hover:underline">সম্পন্ন গ্রাহক তালিকা →</a>
+      <div class="mt-1.5 pt-1 border-t border-teal-200/60">
+        <a href="javascript:void(0)" onclick="filterOrders('COMPLETED')" class="text-[10px] text-teal-800 font-bold hover:underline block truncate">সম্পন্ন গ্রাহক তালিকা →</a>
       </div>
     </div>
 
     <!-- Card 7: সক্রিয় সার্ভিসসমূহ - Soft Sky -->
-    <div class="bg-[#f0f9ff] border border-[#bae6fd] rounded-2xl p-4 shadow-2xs flex flex-col justify-between">
+    <div class="bg-[#f0f9ff] border border-[#bae6fd] rounded-xl p-2.5 sm:p-3 shadow-2xs flex flex-col justify-between">
       <div>
-        <div class="flex items-center justify-between text-xs font-bold text-sky-800 mb-2">
+        <div class="flex items-center justify-between text-[11px] font-bold text-sky-800 mb-1">
           <span>সক্রিয় সার্ভিস ক্যাটাগরি</span>
-          <span class="text-sm">🛠️</span>
+          <span class="text-xs">🛠️</span>
         </div>
-        <div class="flex items-baseline gap-2">
-          <span class="text-2xl font-black text-slate-900" id="stat-card-serv-count">৯ টি</span>
+        <div class="flex items-baseline gap-1.5">
+          <span class="text-lg sm:text-xl font-black text-slate-900 leading-tight" id="stat-card-serv-count">৯ টি</span>
         </div>
-        <div class="text-[11px] text-slate-600 mt-1">ক্যাটাগরিভিত্তিক সাপ্তাহিক শিডিউল</div>
+        <div class="text-[10px] text-slate-600 mt-0.5 truncate">ক্যাটাগরিভিত্তিক সাপ্তাহিক শিডিউল</div>
       </div>
-      <div class="mt-3 pt-2 border-t border-sky-200/60">
-        <a href="javascript:void(0)" onclick="switchTab('services')" class="text-[11px] text-sky-800 font-bold hover:underline">সার্ভিস সম্পাদনা ও রেটকার্ড →</a>
+      <div class="mt-1.5 pt-1 border-t border-sky-200/60">
+        <a href="javascript:void(0)" onclick="switchTab('services')" class="text-[10px] text-sky-800 font-bold hover:underline block truncate">সার্ভিস সম্পাদনা ও রেটকার্ড →</a>
       </div>
     </div>
 
     <!-- Card 8: মোট আদায়কৃত আয় - Mint Emerald -->
-    <div class="bg-[#ecfdf5] border border-[#a7f3d0] rounded-2xl p-4 shadow-2xs flex flex-col justify-between">
+    <div class="bg-[#ecfdf5] border border-[#a7f3d0] rounded-xl p-2.5 sm:p-3 shadow-2xs flex flex-col justify-between">
       <div>
-        <div class="flex items-center justify-between text-xs font-bold text-emerald-800 mb-2">
+        <div class="flex items-center justify-between text-[11px] font-bold text-emerald-800 mb-1">
           <span>মোট আদায়কৃত আয়</span>
-          <span class="text-sm">💰</span>
+          <span class="text-xs">💰</span>
         </div>
-        <div class="flex items-baseline gap-2">
-          <span class="text-2xl font-black text-slate-900">৳${s.total_revenue.toLocaleString()}</span>
+        <div class="flex items-baseline gap-1.5">
+          <span class="text-lg sm:text-xl font-black text-slate-900 leading-tight">৳${s.total_revenue.toLocaleString()}</span>
         </div>
-        <div class="text-[11px] text-slate-600 mt-1">ক্যাশ অন ডেলিভারি ও অনলাইন পেমেন্ট</div>
+        <div class="text-[10px] text-slate-600 mt-0.5 truncate">ক্যাশ অন ডেলিভারি ও অনলাইন</div>
       </div>
-      <div class="mt-3 pt-2 border-t border-emerald-200/60">
-        <span class="text-[11px] text-emerald-800 font-bold">আর্থিক স্থিতি ও হিসাব রিপোর্ট →</span>
+      <div class="mt-1.5 pt-1 border-t border-emerald-200/60">
+        <span class="text-[10px] text-emerald-800 font-bold block truncate">আর্থিক স্থিতি ও হিসাব রিপোর্ট →</span>
       </div>
     </div>
   `;
