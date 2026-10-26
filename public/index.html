@@ -1678,9 +1678,14 @@
       <!-- Top Profile Card (Matching Admin Panel) -->
       <div class="bg-gradient-to-r from-teal-900 via-[#0f766e] to-teal-800 rounded-2xl p-4 sm:p-5 text-white shadow-md mb-5 border border-teal-700/50">
         <div class="flex items-center gap-4">
-          <div class="relative w-16 h-16 rounded-2xl overflow-hidden bg-white/10 border-2 border-white/30 flex items-center justify-center font-black text-2xl shadow-inner shrink-0">
+          <!-- Clickable Avatar with Camera Overlay to Upload Image -->
+          <div onclick="document.getElementById('profile-file-input').click()" class="relative w-16 h-16 rounded-2xl overflow-hidden bg-white/10 border-2 border-white/30 flex items-center justify-center font-black text-2xl shadow-inner shrink-0 cursor-pointer group" title="ছবি আপলোড করতে ক্লিক করুন">
             <img id="profile-modal-avatar-preview" src="" alt="Avatar" class="w-full h-full object-cover hidden">
             <span id="profile-modal-avatar-initial">গ</span>
+            <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center text-white text-[10px] font-bold transition">
+              <span class="text-base">📷</span>
+              <span>বদলান</span>
+            </div>
           </div>
           <div class="space-y-1 min-w-0 flex-1">
             <div class="flex items-center gap-2">
@@ -1707,25 +1712,44 @@
       <div id="profile-tab-content" class="space-y-5">
         <form id="user-profile-edit-form" onsubmit="handleUserProfileSave(event)" class="space-y-4">
           
-          <!-- Avatar Photo Input & Presets -->
-          <div>
-            <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-              প্রোফাইল ছবি (Profile Photo URL / Presets)
-            </label>
-            <div class="flex items-center gap-2 mb-2">
-              <input type="url" id="profile-edit-avatar" oninput="updateProfileAvatarPreview(this.value)" placeholder="ছবির ডাইরেক্ট লিঙ্ক পেস্ট করুন (যেমন: https://...)" class="flex-1 px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-300 text-slate-900 text-xs focus:bg-white focus:border-teal-600 focus:outline-none transition">
-              <button type="button" onclick="clearProfileAvatar()" class="px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-bold transition">রিমুভ</button>
+          <!-- Direct Photo Upload from Device & Gallery -->
+          <div class="p-4 rounded-2xl bg-teal-50/60 border border-teal-200 space-y-3">
+            <div class="flex items-center justify-between">
+              <label class="block text-xs font-bold uppercase tracking-wider text-teal-950">
+                📷 প্রোফাইল ছবি যোগ করুন (Add Photo)
+              </label>
+              <button type="button" onclick="clearProfileAvatar()" class="text-xs font-bold text-rose-600 hover:underline">
+                ✕ ছবি মুছুন
+              </button>
             </div>
-            <!-- Quick Avatar Presets -->
-            <div class="flex flex-wrap items-center gap-2">
-              <span class="text-[11px] text-slate-500 font-medium">অথবা দ্রুত ছবি নির্বাচন করুন:</span>
+
+            <input type="file" id="profile-file-input" accept="image/*" class="hidden" onchange="handleCustomerFileUpload(this)">
+
+            <!-- Big Direct File Upload Button -->
+            <div class="flex flex-wrap items-center gap-2.5">
+              <button type="button" onclick="document.getElementById('profile-file-input').click()" class="px-4 py-2.5 rounded-xl bg-[#0f766e] hover:bg-[#115e59] text-white text-xs font-bold transition flex items-center gap-2 shadow-xs cursor-pointer">
+                <span class="text-sm">📁</span> <span>মোবাইল বা কম্পিউটার থেকে ছবি আপলোড</span>
+              </button>
+              <span id="profile-file-status" class="text-xs text-emerald-800 font-bold hidden bg-emerald-100 border border-emerald-300 px-2.5 py-1 rounded-lg">
+                ✓ ছবি যুক্ত হয়েছে
+              </span>
+            </div>
+
+            <!-- Optional: Link or Quick Presets -->
+            <div class="pt-2.5 border-t border-teal-200/70 flex flex-wrap items-center justify-between gap-2 text-xs">
               <div class="flex items-center gap-1.5">
-                <button type="button" onclick="selectAvatarPreset('https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&auto=format&fit=crop&q=80')" class="w-7 h-7 rounded-full overflow-hidden border-2 border-slate-300 hover:border-teal-500 transition shadow-2xs" title="ছবি ১"><img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&auto=format&fit=crop&q=80" class="w-full h-full object-cover"></button>
-                <button type="button" onclick="selectAvatarPreset('https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120&auto=format&fit=crop&q=80')" class="w-7 h-7 rounded-full overflow-hidden border-2 border-slate-300 hover:border-teal-500 transition shadow-2xs" title="ছবি ২"><img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120&auto=format&fit=crop&q=80" class="w-full h-full object-cover"></button>
-                <button type="button" onclick="selectAvatarPreset('https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=120&auto=format&fit=crop&q=80')" class="w-7 h-7 rounded-full overflow-hidden border-2 border-slate-300 hover:border-teal-500 transition shadow-2xs" title="ছবি ৩"><img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=120&auto=format&fit=crop&q=80" class="w-full h-full object-cover"></button>
-                <button type="button" onclick="selectAvatarPreset('https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=120&auto=format&fit=crop&q=80')" class="w-7 h-7 rounded-full overflow-hidden border-2 border-slate-300 hover:border-teal-500 transition shadow-2xs" title="ছবি ৪"><img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=120&auto=format&fit=crop&q=80" class="w-full h-full object-cover"></button>
+                <span class="text-[11px] text-teal-900 font-medium">অথবা ডেমো ছবি:</span>
+                <button type="button" onclick="selectAvatarPreset('https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&auto=format&fit=crop&q=80')" class="w-6 h-6 rounded-full overflow-hidden border border-teal-300 hover:scale-110 transition" title="ছবি ১"><img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&auto=format&fit=crop&q=80" class="w-full h-full object-cover"></button>
+                <button type="button" onclick="selectAvatarPreset('https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120&auto=format&fit=crop&q=80')" class="w-6 h-6 rounded-full overflow-hidden border border-teal-300 hover:scale-110 transition" title="ছবি ২"><img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120&auto=format&fit=crop&q=80" class="w-full h-full object-cover"></button>
+                <button type="button" onclick="selectAvatarPreset('https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=120&auto=format&fit=crop&q=80')" class="w-6 h-6 rounded-full overflow-hidden border border-teal-300 hover:scale-110 transition" title="ছবি ৩"><img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=120&auto=format&fit=crop&q=80" class="w-full h-full object-cover"></button>
+                <button type="button" onclick="selectAvatarPreset('https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=120&auto=format&fit=crop&q=80')" class="w-6 h-6 rounded-full overflow-hidden border border-teal-300 hover:scale-110 transition" title="ছবি ৪"><img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=120&auto=format&fit=crop&q=80" class="w-full h-full object-cover"></button>
+              </div>
+
+              <div class="flex items-center gap-1.5 w-full sm:w-auto">
+                <input type="url" id="profile-edit-avatar" oninput="updateProfileAvatarPreview(this.value)" placeholder="অথবা ছবির ওয়েব লিংক..." class="w-full sm:w-52 px-3 py-1.5 rounded-lg bg-white border border-teal-300 text-slate-800 text-[11px] focus:outline-none focus:border-teal-600">
               </div>
             </div>
+
           </div>
           
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">

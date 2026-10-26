@@ -1424,9 +1424,71 @@ function previewMyProfileAvatar(url) {
   }
 }
 
+function compressAndCropSquareImage(file, callback) {
+  if (!file || !file.type.startsWith('image/')) {
+    alert('অনুগ্রহ করে একটি সঠিক ছবি (JPG, PNG ইত্যাদি) নির্বাচন করুন।');
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const img = new Image();
+    img.onload = function() {
+      const canvas = document.createElement('canvas');
+      const MAX_SIZE = 256;
+      let width = img.width;
+      let height = img.height;
+
+      // Center crop square
+      let sx = 0, sy = 0, sSize = Math.min(width, height);
+      if (width > height) {
+        sx = (width - height) / 2;
+      } else {
+        sy = (height - width) / 2;
+      }
+
+      canvas.width = MAX_SIZE;
+      canvas.height = MAX_SIZE;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, sx, sy, sSize, sSize, 0, 0, MAX_SIZE, MAX_SIZE);
+
+      const base64Url = canvas.toDataURL('image/jpeg', 0.85);
+      callback(base64Url);
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function handleAdminProfileFileUpload(inputEl) {
+  if (!inputEl.files || !inputEl.files[0]) return;
+  const file = inputEl.files[0];
+  compressAndCropSquareImage(file, (base64Url) => {
+    const avatarInput = document.getElementById('my-profile-avatar-url');
+    if (avatarInput) avatarInput.value = base64Url;
+    previewMyProfileAvatar(base64Url);
+
+    const statusEl = document.getElementById('admin-profile-file-status');
+    if (statusEl) {
+      statusEl.classList.remove('hidden');
+      setTimeout(() => statusEl.classList.add('hidden'), 3500);
+    }
+  });
+}
+
+function handleTeamUserFileUpload(inputEl) {
+  if (!inputEl.files || !inputEl.files[0]) return;
+  const file = inputEl.files[0];
+  compressAndCropSquareImage(file, (base64Url) => {
+    const avatarInput = document.getElementById('manage-user-avatar');
+    if (avatarInput) avatarInput.value = base64Url;
+  });
+}
+
 function setMyAvatarPreset(url) {
   const inp = document.getElementById('my-profile-avatar-url');
   if (inp) inp.value = url;
+  const fileInput = document.getElementById('admin-profile-file-input');
+  if (fileInput) fileInput.value = '';
   previewMyProfileAvatar(url);
 }
 
@@ -1977,6 +2039,10 @@ window.switchUserSubTab = switchUserSubTab;
 window.loadAdminCustomers = loadAdminCustomers;
 window.handleSearchCustomers = handleSearchCustomers;
 window.deleteAdminCustomer = deleteAdminCustomer;
+window.handleAdminProfileFileUpload = handleAdminProfileFileUpload;
+window.handleTeamUserFileUpload = handleTeamUserFileUpload;
+window.setMyAvatarPreset = setMyAvatarPreset;
+window.previewMyProfileAvatar = previewMyProfileAvatar;
 
 
 
