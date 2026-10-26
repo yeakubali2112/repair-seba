@@ -50,279 +50,332 @@
         </button>
 
         <div class="text-center pt-2">
-          <a href="/" class="text-xs text-slate-500 hover:text-slate-800 transition">← মূল ওয়েবসাইটে ফিরে যান</a>
+          <a href="/" class="text-xs text-slate-500 hover:text-cyan-600 transition">← কাস্টমার ওয়েবসাইটে ফিরে যান</a>
         </div>
       </form>
     </div>
   </div>
 
   <!-- 2. MAIN ADMIN DASHBOARD (Visible when logged in) -->
-  <div id="admin-dashboard-screen" class="hidden min-h-screen flex bg-slate-50 text-slate-800">
+  <div id="admin-dashboard-screen" class="hidden min-h-screen bg-[#f1f5f9] text-slate-800 flex flex-col font-sans">
     
-    <!-- Mobile Sidebar Backdrop Overlay -->
-    <div id="sidebar-backdrop" onclick="toggleAdminSidebar(false)" class="fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-40 lg:hidden hidden transition-opacity"></div>
-
-    <!-- LEFT SIDEBAR (Ultra-Professional Navigation) -->
-    <aside id="admin-sidebar" class="fixed lg:sticky top-0 left-0 z-50 h-screen w-64 lg:w-72 bg-white border-r border-slate-200/90 flex flex-col justify-between shrink-0 shadow-xl lg:shadow-none -translate-x-full lg:translate-x-0 transition-transform duration-200 ease-in-out">
-      
-      <!-- Top Brand Header in Sidebar -->
-      <div class="h-20 px-5 border-b border-slate-200/90 flex items-center justify-between shrink-0 bg-white">
-        <div class="flex items-center gap-3">
-          <div class="relative w-11 h-11 rounded-2xl bg-gradient-to-tr from-cyan-600 to-sky-500 text-white flex items-center justify-center font-black text-2xl shadow-md shadow-cyan-600/25">
-            🛠️
-            <!-- Pulse dot for online status -->
-            <span class="absolute -top-0.5 -right-0.5 flex h-3 w-3">
-              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-              <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500 border-2 border-white"></span>
-            </span>
+    <!-- TOP HEADER (Full Width, Matching School Reference Screenshot) -->
+    <header class="bg-white border-b border-slate-200/90 shadow-2xs sticky top-0 z-40">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex items-center justify-between">
+        
+        <!-- Left: Logo & Organization Title -->
+        <div class="flex items-center gap-3.5">
+          <div class="w-11 h-11 rounded-2xl bg-white border border-teal-200/80 p-1 shadow-xs flex items-center justify-center shrink-0">
+            <img src="/favicon.svg" alt="Repair Seba" class="w-9 h-9 rounded-xl">
           </div>
           <div>
-            <div class="flex items-center gap-1.5">
-              <h1 class="text-base font-black tracking-tight text-slate-900 leading-tight">
-                Repair <span class="text-cyan-600">Seba</span>
-              </h1>
-              <span class="px-1.5 py-0.5 text-[9px] font-black rounded-md bg-cyan-50 text-cyan-700 border border-cyan-200/80">PRO</span>
-            </div>
-            <p class="text-[11px] font-medium text-slate-400 mt-0.5 flex items-center gap-1">
-              <span>অ্যাডমিন কন্ট্রোল পোর্টাল</span>
+            <h1 class="text-base sm:text-lg font-black tracking-tight text-[#0f766e] leading-tight flex items-center gap-2">
+              রিপেয়ার সেবা (Repair Seba) - ডিজিটাল ডোরস্টেপ গ্যাজেট সার্ভিস
+            </h1>
+            <p class="text-[11px] font-medium text-slate-500 mt-0.5 flex flex-wrap items-center gap-2">
+              <span>ট্রেড কোড: RS-২০২৬</span>
+              <span class="w-1 h-1 rounded-full bg-slate-300"></span>
+              <span>অনুমোদিত ডায়াগনস্টিক ল্যাব</span>
+              <span class="w-1 h-1 rounded-full bg-slate-300"></span>
+              <span class="text-emerald-700 font-semibold">ঢাকা মহানগর ২৪/৭ সার্বক্ষণিক সার্ভিস</span>
             </p>
           </div>
         </div>
-        <!-- Close button for mobile screen -->
-        <button onclick="toggleAdminSidebar(false)" class="lg:hidden p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition" title="Close Sidebar">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-        </button>
-      </div>
 
-      <!-- Navigation Menu in Sidebar -->
-      <div class="flex-1 overflow-y-auto px-4 py-5 space-y-6">
-        
-        <!-- Category 1: Main Management -->
-        <div>
-          <div class="text-[10px] font-black uppercase tracking-wider text-slate-400 px-3 mb-2.5 flex items-center justify-between">
-            <span>ম্যানেজমেন্ট ও অপারেশন</span>
-            <span class="w-1.5 h-1.5 rounded-full bg-cyan-500"></span>
-          </div>
-          <nav class="space-y-1.5">
-            
-            <!-- 1. Orders Tab -->
-            <button onclick="switchTab('orders'); toggleAdminSidebar(false);" id="tab-btn-orders" class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold bg-gradient-to-r from-cyan-600 to-sky-600 text-white shadow-md shadow-cyan-600/25 transition-all text-left group">
-              <div class="flex items-center gap-3">
-                <span id="tab-icon-orders" class="w-7 h-7 rounded-lg bg-white/20 text-white flex items-center justify-center text-sm shadow-xs transition">
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
-                </span>
-                <span>অর্ডারসমূহ (Orders)</span>
-              </div>
-              <span id="badge-tab-orders" class="px-2 py-0.5 text-[10px] font-bold rounded-full bg-white/20 text-white border border-white/30 transition">
-                ৬টি
-              </span>
-            </button>
-
-            <!-- 2. Services Config Tab -->
-            <button onclick="switchTab('services'); toggleAdminSidebar(false);" id="tab-btn-services" class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-all text-left group">
-              <div class="flex items-center gap-3">
-                <span id="tab-icon-services" class="w-7 h-7 rounded-lg bg-slate-100 text-slate-500 group-hover:text-cyan-600 group-hover:bg-cyan-50 flex items-center justify-center text-sm transition">
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>
-                </span>
-                <span>সার্ভিস কনফিগ (Services)</span>
-              </div>
-              <span id="badge-tab-services" class="px-2 py-0.5 text-[10px] font-bold rounded-full bg-slate-100 text-slate-600 border border-slate-200 transition">
-                ৯টি
-              </span>
-            </button>
-
-            <!-- 3. Inquiries Tab -->
-            <button onclick="switchTab('inquiries'); toggleAdminSidebar(false);" id="tab-btn-inquiries" class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-all text-left group">
-              <div class="flex items-center gap-3">
-                <span id="tab-icon-inquiries" class="w-7 h-7 rounded-lg bg-slate-100 text-slate-500 group-hover:text-cyan-600 group-hover:bg-cyan-50 flex items-center justify-center text-sm transition">
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
-                </span>
-                <span>গ্রাহক মেসেজ (Inquiries)</span>
-              </div>
-              <span id="badge-tab-inquiries" class="px-2 py-0.5 text-[10px] font-bold rounded-full bg-slate-100 text-slate-600 border border-slate-200 transition">
-                মেসেজ
-              </span>
-            </button>
-
-          </nav>
-        </div>
-
-        <!-- Category 2: Website Customization -->
-        <div>
-          <div class="text-[10px] font-black uppercase tracking-wider text-slate-400 px-3 mb-2.5 flex items-center justify-between">
-            <span>ওয়েবসাইট কনটেন্ট</span>
-            <span class="w-1.5 h-1.5 rounded-full bg-sky-400"></span>
-          </div>
-          <nav class="space-y-1.5">
-
-            <!-- 4. Hero Tab -->
-            <button onclick="switchTab('hero'); toggleAdminSidebar(false);" id="tab-btn-hero" class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-all text-left group">
-              <div class="flex items-center gap-3">
-                <span id="tab-icon-hero" class="w-7 h-7 rounded-lg bg-slate-100 text-slate-500 group-hover:text-cyan-600 group-hover:bg-cyan-50 flex items-center justify-center text-sm transition">
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4 5 5 0 013-4.5 5 5 0 0110.5-2 5 5 0 014.5 5.5A4 4 0 0117 21H7z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v3m-3-3l2 2m4-2l-2 2"/></svg>
-                </span>
-                <span>হিরো ব্যানার (Hero)</span>
-              </div>
-              <span id="badge-tab-hero" class="text-[10px] text-slate-400 font-semibold group-hover:text-slate-600 transition">কন্ট্রোল</span>
-            </button>
-
-            <!-- 5. Footer Tab -->
-            <button onclick="switchTab('footer'); toggleAdminSidebar(false);" id="tab-btn-footer" class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-all text-left group">
-              <div class="flex items-center gap-3">
-                <span id="tab-icon-footer" class="w-7 h-7 rounded-lg bg-slate-100 text-slate-500 group-hover:text-cyan-600 group-hover:bg-cyan-50 flex items-center justify-center text-sm transition">
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
-                </span>
-                <span>ফুটার ও অফিস (Footer)</span>
-              </div>
-              <span id="badge-tab-footer" class="text-[10px] text-slate-400 font-semibold group-hover:text-slate-600 transition">ঠিকানা</span>
-            </button>
-
-          </nav>
-        </div>
-
-        <!-- Category 3: Quick Links -->
-        <div>
-          <div class="text-[10px] font-black uppercase tracking-wider text-slate-400 px-3 mb-2 flex items-center justify-between">
-            <span>সরাসরি লিঙ্ক</span>
-          </div>
-          <div class="space-y-1.5">
-            <a href="/" target="_blank" class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-600 hover:text-cyan-700 hover:bg-cyan-50/70 border border-dashed border-slate-200 hover:border-cyan-300 transition group">
-              <div class="flex items-center gap-2.5">
-                <span class="text-sm">🌐</span>
-                <span>কাস্টমার ওয়েবসাইট</span>
-              </div>
-              <svg class="w-3.5 h-3.5 text-slate-400 group-hover:text-cyan-600 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
-            </a>
-          </div>
-        </div>
-
-      </div>
-
-      <!-- Bottom User Profile Card & Logout Section in Sidebar -->
-      <div class="p-3.5 border-t border-slate-200/90 bg-slate-50/80">
-        <div class="p-2.5 rounded-2xl bg-white border border-slate-200/90 shadow-xs flex items-center justify-between gap-3">
-          <div class="flex items-center gap-2.5 min-w-0">
-            <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-cyan-600 to-sky-700 text-white flex items-center justify-center font-black text-xs shadow-xs shrink-0">
-              YA
-            </div>
-            <div class="min-w-0">
-              <p class="text-xs font-bold text-slate-900 truncate">Yeakub Ali</p>
-              <p class="text-[10px] font-medium text-emerald-600 flex items-center gap-1">
-                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> সুপার অ্যাডমিন
-              </p>
-            </div>
-          </div>
-          <button onclick="adminLogout()" title="লগআউট করুন" class="p-2 rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 border border-transparent hover:border-rose-200 transition shrink-0">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
-          </button>
-        </div>
-      </div>
-
-    </aside>
-
-    <!-- RIGHT MAIN CONTENT WRAPPER -->
-    <div class="flex-1 flex flex-col min-w-0 bg-slate-50 min-h-screen">
-      
-      <!-- Top Header Bar (Height matched to sidebar header for seamless horizontal line) -->
-      <header class="h-20 bg-white border-b border-slate-200 sticky top-0 z-30 px-4 sm:px-6 flex items-center justify-between shrink-0">
-        
-        <!-- Left: Mobile Hamburger & Current Page Title -->
+        <!-- Right: Admin User Profile Card & Logout Button -->
         <div class="flex items-center gap-3">
-          <button onclick="toggleAdminSidebar(true)" class="lg:hidden p-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 border border-slate-200" title="Open Menu">
+          
+          <!-- User Profile Capsule (Matching Screenshot) -->
+          <div class="hidden sm:flex items-center gap-2.5 px-3 py-1.5 rounded-xl bg-slate-50 border border-slate-200/80 shadow-2xs">
+            <div class="w-7 h-7 rounded-lg bg-[#0f766e] text-white flex items-center justify-center font-black text-xs shrink-0 shadow-xs">
+              প্র
+            </div>
+            <div class="text-left">
+              <div class="flex items-center gap-1.5">
+                <span class="text-xs font-bold text-slate-900 leading-none">প্রধান সুপার অ্যাডমিন</span>
+                <span class="px-1 py-0.2 text-[9px] font-black rounded bg-emerald-100 text-emerald-800 border border-emerald-200">সুপার</span>
+              </div>
+              <p class="text-[10px] text-slate-500 leading-tight mt-0.5">সুপার অ্যাডমিন (Super Admin) • @yeakubali</p>
+            </div>
+          </div>
+
+          <!-- Logout Button (Pink/Red Pill matching screenshot) -->
+          <button onclick="adminLogout()" class="px-3.5 py-1.5 rounded-xl bg-[#e11d48] hover:bg-[#be123c] text-white text-xs font-bold transition flex items-center gap-1.5 shadow-xs">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+            <span>লগআউট</span>
+          </button>
+
+          <!-- Mobile Toggle Menu Button -->
+          <button onclick="toggleMobileSidebar()" class="lg:hidden p-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 border border-slate-200">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
           </button>
-          <div>
-            <h2 id="top-bar-title" class="text-base sm:text-lg font-black text-slate-900 flex items-center gap-2">
-              <span>📦</span> অর্ডার ম্যানেজমেন্ট ড্যাশবোর্ড
-            </h2>
-            <p class="text-xs text-slate-500 hidden sm:block">ডোরস্টেপ সেবা কন্ট্রোল সেন্টার ও ম্যানেজমেন্ট</p>
-          </div>
+
         </div>
 
-        <!-- Right Side Quick Info & View Site -->
-        <div class="flex items-center gap-2 sm:gap-3">
-          <a href="/" target="_blank" class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-cyan-50 hover:text-cyan-700 hover:border-cyan-200 border border-slate-200 text-xs font-bold text-slate-700 transition">
-            <span>🌐</span> <span>কাস্টমার সাইট</span>
-          </a>
-          <button onclick="loadAdminDashboardData()" class="p-2 rounded-xl text-slate-500 hover:text-cyan-600 hover:bg-cyan-50 border border-slate-200 transition" title="রিফ্রেশ ডাটা">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-          </button>
-        </div>
-      </header>
+      </div>
+    </header>
 
-      <!-- Main Content Area -->
-      <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
-
-        <!-- Metrics Row -->
-        <div id="stats-container" class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3 mb-8">
-          <!-- Rendered by admin.js with light cards -->
-        </div>
-
-        <!-- TAB 1: ORDERS MANAGEMENT -->
-        <section id="tab-orders" class="space-y-6">
+    <!-- MAIN BODY CONTAINER: Floating Sidebar Card + Content Grid -->
+    <div class="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-1">
+      <div class="flex flex-col lg:flex-row gap-6 items-start">
+        
+        <!-- LEFT FLOATING SIDEBAR CARD (Matching Screenshot) -->
+        <aside id="admin-floating-sidebar" class="w-full lg:w-64 shrink-0 bg-white rounded-2xl border border-slate-200/90 shadow-sm p-3.5 lg:sticky lg:top-24 space-y-4">
           
-          <!-- Filter and Search Toolbar -->
-          <div class="bg-white border border-slate-200 p-4 rounded-2xl shadow-xs flex flex-col lg:flex-row items-center justify-between gap-4">
+          <div>
+            <div class="text-[11px] font-bold text-slate-400 px-3 uppercase tracking-wider mb-2">
+              প্রধান মেনু
+            </div>
+            <nav class="space-y-1.5">
+              
+              <!-- 1. Overview (Active by default) -->
+              <button onclick="switchTab('orders')" id="tab-btn-orders" class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold bg-[#0f766e] text-white shadow-md shadow-teal-700/20 transition-all text-left">
+                <div class="flex items-center gap-2.5">
+                  <span class="text-sm">▦</span>
+                  <span>ওভারভিউ</span>
+                </div>
+              </button>
+
+              <!-- 2. Hero Banner Tab -->
+              <button onclick="switchTab('hero')" id="tab-btn-hero" class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-medium text-slate-700 hover:bg-slate-100 transition-all text-left">
+                <div class="flex items-center gap-2.5">
+                  <span class="text-sm">🎨</span>
+                  <span>হিরো ব্যানার</span>
+                </div>
+                <span class="px-2 py-0.5 text-[10px] font-bold rounded-md bg-cyan-50 text-cyan-700 border border-cyan-200/80">হোমপেজ</span>
+              </button>
+
+              <!-- 3. Orders Tab -->
+              <button onclick="switchTab('orders')" class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-medium text-slate-700 hover:bg-slate-100 transition-all text-left">
+                <div class="flex items-center gap-2.5">
+                  <span class="text-sm">📦</span>
+                  <span>অর্ডার আবেদন</span>
+                </div>
+                <span id="badge-tab-orders" class="px-2 py-0.5 text-[10px] font-bold rounded-md bg-amber-100 text-amber-800 border border-amber-200">১ নতুন</span>
+              </button>
+
+              <!-- 4. Services Tab -->
+              <button onclick="switchTab('services')" id="tab-btn-services" class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-medium text-slate-700 hover:bg-slate-100 transition-all text-left">
+                <div class="flex items-center gap-2.5">
+                  <span class="text-sm">🛠️</span>
+                  <span>সার্ভিস ব্যবস্থাপনা</span>
+                </div>
+                <span id="badge-tab-services" class="px-2 py-0.5 text-[10px] font-bold rounded-md bg-emerald-100 text-emerald-800 border border-emerald-200">৯টি সক্রিয়</span>
+              </button>
+
+              <!-- 5. Inquiries Tab -->
+              <button onclick="switchTab('inquiries')" id="tab-btn-inquiries" class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-medium text-slate-700 hover:bg-slate-100 transition-all text-left">
+                <div class="flex items-center gap-2.5">
+                  <span class="text-sm">💬</span>
+                  <span>প্রাপ্ত বার্তা ও ইনকোয়ারি</span>
+                </div>
+                <span id="badge-tab-inquiries" class="px-2 py-0.5 text-[10px] font-bold rounded-md bg-rose-100 text-rose-800 border border-rose-200">২টি</span>
+              </button>
+
+              <!-- 6. Footer Tab -->
+              <button onclick="switchTab('footer')" id="tab-btn-footer" class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-medium text-slate-700 hover:bg-slate-100 transition-all text-left">
+                <div class="flex items-center gap-2.5">
+                  <span class="text-sm">🏢</span>
+                  <span>অফিস ও ফুটার</span>
+                </div>
+                <span class="px-2 py-0.5 text-[10px] font-bold rounded-md bg-slate-100 text-slate-600">সেটিংস</span>
+              </button>
+
+              <!-- 7. Tech & Riders -->
+              <button onclick="alert('রাইডার ও টেকনিশিয়ান নেটওয়ার্ক: ঢাকা শহরের ১৫টি এরিয়ায় ফিল্ড টিম সক্রিয় রয়েছে।')" class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-medium text-slate-700 hover:bg-slate-100 transition-all text-left">
+                <div class="flex items-center gap-2.5">
+                  <span class="text-sm">👥</span>
+                  <span>টেকনিশিয়ান ও স্টাফ</span>
+                </div>
+                <span class="px-2 py-0.5 text-[10px] font-bold rounded-md bg-teal-100 text-teal-800 border border-teal-200">সক্রিয়</span>
+              </button>
+
+              <!-- 8. Reports & Print -->
+              <button onclick="window.print()" class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-medium text-slate-700 hover:bg-slate-100 transition-all text-left">
+                <div class="flex items-center gap-2.5">
+                  <span class="text-sm">🖨️</span>
+                  <span>জব-শীট ও রসিদ প্রিন্ট</span>
+                </div>
+                <span class="px-2 py-0.5 text-[10px] font-bold rounded-md bg-indigo-100 text-indigo-800 border border-indigo-200">রসিদ</span>
+              </button>
+
+              <!-- 9. Customer Site Link -->
+              <a href="/" target="_blank" class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold text-[#0f766e] bg-teal-50/70 hover:bg-teal-100 border border-teal-200/80 transition-all text-left">
+                <div class="flex items-center gap-2.5">
+                  <span class="text-sm">🌐</span>
+                  <span>কাস্টমার ওয়েবসাইট</span>
+                </div>
+                <span class="text-xs">↗</span>
+              </a>
+
+            </nav>
+          </div>
+
+        </aside>
+
+        <!-- RIGHT MAIN CONTENT WRAPPER -->
+        <main class="flex-1 w-full min-w-0 space-y-6">
+          
+          <!-- TAB 1: OVERVIEW DASHBOARD -->
+          <section id="tab-orders" class="space-y-6">
             
-            <!-- Status Filter Tabs -->
-            <div class="flex items-center gap-1.5 overflow-x-auto w-full lg:w-auto pb-2 lg:pb-0 scrollbar-none">
-              <button onclick="filterOrders('ALL')" class="order-status-tab active px-3.5 py-1.5 rounded-xl text-xs font-bold bg-cyan-600 text-white shadow-xs whitespace-nowrap transition">
-                সবগুলো (<span id="count-all">0</span>)
-              </button>
-              <button onclick="filterOrders('PENDING_PICKUP')" class="order-status-tab px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200 whitespace-nowrap transition">
-                পিকআপ বাকি
-              </button>
-              <button onclick="filterOrders('QUOTE_PENDING')" class="order-status-tab px-3.5 py-1.5 rounded-xl text-xs font-bold bg-orange-50 text-orange-700 border border-orange-300 hover:bg-orange-100 whitespace-nowrap transition animate-pulse">
-                ⚠️ মূল্য অনুমোদন অপেক্ষমাণ
-              </button>
-              <button onclick="filterOrders('IN_REPAIR')" class="order-status-tab px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200 whitespace-nowrap transition">
-                মেরামত চলছে
-              </button>
-              <button onclick="filterOrders('OUT_FOR_DELIVERY')" class="order-status-tab px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200 whitespace-nowrap transition">
-                ডেলিভারিতে
-              </button>
-              <button onclick="filterOrders('COMPLETED')" class="order-status-tab px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200 whitespace-nowrap transition">
-                সম্পন্ন
-              </button>
-            </div>
-
-            <!-- Search & Refresh -->
-            <div class="flex items-center gap-3 w-full lg:w-auto">
-              <div class="relative flex-1 lg:w-72">
-                <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <svg class="w-3.5 h-3.5 text-cyan-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+            <!-- Top Status Badges Row (Matching Screenshot) -->
+            <div>
+              <div class="flex flex-wrap items-center gap-2 mb-2">
+                <span class="px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-200 inline-flex items-center gap-1.5">
+                  <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                  <span>লাইভ ওভারভিউ</span>
                 </span>
-                <input type="text" id="order-search-input" placeholder="অর্ডার আইডি, নাম, ফোন বা ব্র্যান্ড..." class="w-full pl-8 pr-4 py-2 text-xs rounded-xl bg-slate-50 border border-slate-300 text-slate-900 focus:bg-white focus:outline-none focus:border-cyan-600 focus:ring-1 focus:ring-cyan-500 transition">
+                <span class="px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800 border border-amber-200 inline-flex items-center gap-1.5">
+                  <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+                  <span>লোকাল ডাটাবেজ সচল</span>
+                </span>
+                <span class="px-3 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-800 border border-blue-200 inline-flex items-center gap-1.5">
+                  <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+                  <span>ক্লাউড সার্ভার কানেক্টেড</span>
+                </span>
               </div>
-              <button onclick="loadAdminOrders()" class="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-300 text-xs font-bold text-slate-700 transition">
-                🔄 রিফ্রেশ
-              </button>
+              <h2 id="top-bar-title" class="text-2xl font-black text-slate-900 tracking-tight">
+                ড্যাশবোর্ড ওভারভিউ
+              </h2>
+              <p class="text-xs text-slate-500 mt-1">
+                রিপেয়ার সেবার সকল সার্ভিসের লাইভ ডাটা, পিকআপ ট্র্যাকিং, মেরামত পরিসংখ্যান ও সাম্প্রতিক কার্যক্রমের সারসংক্ষেপ
+              </p>
             </div>
 
-          </div>
-
-          <!-- Orders Table -->
-          <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-xs">
-            <div class="overflow-x-auto">
-              <table class="w-full text-left text-xs">
-                <thead class="bg-slate-50 text-slate-600 font-bold uppercase tracking-wider border-b border-slate-200">
-                  <tr>
-                    <th class="py-3.5 px-4">অর্ডার নং ও তারিখ</th>
-                    <th class="py-3.5 px-4">গ্রাহকের তথ্য ও ঠিকানা</th>
-                    <th class="py-3.5 px-4">ডিভাইস ও সমস্যা</th>
-                    <th class="py-3.5 px-4">বর্তমান স্ট্যাটাস</th>
-                    <th class="py-3.5 px-4">খরচ ও সম্মতি</th>
-                    <th class="py-3.5 px-4 text-right">একশন</th>
-                  </tr>
-                </thead>
-                <tbody id="orders-table-body" class="divide-y divide-slate-100 text-slate-800">
-                  <!-- Rows loaded by admin.js -->
-                </tbody>
-              </table>
+            <!-- The 8 Pastel Stat Cards (2 Rows of 4 Cards) -->
+            <div id="stats-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <!-- Rendered by admin.js -->
             </div>
-          </div>
 
-        </section>
+            <!-- Orders Table Card ("সর্বশেষ অর্ডারসমূহ (অনলাইন পোর্টাল)") -->
+            <div class="bg-white border border-slate-200/90 rounded-2xl shadow-sm overflow-hidden">
+              
+              <!-- Card Header Toolbar -->
+              <div class="p-4 sm:p-5 border-b border-slate-200/80 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                
+                <!-- Title & Count Badge -->
+                <div class="flex items-center gap-2.5">
+                  <h3 class="text-base font-bold text-slate-900">
+                    সর্বশেষ অর্ডারসমূহ (অনলাইন পোর্টাল)
+                  </h3>
+                  <span id="badge-table-total" class="px-2.5 py-0.5 text-xs font-bold rounded-md bg-slate-100 text-slate-600 border border-slate-200">
+                    ৬টি মোট
+                  </span>
+                </div>
+
+                <!-- Right Actions: Demo Order Button + Filters + Search -->
+                <div class="flex flex-wrap items-center gap-2">
+                  
+                  <!-- Red Demo Order Button (Matching Screenshot) -->
+                  <button onclick="createNewDemoOrder()" class="px-3 py-1.5 rounded-lg bg-[#fff1f2] hover:bg-[#ffe4e6] text-[#e11d48] border border-[#fecdd3] text-xs font-bold transition flex items-center gap-1 shadow-2xs">
+                    <span>🏷️</span> <span>ডেমো আবেদন যুক্ত</span>
+                  </button>
+
+                  <!-- Filter Pills -->
+                  <div class="flex items-center gap-1 bg-slate-100 p-1 rounded-xl border border-slate-200 text-xs">
+                    <button onclick="filterOrders('ALL')" class="order-status-tab active px-2.5 py-1 rounded-lg font-bold bg-[#0f766e] text-white shadow-2xs transition">সকল</button>
+                    <button onclick="filterOrders('PENDING_PICKUP')" class="order-status-tab px-2.5 py-1 rounded-lg text-slate-700 hover:text-slate-900 transition font-medium">অপেক্ষমাণ</button>
+                    <button onclick="filterOrders('QUOTE_APPROVED')" class="order-status-tab px-2.5 py-1 rounded-lg text-slate-700 hover:text-slate-900 transition font-medium">অনুমোদিত</button>
+                    <button onclick="filterOrders('IN_REPAIR')" class="order-status-tab px-2.5 py-1 rounded-lg text-slate-700 hover:text-slate-900 transition font-medium">মেরামত</button>
+                    <button onclick="filterOrders('COMPLETED')" class="order-status-tab px-2.5 py-1 rounded-lg text-slate-700 hover:text-slate-900 transition font-medium">সম্পন্ন</button>
+                  </div>
+
+                  <!-- Quick Refresh -->
+                  <button onclick="loadAdminOrders()" class="p-2 rounded-xl text-slate-500 hover:text-teal-700 hover:bg-teal-50 border border-slate-200 transition" title="রিফ্রেশ">
+                    🔄
+                  </button>
+
+                </div>
+
+              </div>
+
+              <!-- Orders Table -->
+              <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs">
+                  <thead class="bg-slate-50/80 text-slate-600 font-bold uppercase tracking-wider border-b border-slate-200/90">
+                    <tr>
+                      <th class="py-3 px-4">ট্র্যাকিং আইডি</th>
+                      <th class="py-3 px-4">গ্রাহকের নাম</th>
+                      <th class="py-3 px-4">ডিভাইস ও সমস্যা</th>
+                      <th class="py-3 px-4">মোবাইল</th>
+                      <th class="py-3 px-4">তারিখ</th>
+                      <th class="py-3 px-4">অবস্থা</th>
+                      <th class="py-3 px-4 text-right">অ্যাকশন</th>
+                    </tr>
+                  </thead>
+                  <tbody id="orders-table-body" class="divide-y divide-slate-100 text-slate-800">
+                    <!-- Loaded by admin.js -->
+                  </tbody>
+                </table>
+              </div>
+
+            </div>
+
+            <!-- Bottom Two Summary Cards (Matching Reference Screenshot) -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+              
+              <!-- Left Card: Customer Inquiries Preview -->
+              <div class="bg-white border border-slate-200/90 rounded-2xl shadow-sm p-5 space-y-3">
+                <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                  <div class="flex items-center gap-2">
+                    <span class="text-base text-rose-600">💬</span>
+                    <h4 class="text-sm font-bold text-slate-900">সর্বশেষ প্রাপ্ত বার্তা (ওয়েবসাইট অনুসন্ধান)</h4>
+                  </div>
+                  <button onclick="switchTab('inquiries')" class="text-xs font-bold text-rose-600 hover:underline">
+                    সকল বার্তা (২) →
+                  </button>
+                </div>
+                <div class="space-y-2.5 text-xs">
+                  <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 flex items-start justify-between">
+                    <div>
+                      <div class="font-bold text-slate-900">মো: আরিফুল ইসলাম (০১৭১১-২২৩৩৪৪)</div>
+                      <div class="text-[11px] text-slate-600 mt-0.5">iPhone 13 Pro এর ব্যাটারি হেলথ ও অরিজিনাল ডিসপ্লে রিপ্লেসমেন্ট রেট কত?</div>
+                    </div>
+                    <span class="text-[10px] text-slate-400 whitespace-nowrap">আজ</span>
+                  </div>
+                  <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 flex items-start justify-between">
+                    <div>
+                      <div class="font-bold text-slate-900">সালমা আখতার (০১৮২২-৩৩৪৪৫৫)</div>
+                      <div class="text-[11px] text-slate-600 mt-0.5">মিরপুর ১২ থেকে ট্যাব পিকআপ করতে কত সময় লাগবে?</div>
+                    </div>
+                    <span class="text-[10px] text-slate-400 whitespace-nowrap">গতকাল</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Right Card: Service & Policy Announcements -->
+              <div class="bg-white border border-slate-200/90 rounded-2xl shadow-sm p-5 space-y-3">
+                <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                  <div class="flex items-center gap-2">
+                    <span class="text-base text-purple-600">📢</span>
+                    <h4 class="text-sm font-bold text-slate-900">সর্বশেষ প্রকাশিত নোটিশ ও পলিসি আপডেট</h4>
+                  </div>
+                  <button onclick="switchTab('services')" class="text-xs font-bold text-purple-600 hover:underline">
+                    সকল সার্ভিস (৯) →
+                  </button>
+                </div>
+                <div class="space-y-2.5 text-xs">
+                  <div class="p-3 rounded-xl bg-purple-50/60 border border-purple-200 text-purple-900 flex items-start gap-2">
+                    <span class="font-bold text-purple-700">📌</span>
+                    <div>
+                      <div class="font-bold">৯০ দিনের গ্যারান্টিযুক্ত রিপেয়ার ওয়ারেন্টি নীতি কার্যকর</div>
+                      <div class="text-[11px] text-purple-700/80 mt-0.5">ডিসপ্লে ও মাদারবোর্ড রিপেয়ারের ক্ষেত্রে অফিশিয়াল ডিজিটাল ওয়ারেন্টি কার্ড প্রদান করা হবে।</div>
+                    </div>
+                  </div>
+                  <div class="p-3 rounded-xl bg-emerald-50/60 border border-emerald-200 text-emerald-900 flex items-start gap-2">
+                    <span class="font-bold text-emerald-700">🚀</span>
+                    <div>
+                      <div class="font-bold">ঢাকা মহানগরের সকল থানায় ফ্রি ডোরস্টেপ পিকআপ চালু</div>
+                      <div class="text-[11px] text-emerald-700/80 mt-0.5">সকাল ৯টা থেকে রাত ৯টা পর্যন্ত যেকোনো গ্যাজেট ফ্রি পিকআপ সেবা প্রদান করা হচ্ছে।</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+          </section>
 
         <!-- TAB 2: SERVICES CONFIG -->
         <section id="tab-services" class="hidden space-y-6">
@@ -737,6 +790,7 @@
     </div>
 
   </div>
+</div>
 
   <!-- ORDER MANAGEMENT MODAL (For Updating Diagnosis, Quote, Status & Rider) -->
   <div id="order-edit-modal" class="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs hidden flex items-center justify-center p-4">

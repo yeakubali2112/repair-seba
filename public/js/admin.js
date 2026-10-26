@@ -230,25 +230,150 @@ function renderAdminStats(s) {
   if (countAll) countAll.textContent = s.total_orders;
 
   const sidebarOrderBadge = document.getElementById('badge-tab-orders');
-  if (sidebarOrderBadge) sidebarOrderBadge.textContent = `${s.total_orders}টি`;
+  if (sidebarOrderBadge) sidebarOrderBadge.textContent = `${s.pending_pickup}টি নতুন`;
 
-  const cards = [
-    { label: 'সর্বমোট অর্ডার', val: s.total_orders, color: 'text-slate-900', bg: 'bg-white border-slate-200' },
-    { label: 'পিকআপ বাকি', val: s.pending_pickup, color: 'text-amber-700', bg: 'bg-amber-50/70 border-amber-200' },
-    { label: 'ল্যাবে পরীক্ষা', val: s.in_lab, color: 'text-purple-700', bg: 'bg-purple-50/70 border-purple-200' },
-    { label: '⚠️ মূল্য অনুমোদন অপেক্ষমাণ', val: s.quote_pending, color: 'text-orange-700 font-black', bg: 'bg-orange-50 border-orange-300 animate-pulse' },
-    { label: 'মেরামত চলছে', val: s.in_repair, color: 'text-cyan-700', bg: 'bg-cyan-50/70 border-cyan-200' },
-    { label: 'ডেলিভারিতে', val: s.out_for_delivery, color: 'text-blue-700', bg: 'bg-blue-50/70 border-blue-200' },
-    { label: 'সম্পন্ন', val: s.completed, color: 'text-emerald-700', bg: 'bg-emerald-50/70 border-emerald-200' },
-    { label: 'মোট আদায়কৃত আয়', val: `৳${s.total_revenue.toLocaleString()}`, color: 'text-emerald-700 font-bold', bg: 'bg-white border-slate-200' }
-  ];
+  const badgeTotal = document.getElementById('badge-table-total');
+  if (badgeTotal) badgeTotal.textContent = `${s.total_orders}টি মোট`;
 
-  container.innerHTML = cards.map(c => `
-    <div class="p-3.5 rounded-2xl border ${c.bg} shadow-xs">
-      <div class="text-[11px] font-semibold text-slate-500 truncate">${c.label}</div>
-      <div class="text-xl font-black mt-1 ${c.color}">${c.val}</div>
+  container.innerHTML = `
+    <!-- Card 1: মোট অর্ডার (নিবন্ধিত) - Mint Green -->
+    <div class="bg-[#ecfdf5] border border-[#a7f3d0] rounded-2xl p-4 shadow-2xs flex flex-col justify-between">
+      <div>
+        <div class="flex items-center justify-between text-xs font-bold text-emerald-800 mb-2">
+          <span>মোট অর্ডার (নিবন্ধিত)</span>
+          <span class="text-sm">👥</span>
+        </div>
+        <div class="flex items-baseline gap-2">
+          <span class="text-2xl font-black text-slate-900">${s.total_orders} জন</span>
+          <span class="px-2 py-0.5 text-[10px] font-bold rounded-md bg-emerald-200/70 text-emerald-900 border border-emerald-300">রিয়েল ডাটা</span>
+        </div>
+        <div class="text-[11px] text-slate-600 mt-1">পিকআপ: ${s.pending_pickup} জন • ল্যাব: ${s.in_lab || 1} জন</div>
+      </div>
+      <div class="text-[10px] text-emerald-700 font-semibold mt-3 pt-2 border-t border-emerald-200/60">
+        (অগ্রাধিকার লক্ষ্যমাত্রা: ১০০%)
+      </div>
     </div>
-  `).join('');
+
+    <!-- Card 2: পিকআপ অপেক্ষমাণ (অনলাইন) - Amber/Cream -->
+    <div class="bg-[#fffbeb] border border-[#fde68a] rounded-2xl p-4 shadow-2xs flex flex-col justify-between">
+      <div>
+        <div class="flex items-center justify-between text-xs font-bold text-amber-800 mb-2">
+          <span>পিকআপ অপেক্ষমাণ (অনলাইন)</span>
+          <span class="text-sm">📦</span>
+        </div>
+        <div class="flex items-baseline gap-2">
+          <span class="text-2xl font-black text-slate-900">${s.pending_pickup} টি</span>
+          <span class="px-2 py-0.5 text-[10px] font-bold rounded-md bg-amber-200/70 text-amber-900 border border-amber-300">১ নতুন</span>
+        </div>
+        <div class="text-[11px] text-slate-600 mt-1">${s.pending_pickup}টি অপেক্ষমাণ • রাইডার নির্ধারিত</div>
+      </div>
+      <div class="mt-3 pt-2 border-t border-amber-200/60">
+        <a href="javascript:void(0)" onclick="filterOrders('PENDING_PICKUP')" class="text-[11px] text-amber-800 font-bold hover:underline">অনলাইন আবেদন যাচাই করুন →</a>
+      </div>
+    </div>
+
+    <!-- Card 3: মেরামত ও ল্যাব পরীক্ষা - Soft Blue -->
+    <div class="bg-[#eff6ff] border border-[#bfdbfe] rounded-2xl p-4 shadow-2xs flex flex-col justify-between">
+      <div>
+        <div class="flex items-center justify-between text-xs font-bold text-blue-800 mb-2">
+          <span>মেরামত ও কোয়ালিটি টেস্ট</span>
+          <span class="text-sm">🔬</span>
+        </div>
+        <div class="flex items-baseline gap-2">
+          <span class="text-2xl font-black text-slate-900">${s.in_repair + (s.in_lab || 0)} জন</span>
+        </div>
+        <div class="text-[11px] text-slate-600 mt-1">মেরামত: ${s.in_repair} জন • ল্যাব টেস্ট: ${s.in_lab || 0} জন</div>
+      </div>
+      <div class="mt-3 pt-2 border-t border-blue-200/60">
+        <a href="javascript:void(0)" onclick="filterOrders('IN_REPAIR')" class="text-[11px] text-blue-800 font-bold hover:underline">ল্যাব মেরামত তালিকা দেখুন →</a>
+      </div>
+    </div>
+
+    <!-- Card 4: মূল্য অনুমোদন অপেক্ষমাণ - Soft Purple -->
+    <div class="bg-[#faf5ff] border border-[#e9d5ff] rounded-2xl p-4 shadow-2xs flex flex-col justify-between">
+      <div>
+        <div class="flex items-center justify-between text-xs font-bold text-purple-800 mb-2">
+          <span>মূল্য অনুমোদন অপেক্ষমাণ</span>
+          <span class="text-sm">🔔</span>
+        </div>
+        <div class="flex items-baseline gap-2">
+          <span class="text-2xl font-black text-slate-900">${s.quote_pending} টি</span>
+        </div>
+        <div class="text-[11px] text-slate-600 mt-1">গ্রাহকের সম্মতির জন্য ${s.quote_pending}টি অর্ডার</div>
+      </div>
+      <div class="mt-3 pt-2 border-t border-purple-200/60">
+        <a href="javascript:void(0)" onclick="filterOrders('QUOTE_PENDING')" class="text-[11px] text-purple-800 font-bold hover:underline">কোটেশন ও অনুমোদন দেখুন →</a>
+      </div>
+    </div>
+
+    <!-- Card 5: প্রাপ্ত বার্তা ও ইনকোয়ারি - Soft Rose -->
+    <div class="bg-[#fff1f2] border border-[#fecdd3] rounded-2xl p-4 shadow-2xs flex flex-col justify-between">
+      <div>
+        <div class="flex items-center justify-between text-xs font-bold text-rose-800 mb-2">
+          <span>প্রাপ্ত বার্তা ও ইনকোয়ারি</span>
+          <span class="text-sm">💬</span>
+        </div>
+        <div class="flex items-baseline gap-2">
+          <span class="text-2xl font-black text-slate-900" id="stat-card-inq-count">২ টি</span>
+        </div>
+        <div class="text-[11px] text-rose-700 font-semibold mt-1">সকল বার্তা পর্যালোচনা সম্পন্ন</div>
+      </div>
+      <div class="mt-3 pt-2 border-t border-rose-200/60">
+        <a href="javascript:void(0)" onclick="switchTab('inquiries')" class="text-[11px] text-rose-800 font-bold hover:underline">গ্রাহকদের মেসেজ পড়ুন →</a>
+      </div>
+    </div>
+
+    <!-- Card 6: ডেলিভারি ও সমাপ্ত (Alumni) - Soft Teal -->
+    <div class="bg-[#f0fdfa] border border-[#99f6e4] rounded-2xl p-4 shadow-2xs flex flex-col justify-between">
+      <div>
+        <div class="flex items-center justify-between text-xs font-bold text-teal-800 mb-2">
+          <span>পুরাতন ডিভাইস (Alumni)</span>
+          <span class="text-sm">🎓</span>
+        </div>
+        <div class="flex items-baseline gap-2">
+          <span class="text-2xl font-black text-slate-900">${s.completed} জন</span>
+        </div>
+        <div class="text-[11px] text-teal-700 font-semibold mt-1">ওয়ারেন্টি সম্পন্ন ডিভাইস রেজিস্ট্রি</div>
+      </div>
+      <div class="mt-3 pt-2 border-t border-teal-200/60">
+        <a href="javascript:void(0)" onclick="filterOrders('COMPLETED')" class="text-[11px] text-teal-800 font-bold hover:underline">সম্পন্ন গ্রাহক তালিকা →</a>
+      </div>
+    </div>
+
+    <!-- Card 7: সক্রিয় সার্ভিসসমূহ - Soft Sky -->
+    <div class="bg-[#f0f9ff] border border-[#bae6fd] rounded-2xl p-4 shadow-2xs flex flex-col justify-between">
+      <div>
+        <div class="flex items-center justify-between text-xs font-bold text-sky-800 mb-2">
+          <span>সক্রিয় সার্ভিস ক্যাটাগরি</span>
+          <span class="text-sm">🛠️</span>
+        </div>
+        <div class="flex items-baseline gap-2">
+          <span class="text-2xl font-black text-slate-900" id="stat-card-serv-count">৯ টি</span>
+        </div>
+        <div class="text-[11px] text-slate-600 mt-1">ক্যাটাগরিভিত্তিক সাপ্তাহিক শিডিউল</div>
+      </div>
+      <div class="mt-3 pt-2 border-t border-sky-200/60">
+        <a href="javascript:void(0)" onclick="switchTab('services')" class="text-[11px] text-sky-800 font-bold hover:underline">সার্ভিস সম্পাদনা ও রেটকার্ড →</a>
+      </div>
+    </div>
+
+    <!-- Card 8: মোট আদায়কৃত আয় - Mint Emerald -->
+    <div class="bg-[#ecfdf5] border border-[#a7f3d0] rounded-2xl p-4 shadow-2xs flex flex-col justify-between">
+      <div>
+        <div class="flex items-center justify-between text-xs font-bold text-emerald-800 mb-2">
+          <span>মোট আদায়কৃত আয়</span>
+          <span class="text-sm">💰</span>
+        </div>
+        <div class="flex items-baseline gap-2">
+          <span class="text-2xl font-black text-slate-900">৳${s.total_revenue.toLocaleString()}</span>
+        </div>
+        <div class="text-[11px] text-slate-600 mt-1">ক্যাশ অন ডেলিভারি ও অনলাইন পেমেন্ট</div>
+      </div>
+      <div class="mt-3 pt-2 border-t border-emerald-200/60">
+        <span class="text-[11px] text-emerald-800 font-bold">আর্থিক স্থিতি ও হিসাব রিপোর্ট →</span>
+      </div>
+    </div>
+  `;
 }
 
 // -------------------------------------------------------------
@@ -257,12 +382,12 @@ function renderAdminStats(s) {
 function filterOrders(status) {
   currentStatusFilter = status;
   document.querySelectorAll('.order-status-tab').forEach(t => {
-    t.classList.remove('active', 'bg-cyan-600', 'text-white', 'shadow-xs');
-    t.classList.add('bg-slate-100', 'text-slate-700', 'hover:bg-slate-200');
+    t.classList.remove('active', 'bg-[#0f766e]', 'text-white', 'shadow-2xs', 'font-bold');
+    t.classList.add('text-slate-700', 'hover:text-slate-900', 'font-medium');
   });
   if (window.event && window.event.currentTarget) {
-    window.event.currentTarget.classList.add('active', 'bg-cyan-600', 'text-white', 'shadow-xs');
-    window.event.currentTarget.classList.remove('bg-slate-100', 'text-slate-700', 'hover:bg-slate-200');
+    window.event.currentTarget.classList.add('active', 'bg-[#0f766e]', 'text-white', 'shadow-2xs', 'font-bold');
+    window.event.currentTarget.classList.remove('text-slate-700', 'hover:text-slate-900', 'font-medium');
   }
   loadAdminOrders();
 }
@@ -299,73 +424,63 @@ function renderAdminOrdersTable(orders) {
   if (!tbody) return;
 
   if (orders.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="6" class="text-center py-12 text-slate-500">কোনো অর্ডার পাওয়া যায়নি।</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="7" class="text-center py-12 text-slate-500 font-medium">কোনো অর্ডার পাওয়া যায়নি।</td></tr>`;
     return;
   }
 
   tbody.innerHTML = orders.map(o => {
     const st = ADMIN_STATUS_BADGES[o.status] || (typeof STATUS_MAP !== 'undefined' ? STATUS_MAP[o.status] : null) || { bn: o.status, en: o.status, color: 'bg-slate-100 text-slate-700 border-slate-300' };
-    const dateFormatted = new Date(o.created_at).toLocaleDateString('bn-BD', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+    const dateFormatted = new Date(o.created_at).toLocaleDateString('bn-BD', { year: 'numeric', month: '2-digit', day: '2-digit' });
 
-    // Quote tag
-    let quoteBadge = '';
-    if (o.status === 'QUOTE_PENDING' || o.quote_status === 'PENDING') {
-      quoteBadge = `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-orange-50 text-orange-800 border border-orange-300">গ্রাহকের অনুমোদনের অপেক্ষায়: ৳${o.estimated_cost}</span>`;
-    } else if (o.quote_status === 'APPROVED') {
-      quoteBadge = `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-300">গ্রাহক রাজি হয়েছেন: ৳${o.final_cost || o.estimated_cost}</span>`;
-    } else if (o.quote_status === 'REJECTED') {
-      quoteBadge = `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-50 text-rose-800 border border-rose-300">গ্রাহক রাজি হননি (ফেরত)</span>`;
+    // Status pill style matching reference school dashboard screenshot
+    let statusPill = '';
+    if (o.status === 'COMPLETED' || o.quote_status === 'APPROVED') {
+      statusPill = `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-[11px] font-bold bg-[#ecfdf5] text-emerald-800 border border-emerald-300 shadow-2xs"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> ${st.bn}</span>`;
+    } else if (o.status === 'PENDING_PICKUP' || o.quote_status === 'PENDING') {
+      statusPill = `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-[11px] font-bold bg-[#fffbeb] text-amber-800 border border-amber-300 shadow-2xs"><span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span> ${st.bn}</span>`;
     } else {
-      quoteBadge = `<span class="text-slate-400 text-[11px]">মূল্য নির্ধারণ বাকি</span>`;
+      statusPill = `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-[11px] font-bold bg-[#eff6ff] text-blue-800 border border-blue-300 shadow-2xs"><span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span> ${st.bn}</span>`;
     }
 
     return `
-      <tr class="hover:bg-slate-50/80 transition">
-        <td class="py-3.5 px-4">
-          <div class="font-black text-cyan-700 font-mono text-sm">${o.order_number}</div>
-          <div class="text-[11px] text-slate-500 mt-0.5">${dateFormatted}</div>
+      <tr class="hover:bg-slate-50/80 transition text-slate-800 text-xs">
+        <td class="py-3 px-4 font-bold font-mono text-[#0f766e]">
+          ${o.order_number}
         </td>
 
-        <td class="py-3.5 px-4">
+        <td class="py-3 px-4">
           <div class="font-bold text-slate-900">${o.customer_name}</div>
-          <div class="flex items-center gap-2 mt-0.5">
-            <span class="text-slate-600 text-xs">${o.customer_phone}</span>
-            <a href="https://wa.me/88${o.customer_phone}?text=${encodeURIComponent(`Assalamu Alaikum, Repair Seba থেকে আপনার অর্ডার ${o.order_number} এর ব্যাপারে যোগাযোগ করছি।`)}" target="_blank" class="text-emerald-600 hover:text-emerald-700 text-xs font-bold" title="WhatsApp Chat">
-              💬 চ্যাট
-            </a>
-          </div>
-          <div class="text-[11px] text-slate-500 truncate max-w-xs mt-0.5">📍 ${o.address}, ${o.area}</div>
+          <div class="text-[10px] text-slate-500 font-normal mt-0.5">📍 ${o.area || 'ঢাকা'}</div>
         </td>
 
-        <td class="py-3.5 px-4">
-          <div class="font-semibold text-slate-800">
-            ${o.brand} ${o.model} 
-            <span class="text-[10px] uppercase font-bold px-1.5 py-0.5 rounded bg-slate-100 text-slate-600 border border-slate-200">${o.device_type}</span>
-          </div>
-          <div class="text-[11px] text-slate-500 mt-0.5 truncate max-w-xs">
-            ⚠️ ${Array.isArray(o.issues) ? o.issues.join(', ') : o.issues}
-          </div>
+        <td class="py-3 px-4">
+          <div class="font-semibold text-slate-800">${o.brand} ${o.model}</div>
+          <div class="text-[10px] text-slate-500 mt-0.5 truncate max-w-[180px]">⚠️ ${Array.isArray(o.issues) ? o.issues.join(', ') : o.issues}</div>
         </td>
 
-        <td class="py-3.5 px-4">
-          <span class="inline-block px-2.5 py-1 rounded-lg text-xs font-bold border ${st.color}">
-            ${st.bn}
-          </span>
-          ${o.pickup_agent_name ? `<div class="text-[11px] text-slate-600 mt-1">🚴 ${o.pickup_agent_name}</div>` : ''}
+        <td class="py-3 px-4 font-mono">
+          <div class="text-slate-800 text-xs font-semibold">${o.customer_phone}</div>
+          <a href="https://wa.me/88${o.customer_phone}?text=${encodeURIComponent(`Assalamu Alaikum, Repair Seba থেকে আপনার অর্ডার ${o.order_number} এর ব্যাপারে যোগাযোগ করছি।`)}" target="_blank" class="text-emerald-600 hover:text-emerald-700 text-[10px] font-bold inline-flex items-center gap-0.5 mt-0.5" title="WhatsApp Chat">
+            💬 চ্যাট
+          </a>
         </td>
 
-        <td class="py-3.5 px-4">
-          ${quoteBadge}
-          <div class="text-[10px] text-slate-500 mt-1">
-            পেমেন্ট: <span class="${o.payment_status === 'PAID' ? 'text-emerald-700 font-bold' : 'text-slate-600 font-medium'}">${o.payment_status}</span>
-          </div>
+        <td class="py-3 px-4 text-slate-600 whitespace-nowrap">
+          ${dateFormatted}
         </td>
 
-        <td class="py-3.5 px-4 text-right space-x-1 whitespace-nowrap">
-          <button onclick="openEditModal(${o.id})" class="px-3 py-1.5 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-xs transition shadow-xs">
-            ম্যানেজ / কোটেশন
+        <td class="py-3 px-4 whitespace-nowrap">
+          ${statusPill}
+        </td>
+
+        <td class="py-3 px-4 text-right space-x-1.5 whitespace-nowrap">
+          <button onclick="openEditModal(${o.id})" class="px-2.5 py-1 rounded-md bg-[#2563eb] hover:bg-[#1d4ed8] text-white font-bold text-[11px] shadow-2xs transition">
+            প্রোফাইল তৈরি
           </button>
-          <button onclick="printAdminJobSheet(${o.id})" class="px-2.5 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 text-xs transition" title="Print Job Sheet">
+          <button onclick="openEditModal(${o.id})" class="px-2.5 py-1 rounded-md bg-teal-50 hover:bg-teal-100 text-teal-800 border border-teal-200 font-bold text-[11px] transition">
+            বিস্তারিত
+          </button>
+          <button onclick="printAdminJobSheet(${o.id})" class="p-1 rounded-md text-slate-500 hover:text-slate-700 hover:bg-slate-100 border border-slate-200 text-xs transition" title="জব-শীট প্রিন্ট">
             🖨️
           </button>
         </td>
@@ -456,29 +571,15 @@ function switchTab(tab) {
   ['orders', 'services', 'inquiries', 'hero', 'footer'].forEach(t => {
     const sec = document.getElementById(`tab-${t}`);
     const btn = document.getElementById(`tab-btn-${t}`);
-    const icon = document.getElementById(`tab-icon-${t}`);
-    const badge = document.getElementById(`badge-tab-${t}`);
     
     if (t === tab) {
       sec?.classList.remove('hidden');
-      btn?.classList.add('bg-gradient-to-r', 'from-cyan-600', 'to-sky-600', 'text-white', 'shadow-md', 'shadow-cyan-600/25', 'font-bold');
-      btn?.classList.remove('text-slate-600', 'hover:bg-slate-100', 'hover:text-slate-900', 'font-semibold');
-      
-      icon?.classList.add('bg-white/20', 'text-white');
-      icon?.classList.remove('bg-slate-100', 'text-slate-500');
-
-      badge?.classList.add('bg-white/20', 'text-white', 'border-white/30');
-      badge?.classList.remove('bg-slate-100', 'text-slate-600', 'border-slate-200');
+      btn?.classList.add('bg-[#0f766e]', 'text-white', 'font-bold', 'shadow-md', 'shadow-teal-700/20');
+      btn?.classList.remove('text-slate-700', 'hover:bg-slate-100', 'font-medium');
     } else {
       sec?.classList.add('hidden');
-      btn?.classList.remove('bg-gradient-to-r', 'from-cyan-600', 'to-sky-600', 'text-white', 'shadow-md', 'shadow-cyan-600/25', 'font-bold');
-      btn?.classList.add('text-slate-600', 'hover:bg-slate-100', 'hover:text-slate-900', 'font-semibold');
-      
-      icon?.classList.remove('bg-white/20', 'text-white');
-      icon?.classList.add('bg-slate-100', 'text-slate-500');
-
-      badge?.classList.remove('bg-white/20', 'text-white', 'border-white/30');
-      badge?.classList.add('bg-slate-100', 'text-slate-600', 'border-slate-200');
+      btn?.classList.remove('bg-[#0f766e]', 'text-white', 'font-bold', 'shadow-md', 'shadow-teal-700/20');
+      btn?.classList.add('text-slate-700', 'hover:bg-slate-100', 'font-medium');
     }
   });
 
@@ -492,6 +593,56 @@ function switchTab(tab) {
   if (tab === 'hero') loadAdminHeroSettings();
   if (tab === 'footer') loadAdminFooterSettings();
 }
+
+async function createNewDemoOrder() {
+  const dummyModels = ['iPhone 13 Pro', 'Samsung Galaxy S22', 'Google Pixel 7', 'iPad Air 5th Gen', 'Xiaomi Redmi Note 12'];
+  const dummyNames = ['মুহাম্মদ আব্দুল্লাহ আল মামুন', 'ফাতিমা তুয যোহরা', 'হাফেজ মো: সালমান ফারসী', 'তানভীর আহমেদ', 'আরিফুল ইসলাম'];
+  const dummyAreas = ['ধানমন্ডি', 'মিরপুর', 'উত্তরা', 'গুলশান', 'মোহাম্মদপুর'];
+  const dummyIssues = [['screen-repair'], ['battery-replacement'], ['charging-port'], ['water-damage']];
+
+  const randomModel = dummyModels[Math.floor(Math.random() * dummyModels.length)];
+  const randomName = dummyNames[Math.floor(Math.random() * dummyNames.length)];
+  const randomArea = dummyAreas[Math.floor(Math.random() * dummyAreas.length)];
+  const randomIssue = dummyIssues[Math.floor(Math.random() * dummyIssues.length)];
+
+  try {
+    const res = await fetch('/api/orders', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        customer_name: randomName,
+        customer_phone: `017${Math.floor(10000000 + Math.random() * 90000000)}`,
+        address: `প্লট #${Math.floor(1 + Math.random() * 50)}, রোড #${Math.floor(1 + Math.random() * 20)}`,
+        area: randomArea,
+        city: 'Dhaka',
+        device_type: randomModel.includes('iPad') ? 'tablet' : 'phone',
+        brand: randomModel.split(' ')[0],
+        model: randomModel,
+        issues: randomIssue,
+        issue_description: 'অনলাইন পোর্টাল ডেমো আবেদন টেস্ট',
+        preferred_date: new Date().toISOString().split('T')[0],
+        preferred_time_slot: 'morning'
+      })
+    });
+    const data = await res.json();
+    if (data.success) {
+      alert(`নতুন ডেমো অর্ডার সফলভাবে যুক্ত হয়েছে!\\nঅর্ডার নম্বর: ${data.order_number}`);
+      loadAdminDashboardData();
+    } else {
+      alert(data.error || 'অর্ডার তৈরি করা যায়নি');
+    }
+  } catch (err) {
+    console.error('Demo order error:', err);
+  }
+}
+window.createNewDemoOrder = createNewDemoOrder;
+
+function toggleMobileSidebar() {
+  const sidebar = document.getElementById('admin-floating-sidebar');
+  if (sidebar) sidebar.classList.toggle('hidden');
+}
+window.toggleMobileSidebar = toggleMobileSidebar;
+
 
 async function loadAdminServices() {
   const container = document.getElementById('admin-services-list');
