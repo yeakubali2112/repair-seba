@@ -898,6 +898,7 @@ const server = http.createServer(async (req, res) => {
     if (safePath === '/' || safePath === '\\') safePath = '/index.html';
     if (safePath === '/admin' || safePath === '/admin/') safePath = '/admin.html';
     if (safePath === '/track' || safePath === '/track/') safePath = '/index.html';
+    if (safePath === '/favicon.ico') safePath = '/favicon.svg';
 
     let filePath = path.join(PUBLIC_DIR, safePath);
 
