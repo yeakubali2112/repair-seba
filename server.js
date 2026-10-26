@@ -1129,6 +1129,29 @@ const server = http.createServer(async (req, res) => {
         });
       }
 
+      if (pathname.startsWith('/api/admin/customers/') && method === 'PUT') {
+        const admin = getAuthenticatedAdmin(req);
+        if (!admin) return errorResponse(res, 401, 'Unauthorized');
+        const customerId = parseInt(pathname.split('/')[4], 10);
+        if (!customerId) return errorResponse(res, 400, 'Invalid customer ID');
+
+        const body = await parseBody(req);
+        const { name, phone, email, address, area, city } = body;
+        if (!name || !phone) {
+          return errorResponse(res, 400, 'গ্রাহকের নাম ও ফোন নম্বর আবশ্যক');
+        }
+
+        const now = new Date().toISOString();
+        db.prepare(`
+          UPDATE users 
+          SET name = ?, phone = ?, email = ?, address = ?, area = ?, city = ?, updated_at = ?
+          WHERE id = ?
+        `).run(name.trim(), phone.trim(), (email || '').trim(), (address || '').trim(), (area || '').trim(), (city || 'Dhaka').trim(), now, customerId);
+
+        const updated = db.prepare('SELECT * FROM users WHERE id = ?').get(customerId);
+        return jsonResponse(res, 200, { success: true, customer: updated, message: 'গ্রাহকের তথ্য সফলভাবে সংরক্ষণ করা হয়েছে' });
+      }
+
       if (pathname.startsWith('/api/admin/customers/') && method === 'DELETE') {
         const admin = getAuthenticatedAdmin(req);
         if (!admin) return errorResponse(res, 401, 'Unauthorized');

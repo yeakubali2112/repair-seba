@@ -2040,16 +2040,13 @@ function renderAdminCustomersTable(customers) {
           <div class="text-[10px] text-slate-400 whitespace-nowrap">${timeStr}</div>
         </td>
 
-        <!-- 7. Actions -->
-        <td class="py-2.5 px-2.5 sm:px-3 text-right">
-          <div class="flex items-center justify-end gap-1 whitespace-nowrap">
-            <button onclick="openCustomerDetailsModal(${c.id})" class="px-2 py-1 rounded-lg bg-teal-50 hover:bg-teal-100 text-[#0f766e] border border-teal-200 font-bold text-[11px] transition inline-flex items-center gap-1 shadow-2xs cursor-pointer" title="বিস্তারিত প্রোফাইল">
-              <span>👁️</span> <span>বিস্তারিত</span>
+        <!-- 7. Actions (Only Edit icon and Delete icon) -->
+        <td class="py-2.5 px-2.5 sm:px-3 text-center">
+          <div class="flex items-center justify-center gap-1.5 whitespace-nowrap">
+            <button onclick="openCustomerEditModal(${c.id})" class="w-7 h-7 rounded-lg bg-teal-50 hover:bg-teal-100 text-[#0f766e] border border-teal-200/90 flex items-center justify-center text-xs transition shadow-2xs hover:scale-105 cursor-pointer" title="গ্রাহকের তথ্য সম্পাদনা ও বিস্তারিত">
+              ✏️
             </button>
-            <a href="https://wa.me/88${c.phone}?text=${encodeURIComponent(`Assalamu Alaikum ${c.name || ''}, Repair Seba থেকে আপনার সাথে যোগাযোগ করছি।`)}" target="_blank" class="w-6 h-6 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white flex items-center justify-center text-[10px] transition shadow-2xs" title="WhatsApp Message">
-              💬
-            </a>
-            <button onclick="deleteAdminCustomer(${c.id}, '${(c.name || c.phone).replace(/'/g, "\\'")}')" class="w-6 h-6 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 flex items-center justify-center text-[10px] transition cursor-pointer" title="গ্রাহক মুছে ফেলুন">
+            <button onclick="deleteAdminCustomer(${c.id}, '${(c.name || c.phone).replace(/'/g, "\\'")}')" class="w-7 h-7 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200/90 flex items-center justify-center text-xs transition shadow-2xs hover:scale-105 cursor-pointer" title="গ্রাহক মুছে ফেলুন">
               🗑️
             </button>
           </div>
@@ -2087,7 +2084,7 @@ function handleFilterCustomers(filter) {
   }
 }
 
-function openCustomerDetailsModal(customerId) {
+function openCustomerEditModal(customerId) {
   const customer = cachedAdminCustomers.find(c => c.id === customerId);
   if (!customer) return;
 
@@ -2113,100 +2110,172 @@ function openCustomerDetailsModal(customerId) {
   });
 
   const ordersListHtml = custOrders.length > 0 ? custOrders.map(o => `
-    <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+    <div class="p-3 rounded-2xl bg-slate-50 border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 text-xs">
       <div>
         <div class="flex items-center gap-2">
-          <span class="font-bold text-slate-900 font-mono text-sm">#${o.order_number}</span>
+          <span class="font-bold text-slate-900 font-mono text-xs">#${o.order_number}</span>
           <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-teal-100 text-teal-800 border border-teal-200">${o.status}</span>
         </div>
         <div class="text-slate-600 font-medium mt-1">
           📱 <strong>${o.brand || ''} ${o.model || ''}</strong> (${o.device_type || 'Device'})
         </div>
-        <div class="text-[11px] text-slate-400 mt-0.5">
+        <div class="text-[10px] text-slate-400 mt-0.5">
           📅 ${new Date(o.created_at).toLocaleDateString('bn-BD', { month: 'short', day: 'numeric', year: 'numeric' })}
         </div>
       </div>
       <div class="flex items-center gap-2 shrink-0">
         <span class="font-bold text-slate-900 font-sans">৳${o.final_cost || o.estimated_cost || 0}</span>
-        <button onclick="closeCustomerDetailsModal(); switchTab('orders'); setTimeout(() => searchOrder('${o.order_number}'), 300);" class="px-3 py-1.5 rounded-xl bg-[#0f766e] hover:bg-[#115e59] text-white font-bold text-xs transition cursor-pointer">
+        <button onclick="closeCustomerDetailsModal(); switchTab('orders'); setTimeout(() => searchOrder('${o.order_number}'), 300);" class="px-2.5 py-1 rounded-xl bg-[#0f766e] hover:bg-[#115e59] text-white font-bold text-xs transition cursor-pointer">
           অর্ডারে যান →
         </button>
       </div>
     </div>
   `).join('') : `
-    <div class="p-4 rounded-xl bg-slate-50 border border-dashed border-slate-200 text-center text-xs text-slate-500">
+    <div class="p-3.5 rounded-xl bg-slate-50 border border-dashed border-slate-200 text-center text-xs text-slate-500">
       এই গ্রাহক এখনও ওয়েবসাইট থেকে কোনো মেরামতের অর্ডার প্লেস করেননি।
     </div>
   `;
 
   content.innerHTML = `
     <!-- Customer Header Card -->
-    <div class="p-4 rounded-2xl bg-gradient-to-r from-teal-900 to-teal-700 text-white flex items-center gap-4">
-      <div class="w-16 h-16 rounded-2xl overflow-hidden bg-white/10 border-2 border-white/30 flex items-center justify-center font-bold text-xl shrink-0 shadow-inner">
-        ${avatarHtml}
-      </div>
-      <div class="space-y-1 min-w-0 flex-1">
-        <div class="flex items-center gap-2">
-          <h4 class="text-lg font-black text-white truncate">${customer.name || 'সম্মানিত গ্রাহক'}</h4>
-          <span class="px-2 py-0.5 text-[10px] font-bold rounded-md bg-white/20 text-teal-100">আইডি: #RS-C${customer.id}</span>
+    <div class="p-4 rounded-2xl bg-gradient-to-r from-teal-900 to-teal-700 text-white flex items-center justify-between gap-4">
+      <div class="flex items-center gap-3 min-w-0">
+        <div class="w-12 h-12 rounded-2xl overflow-hidden bg-white/10 border-2 border-white/30 flex items-center justify-center font-bold text-lg shrink-0 shadow-inner">
+          ${avatarHtml}
         </div>
-        <p class="text-xs text-teal-100 flex items-center gap-1.5 font-mono">
-          <span>📞 ${customer.phone}</span>
-        </p>
-        <p class="text-[11px] text-teal-200/90">
-          যুক্ত হয়েছেন: ${regDate}
-        </p>
+        <div class="space-y-0.5 min-w-0">
+          <div class="flex items-center gap-2">
+            <h4 class="text-base font-black text-white truncate">${customer.name || 'সম্মানিত গ্রাহক'}</h4>
+            <span class="px-2 py-0.5 text-[10px] font-bold rounded-md bg-white/20 text-teal-100 font-mono">#RS-C${customer.id}</span>
+          </div>
+          <p class="text-xs text-teal-100 font-mono">
+            📞 ${customer.phone}
+          </p>
+          <p class="text-[10px] text-teal-200/80">
+            যুক্ত হয়েছেন: ${regDate}
+          </p>
+        </div>
+      </div>
+      
+      <!-- Contact Shortcuts -->
+      <div class="flex items-center gap-1.5 shrink-0">
+        <a href="https://wa.me/88${customer.phone}?text=${encodeURIComponent(`Assalamu Alaikum ${customer.name || ''}, Repair Seba থেকে আপনার সাথে যোগাযোগ করছি।`)}" target="_blank" class="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition flex items-center gap-1 shadow-xs" title="WhatsApp Message">
+          <span>💬</span> <span>WhatsApp</span>
+        </a>
+        <a href="tel:${customer.phone}" class="p-2 rounded-xl bg-white/15 hover:bg-white/25 text-white transition flex items-center justify-center" title="সরাসরি কল">
+          📞
+        </a>
       </div>
     </div>
 
-    <!-- Contact & Action Buttons -->
-    <div class="grid grid-cols-3 gap-2">
-      <a href="tel:${customer.phone}" class="py-2.5 px-3 rounded-xl bg-teal-50 hover:bg-teal-100 text-[#0f766e] border border-teal-200 font-bold text-xs transition flex items-center justify-center gap-1.5 shadow-2xs">
-        <span>📞</span> <span>সরাসরি কল</span>
-      </a>
-      <a href="https://wa.me/88${customer.phone}?text=${encodeURIComponent(`Assalamu Alaikum ${customer.name || ''}, Repair Seba থেকে আপনার সাথে যোগাযোগ করছি।`)}" target="_blank" class="py-2.5 px-3 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 font-bold text-xs transition flex items-center justify-center gap-1.5 shadow-2xs">
-        <span>💬</span> <span>WhatsApp</span>
-      </a>
-      <button onclick="navigator.clipboard.writeText('${customer.phone}'); alert('ফোন নম্বর কপি করা হয়েছে: ${customer.phone}');" class="py-2.5 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 font-bold text-xs transition flex items-center justify-center gap-1.5 shadow-2xs cursor-pointer">
-        <span>📋</span> <span>কপি ফোন</span>
-      </button>
-    </div>
+    <!-- Edit Customer Profile Form -->
+    <form onsubmit="handleSaveCustomerEdit(event, ${customer.id}); return false;" class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3 text-xs">
+      <div class="font-bold text-slate-800 border-b border-slate-200/80 pb-2 flex items-center justify-between">
+        <div class="flex items-center gap-1.5 text-teal-950 font-bold">
+          <span>✏️</span> <span>গ্রাহকের তথ্য সম্পাদনা (Edit Profile)</span>
+        </div>
+        <span class="text-[10px] text-slate-400 font-normal">পরিবর্তন করতে তথ্য এডিট করুন</span>
+      </div>
 
-    <!-- Profile Details Grid -->
-    <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3 text-xs">
-      <div class="font-bold text-slate-800 border-b border-slate-200/80 pb-2 flex items-center gap-1.5">
-        <span>📍</span> <span>ঠিকানা ও ব্যক্তিগত বিবরণ</span>
-      </div>
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-slate-700">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <div>
-          <span class="text-slate-400 block text-[10px] uppercase font-bold">ইমেইল এড্রেস:</span>
-          <span class="font-medium text-slate-900">${customer.email || 'দেওয়া হয়নি'}</span>
+          <label class="block font-bold text-slate-700 mb-1">পূর্ণ নাম (Full Name)*</label>
+          <input type="text" id="edit-cust-name" required value="${(customer.name || '').replace(/"/g, '&quot;')}" class="w-full px-3 py-2 rounded-xl bg-white border border-slate-300 text-slate-900 text-xs focus:border-teal-600 focus:outline-none transition">
         </div>
         <div>
-          <span class="text-slate-400 block text-[10px] uppercase font-bold">সিটি / শহর:</span>
-          <span class="font-medium text-slate-900">${customer.city || 'ঢাকা'}</span>
-        </div>
-        <div class="sm:col-span-2">
-          <span class="text-slate-400 block text-[10px] uppercase font-bold">ডেলিভারি / বর্তমান ঠিকানা:</span>
-          <span class="font-medium text-slate-900">${[customer.address, customer.area].filter(Boolean).join(', ') || 'ঠিকানা দেওয়া হয়নি'}</span>
+          <label class="block font-bold text-slate-700 mb-1">মোবাইল নম্বর (Phone)*</label>
+          <input type="tel" id="edit-cust-phone" required value="${(customer.phone || '').replace(/"/g, '&quot;')}" class="w-full px-3 py-2 rounded-xl bg-white border border-slate-300 text-slate-900 text-xs font-mono font-bold focus:border-teal-600 focus:outline-none transition">
         </div>
       </div>
-    </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">ইমেইল এড্রেস (Email)</label>
+          <input type="email" id="edit-cust-email" value="${(customer.email || '').replace(/"/g, '&quot;')}" placeholder="customer@example.com" class="w-full px-3 py-2 rounded-xl bg-white border border-slate-300 text-slate-900 text-xs focus:border-teal-600 focus:outline-none transition">
+        </div>
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">এলাকা / জোন (Area)</label>
+          <input type="text" id="edit-cust-area" value="${(customer.area || '').replace(/"/g, '&quot;')}" placeholder="যেমন: মিরপুর ১০, ধানমন্ডি" class="w-full px-3 py-2 rounded-xl bg-white border border-slate-300 text-slate-900 text-xs focus:border-teal-600 focus:outline-none transition">
+        </div>
+      </div>
+
+      <div>
+        <label class="block font-bold text-slate-700 mb-1">বিস্তারিত ঠিকানা (Full Address)</label>
+        <input type="text" id="edit-cust-address" value="${(customer.address || '').replace(/"/g, '&quot;')}" placeholder="বাসা নম্বর, রোড, এলাকা..." class="w-full px-3 py-2 rounded-xl bg-white border border-slate-300 text-slate-900 text-xs focus:border-teal-600 focus:outline-none transition">
+      </div>
+
+      <div class="pt-1 flex items-center justify-end">
+        <button type="submit" id="btn-save-cust" class="px-4 py-2 rounded-xl bg-[#0f766e] hover:bg-[#115e59] text-white font-bold text-xs transition flex items-center gap-1.5 shadow-xs cursor-pointer">
+          <span>💾</span> <span>পরিবর্তন সংরক্ষণ করুন</span>
+        </button>
+      </div>
+    </form>
 
     <!-- Orders Section -->
-    <div class="space-y-2.5">
+    <div class="space-y-2">
       <div class="flex items-center justify-between">
         <h5 class="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
           <span>📦</span> <span>এই গ্রাহকের সমস্ত অর্ডার (${custOrders.length}টি)</span>
         </h5>
       </div>
-      <div class="space-y-2 max-h-56 overflow-y-auto pr-1">
+      <div class="space-y-2 max-h-48 overflow-y-auto pr-1">
         ${ordersListHtml}
       </div>
     </div>
   `;
 
   document.getElementById('customer-details-modal')?.classList.remove('hidden');
+}
+
+async function handleSaveCustomerEdit(e, customerId) {
+  if (e && e.preventDefault) e.preventDefault();
+  const name = document.getElementById('edit-cust-name')?.value.trim();
+  const phone = document.getElementById('edit-cust-phone')?.value.trim();
+  const email = document.getElementById('edit-cust-email')?.value.trim();
+  const area = document.getElementById('edit-cust-area')?.value.trim();
+  const address = document.getElementById('edit-cust-address')?.value.trim();
+  const btn = document.getElementById('btn-save-cust');
+
+  if (!name || !phone) {
+    alert('গ্রাহকের নাম ও ফোন নম্বর আবশ্যক।');
+    return;
+  }
+
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = 'সংরক্ষণ হচ্ছে...';
+  }
+
+  try {
+    const res = await fetch(`/api/admin/customers/${customerId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${adminToken}`
+      },
+      body: JSON.stringify({ name, phone, email, area, address })
+    });
+    const data = await res.json();
+    if (data.success) {
+      alert('গ্রাহকের তথ্য সফলভাবে সংরক্ষণ করা হয়েছে!');
+      closeCustomerDetailsModal();
+      loadAdminCustomers();
+    } else {
+      alert(data.error || 'সংরক্ষণ করা যায়নি');
+    }
+  } catch (err) {
+    console.error('Save customer error:', err);
+    alert('সার্ভার এরর');
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = 'পরিবর্তন সংরক্ষণ করুন';
+    }
+  }
+}
+
+function openCustomerDetailsModal(customerId) {
+  openCustomerEditModal(customerId);
 }
 
 function closeCustomerDetailsModal() {
@@ -2237,8 +2306,10 @@ window.switchUserSubTab = switchUserSubTab;
 window.loadAdminCustomers = loadAdminCustomers;
 window.handleSearchCustomers = handleSearchCustomers;
 window.handleFilterCustomers = handleFilterCustomers;
+window.openCustomerEditModal = openCustomerEditModal;
 window.openCustomerDetailsModal = openCustomerDetailsModal;
 window.closeCustomerDetailsModal = closeCustomerDetailsModal;
+window.handleSaveCustomerEdit = handleSaveCustomerEdit;
 window.deleteAdminCustomer = deleteAdminCustomer;
 window.handleAdminProfileFileUpload = handleAdminProfileFileUpload;
 window.handleTeamUserFileUpload = handleTeamUserFileUpload;

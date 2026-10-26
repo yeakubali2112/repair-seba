@@ -469,12 +469,6 @@
                     <option value="with_orders">যাদের অর্ডার আছে</option>
                     <option value="no_orders">নতুন (অর্ডার ছাড়া)</option>
                   </select>
-
-                  <!-- Refresh Button -->
-                  <button onclick="loadAdminCustomers()" class="px-3 py-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-white bg-slate-100 border border-slate-200 transition text-xs font-bold flex items-center gap-1.5 shadow-2xs cursor-pointer" title="রিফ্রেশ করুন">
-                    <span id="cust-refresh-icon">🔄</span>
-                    <span class="hidden sm:inline">রিফ্রেশ</span>
-                  </button>
                 </div>
               </div>
 
@@ -482,13 +476,13 @@
               <div class="w-full overflow-hidden">
                 <table class="w-full text-left text-xs table-fixed">
                   <colgroup>
-                    <col style="width: 21%;">
-                    <col style="width: 13%;">
-                    <col style="width: 15%;">
-                    <col style="width: 18%;">
+                    <col style="width: 23%;">
+                    <col style="width: 14%;">
+                    <col style="width: 16%;">
+                    <col style="width: 20%;">
                     <col style="width: 10%;">
-                    <col style="width: 10%;">
-                    <col style="width: 13%;">
+                    <col style="width: 9%;">
+                    <col style="width: 8%;">
                   </colgroup>
                   <thead class="bg-slate-50 text-slate-600 font-bold uppercase tracking-wider border-b border-slate-200">
                     <tr>
@@ -498,7 +492,7 @@
                       <th class="py-2.5 px-2.5 sm:px-3">ঠিকানা ও এরিয়া</th>
                       <th class="py-2.5 px-2.5 sm:px-3 text-center">সর্বমোট অর্ডার</th>
                       <th class="py-2.5 px-2.5 sm:px-3">রেজিস্ট্রেশন</th>
-                      <th class="py-2.5 px-2.5 sm:px-3 text-right">অ্যাকশন</th>
+                      <th class="py-2.5 px-2.5 sm:px-3 text-center">অ্যাকশন</th>
                     </tr>
                   </thead>
                   <tbody id="admin-customers-table-body" class="divide-y divide-slate-100 text-slate-800">
