@@ -578,20 +578,13 @@ function renderAdminOrdersTable(orders) {
     const curStatus = statusList.find(s => s.val === o.status) || { color: 'bg-slate-50 text-slate-800 border-slate-300' };
     const dateFormatted = new Date(o.created_at).toLocaleDateString('bn-BD', { year: 'numeric', month: '2-digit', day: '2-digit' });
 
-    // Direct status dropdown (No modal/submit needed! Direct 1-click update/allow)
+    // Direct status dropdown (No modal/submit needed! Direct 1-click update)
     const statusWidget = `
-      <div class="flex items-center gap-1 min-w-0">
-        <select onchange="quickUpdateOrderStatus(${o.id}, this.value)" class="text-[11px] font-bold py-1 px-1 rounded-lg border cursor-pointer transition focus:outline-none focus:ring-1 focus:ring-teal-500 shadow-2xs w-full truncate ${curStatus.color}" title="সরাসরি স্ট্যাটাস পরিবর্তন">
-          ${statusList.map(s => `
-            <option value="${s.val}" ${s.val === o.status ? 'selected' : ''}>${s.label}</option>
-          `).join('')}
-        </select>
-        ${o.status === 'QUOTE_PENDING' ? `
-          <button onclick="quickDirectApprove(${o.id})" class="px-1.5 py-1 rounded-md text-[10px] font-bold bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs transition shrink-0" title="সরাসরি কোটেশন অনুমোদন">
-            ✓ অনুমোদন
-          </button>
-        ` : ''}
-      </div>
+      <select onchange="quickUpdateOrderStatus(${o.id}, this.value)" class="text-[11px] font-bold py-1.5 px-2 rounded-xl border cursor-pointer transition focus:outline-none focus:ring-1 focus:ring-teal-500 shadow-2xs w-full ${curStatus.color}" title="সরাসরি স্ট্যাটাস পরিবর্তন করুন">
+        ${statusList.map(s => `
+          <option value="${s.val}" ${s.val === o.status ? 'selected' : ''}>${s.label}</option>
+        `).join('')}
+      </select>
     `;
 
     return `
