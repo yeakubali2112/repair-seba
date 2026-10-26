@@ -229,6 +229,9 @@ function renderAdminStats(s) {
   const countAll = document.getElementById('count-all');
   if (countAll) countAll.textContent = s.total_orders;
 
+  const sidebarOrderBadge = document.getElementById('badge-tab-orders');
+  if (sidebarOrderBadge) sidebarOrderBadge.textContent = `${s.total_orders}টি`;
+
   const cards = [
     { label: 'সর্বমোট অর্ডার', val: s.total_orders, color: 'text-slate-900', bg: 'bg-white border-slate-200' },
     { label: 'পিকআপ বাকি', val: s.pending_pickup, color: 'text-amber-700', bg: 'bg-amber-50/70 border-amber-200' },
@@ -453,14 +456,29 @@ function switchTab(tab) {
   ['orders', 'services', 'inquiries', 'hero', 'footer'].forEach(t => {
     const sec = document.getElementById(`tab-${t}`);
     const btn = document.getElementById(`tab-btn-${t}`);
+    const icon = document.getElementById(`tab-icon-${t}`);
+    const badge = document.getElementById(`badge-tab-${t}`);
+    
     if (t === tab) {
       sec?.classList.remove('hidden');
-      btn?.classList.add('bg-cyan-600', 'text-white', 'shadow-md', 'shadow-cyan-600/20', 'font-bold');
+      btn?.classList.add('bg-gradient-to-r', 'from-cyan-600', 'to-sky-600', 'text-white', 'shadow-md', 'shadow-cyan-600/25', 'font-bold');
       btn?.classList.remove('text-slate-600', 'hover:bg-slate-100', 'hover:text-slate-900', 'font-semibold');
+      
+      icon?.classList.add('bg-white/20', 'text-white');
+      icon?.classList.remove('bg-slate-100', 'text-slate-500');
+
+      badge?.classList.add('bg-white/20', 'text-white', 'border-white/30');
+      badge?.classList.remove('bg-slate-100', 'text-slate-600', 'border-slate-200');
     } else {
       sec?.classList.add('hidden');
-      btn?.classList.remove('bg-cyan-600', 'text-white', 'shadow-md', 'shadow-cyan-600/20', 'font-bold');
+      btn?.classList.remove('bg-gradient-to-r', 'from-cyan-600', 'to-sky-600', 'text-white', 'shadow-md', 'shadow-cyan-600/25', 'font-bold');
       btn?.classList.add('text-slate-600', 'hover:bg-slate-100', 'hover:text-slate-900', 'font-semibold');
+      
+      icon?.classList.remove('bg-white/20', 'text-white');
+      icon?.classList.add('bg-slate-100', 'text-slate-500');
+
+      badge?.classList.remove('bg-white/20', 'text-white', 'border-white/30');
+      badge?.classList.add('bg-slate-100', 'text-slate-600', 'border-slate-200');
     }
   });
 
@@ -485,6 +503,8 @@ async function loadAdminServices() {
     });
     const data = await res.json();
     if (data.success) {
+      const servBadge = document.getElementById('badge-tab-services');
+      if (servBadge && data.services) servBadge.textContent = `${data.services.length}টি`;
       container.innerHTML = data.services.map(s => {
         const iconMap = {
           'smartphone': '📱', 'battery-charging': '🔋', 'zap': '⚡', 'cpu': '🔬',
@@ -534,6 +554,8 @@ async function loadAdminContacts() {
     });
     const data = await res.json();
     if (data.success) {
+      const inqBadge = document.getElementById('badge-tab-inquiries');
+      if (inqBadge && data.contacts) inqBadge.textContent = `${data.contacts.length}টি`;
       if (data.contacts.length === 0) {
         container.innerHTML = `<div class="p-8 text-center text-slate-500 bg-white border border-slate-200 rounded-2xl shadow-xs">কোনো মেসেজ জমা নেই।</div>`;
         return;

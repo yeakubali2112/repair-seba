@@ -62,64 +62,160 @@
     <!-- Mobile Sidebar Backdrop Overlay -->
     <div id="sidebar-backdrop" onclick="toggleAdminSidebar(false)" class="fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-40 lg:hidden hidden transition-opacity"></div>
 
-    <!-- LEFT SIDEBAR (Sidebar Navigation as requested) -->
-    <aside id="admin-sidebar" class="fixed lg:sticky top-0 left-0 z-50 h-screen w-64 lg:w-72 bg-white border-r border-slate-200 flex flex-col justify-between shrink-0 shadow-lg lg:shadow-none -translate-x-full lg:translate-x-0 transition-transform duration-200 ease-in-out">
+    <!-- LEFT SIDEBAR (Ultra-Professional Navigation) -->
+    <aside id="admin-sidebar" class="fixed lg:sticky top-0 left-0 z-50 h-screen w-64 lg:w-72 bg-white border-r border-slate-200/90 flex flex-col justify-between shrink-0 shadow-xl lg:shadow-none -translate-x-full lg:translate-x-0 transition-transform duration-200 ease-in-out">
       
-      <!-- Top Brand Header in Sidebar (Height matched to top bar for seamless horizontal line) -->
-      <div class="h-20 px-5 border-b border-slate-200 flex items-center justify-between shrink-0">
+      <!-- Top Brand Header in Sidebar -->
+      <div class="h-20 px-5 border-b border-slate-200/90 flex items-center justify-between shrink-0 bg-white">
         <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-xl bg-cyan-600 text-white flex items-center justify-center font-black text-xl shadow-md shadow-cyan-600/20">
+          <div class="relative w-11 h-11 rounded-2xl bg-gradient-to-tr from-cyan-600 to-sky-500 text-white flex items-center justify-center font-black text-2xl shadow-md shadow-cyan-600/25">
             🛠️
+            <!-- Pulse dot for online status -->
+            <span class="absolute -top-0.5 -right-0.5 flex h-3 w-3">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500 border-2 border-white"></span>
+            </span>
           </div>
           <div>
-            <h1 class="text-lg font-black tracking-tight text-slate-900">
-              Repair Seba
-            </h1>
+            <div class="flex items-center gap-1.5">
+              <h1 class="text-base font-black tracking-tight text-slate-900 leading-tight">
+                Repair <span class="text-cyan-600">Seba</span>
+              </h1>
+              <span class="px-1.5 py-0.5 text-[9px] font-black rounded-md bg-cyan-50 text-cyan-700 border border-cyan-200/80">PRO</span>
+            </div>
+            <p class="text-[11px] font-medium text-slate-400 mt-0.5 flex items-center gap-1">
+              <span>অ্যাডমিন কন্ট্রোল পোর্টাল</span>
+            </p>
           </div>
         </div>
         <!-- Close button for mobile screen -->
-        <button onclick="toggleAdminSidebar(false)" class="lg:hidden p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100" title="Close Sidebar">
+        <button onclick="toggleAdminSidebar(false)" class="lg:hidden p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition" title="Close Sidebar">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
         </button>
       </div>
 
       <!-- Navigation Menu in Sidebar -->
       <div class="flex-1 overflow-y-auto px-4 py-5 space-y-6">
+        
+        <!-- Category 1: Main Management -->
         <div>
+          <div class="text-[10px] font-black uppercase tracking-wider text-slate-400 px-3 mb-2.5 flex items-center justify-between">
+            <span>ম্যানেজমেন্ট ও অপারেশন</span>
+            <span class="w-1.5 h-1.5 rounded-full bg-cyan-500"></span>
+          </div>
           <nav class="space-y-1.5">
-            <button onclick="switchTab('orders'); toggleAdminSidebar(false);" id="tab-btn-orders" class="w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-bold bg-cyan-600 text-white shadow-md shadow-cyan-600/20 transition-all text-left">
-              <span class="text-lg">📦</span>
-              <span class="flex-1">অর্ডারসমূহ (Orders)</span>
+            
+            <!-- 1. Orders Tab -->
+            <button onclick="switchTab('orders'); toggleAdminSidebar(false);" id="tab-btn-orders" class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold bg-gradient-to-r from-cyan-600 to-sky-600 text-white shadow-md shadow-cyan-600/25 transition-all text-left group">
+              <div class="flex items-center gap-3">
+                <span id="tab-icon-orders" class="w-7 h-7 rounded-lg bg-white/20 text-white flex items-center justify-center text-sm shadow-xs transition">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+                </span>
+                <span>অর্ডারসমূহ (Orders)</span>
+              </div>
+              <span id="badge-tab-orders" class="px-2 py-0.5 text-[10px] font-bold rounded-full bg-white/20 text-white border border-white/30 transition">
+                ৬টি
+              </span>
             </button>
 
-            <button onclick="switchTab('services'); toggleAdminSidebar(false);" id="tab-btn-services" class="w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-all text-left">
-              <span class="text-lg">⚙️</span>
-              <span class="flex-1">সার্ভিস কনফিগ (Services)</span>
+            <!-- 2. Services Config Tab -->
+            <button onclick="switchTab('services'); toggleAdminSidebar(false);" id="tab-btn-services" class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-all text-left group">
+              <div class="flex items-center gap-3">
+                <span id="tab-icon-services" class="w-7 h-7 rounded-lg bg-slate-100 text-slate-500 group-hover:text-cyan-600 group-hover:bg-cyan-50 flex items-center justify-center text-sm transition">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>
+                </span>
+                <span>সার্ভিস কনফিগ (Services)</span>
+              </div>
+              <span id="badge-tab-services" class="px-2 py-0.5 text-[10px] font-bold rounded-full bg-slate-100 text-slate-600 border border-slate-200 transition">
+                ৯টি
+              </span>
             </button>
 
-            <button onclick="switchTab('inquiries'); toggleAdminSidebar(false);" id="tab-btn-inquiries" class="w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-all text-left">
-              <span class="text-lg">💬</span>
-              <span class="flex-1">গ্রাহক মেসেজ (Inquiries)</span>
+            <!-- 3. Inquiries Tab -->
+            <button onclick="switchTab('inquiries'); toggleAdminSidebar(false);" id="tab-btn-inquiries" class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-all text-left group">
+              <div class="flex items-center gap-3">
+                <span id="tab-icon-inquiries" class="w-7 h-7 rounded-lg bg-slate-100 text-slate-500 group-hover:text-cyan-600 group-hover:bg-cyan-50 flex items-center justify-center text-sm transition">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+                </span>
+                <span>গ্রাহক মেসেজ (Inquiries)</span>
+              </div>
+              <span id="badge-tab-inquiries" class="px-2 py-0.5 text-[10px] font-bold rounded-full bg-slate-100 text-slate-600 border border-slate-200 transition">
+                মেসেজ
+              </span>
             </button>
 
-            <button onclick="switchTab('hero'); toggleAdminSidebar(false);" id="tab-btn-hero" class="w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-all text-left">
-              <span class="text-lg">🎨</span>
-              <span class="flex-1">হিরো ব্যানার (Hero)</span>
-            </button>
-
-            <button onclick="switchTab('footer'); toggleAdminSidebar(false);" id="tab-btn-footer" class="w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-all text-left">
-              <span class="text-lg">👣</span>
-              <span class="flex-1">ফুটার ম্যানেজমেন্ট (Footer)</span>
-            </button>
           </nav>
         </div>
+
+        <!-- Category 2: Website Customization -->
+        <div>
+          <div class="text-[10px] font-black uppercase tracking-wider text-slate-400 px-3 mb-2.5 flex items-center justify-between">
+            <span>ওয়েবসাইট কনটেন্ট</span>
+            <span class="w-1.5 h-1.5 rounded-full bg-sky-400"></span>
+          </div>
+          <nav class="space-y-1.5">
+
+            <!-- 4. Hero Tab -->
+            <button onclick="switchTab('hero'); toggleAdminSidebar(false);" id="tab-btn-hero" class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-all text-left group">
+              <div class="flex items-center gap-3">
+                <span id="tab-icon-hero" class="w-7 h-7 rounded-lg bg-slate-100 text-slate-500 group-hover:text-cyan-600 group-hover:bg-cyan-50 flex items-center justify-center text-sm transition">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4 5 5 0 013-4.5 5 5 0 0110.5-2 5 5 0 014.5 5.5A4 4 0 0117 21H7z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v3m-3-3l2 2m4-2l-2 2"/></svg>
+                </span>
+                <span>হিরো ব্যানার (Hero)</span>
+              </div>
+              <span id="badge-tab-hero" class="text-[10px] text-slate-400 font-semibold group-hover:text-slate-600 transition">কন্ট্রোল</span>
+            </button>
+
+            <!-- 5. Footer Tab -->
+            <button onclick="switchTab('footer'); toggleAdminSidebar(false);" id="tab-btn-footer" class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-all text-left group">
+              <div class="flex items-center gap-3">
+                <span id="tab-icon-footer" class="w-7 h-7 rounded-lg bg-slate-100 text-slate-500 group-hover:text-cyan-600 group-hover:bg-cyan-50 flex items-center justify-center text-sm transition">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+                </span>
+                <span>ফুটার ও অফিস (Footer)</span>
+              </div>
+              <span id="badge-tab-footer" class="text-[10px] text-slate-400 font-semibold group-hover:text-slate-600 transition">ঠিকানা</span>
+            </button>
+
+          </nav>
+        </div>
+
+        <!-- Category 3: Quick Links -->
+        <div>
+          <div class="text-[10px] font-black uppercase tracking-wider text-slate-400 px-3 mb-2 flex items-center justify-between">
+            <span>সরাসরি লিঙ্ক</span>
+          </div>
+          <div class="space-y-1.5">
+            <a href="/" target="_blank" class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-600 hover:text-cyan-700 hover:bg-cyan-50/70 border border-dashed border-slate-200 hover:border-cyan-300 transition group">
+              <div class="flex items-center gap-2.5">
+                <span class="text-sm">🌐</span>
+                <span>কাস্টমার ওয়েবসাইট</span>
+              </div>
+              <svg class="w-3.5 h-3.5 text-slate-400 group-hover:text-cyan-600 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+            </a>
+          </div>
+        </div>
+
       </div>
 
-      <!-- Bottom Logout Section in Sidebar -->
-      <div class="p-4 border-t border-slate-100 bg-slate-50/70">
-        <button onclick="adminLogout()" class="w-full py-2.5 px-3 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-xs font-bold transition flex items-center justify-center gap-2">
-          <span>🚪</span> লগআউট (Logout)
-        </button>
+      <!-- Bottom User Profile Card & Logout Section in Sidebar -->
+      <div class="p-3.5 border-t border-slate-200/90 bg-slate-50/80">
+        <div class="p-2.5 rounded-2xl bg-white border border-slate-200/90 shadow-xs flex items-center justify-between gap-3">
+          <div class="flex items-center gap-2.5 min-w-0">
+            <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-cyan-600 to-sky-700 text-white flex items-center justify-center font-black text-xs shadow-xs shrink-0">
+              YA
+            </div>
+            <div class="min-w-0">
+              <p class="text-xs font-bold text-slate-900 truncate">Yeakub Ali</p>
+              <p class="text-[10px] font-medium text-emerald-600 flex items-center gap-1">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> সুপার অ্যাডমিন
+              </p>
+            </div>
+          </div>
+          <button onclick="adminLogout()" title="লগআউট করুন" class="p-2 rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 border border-transparent hover:border-rose-200 transition shrink-0">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+          </button>
+        </div>
       </div>
 
     </aside>
@@ -143,8 +239,15 @@
           </div>
         </div>
 
-        <!-- Right Side Empty Placeholder -->
-        <div></div>
+        <!-- Right Side Quick Info & View Site -->
+        <div class="flex items-center gap-2 sm:gap-3">
+          <a href="/" target="_blank" class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-cyan-50 hover:text-cyan-700 hover:border-cyan-200 border border-slate-200 text-xs font-bold text-slate-700 transition">
+            <span>🌐</span> <span>কাস্টমার সাইট</span>
+          </a>
+          <button onclick="loadAdminDashboardData()" class="p-2 rounded-xl text-slate-500 hover:text-cyan-600 hover:bg-cyan-50 border border-slate-200 transition" title="রিফ্রেশ ডাটা">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+          </button>
+        </div>
       </header>
 
       <!-- Main Content Area -->
