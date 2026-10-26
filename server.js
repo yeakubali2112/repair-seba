@@ -91,6 +91,30 @@ function errorResponse(res, statusCode, message, details = null) {
   });
 }
 
+const AUTH_SECRET = process.env.ADMIN_AUTH_SECRET || 'repair_seba_jwt_secret_2026';
+
+function generateAdminToken(admin) {
+  const expiresAt = Date.now() + (7 * 24 * 60 * 60 * 1000); // 7 days
+  const payload = JSON.stringify({
+    adminId: admin.id,
+    username: admin.username,
+    name: admin.name || 'Admin',
+    role: admin.role || 'SUPER_ADMIN',
+    expiresAt
+  });
+  const b64 = Buffer.from(payload).toString('base64url');
+  const hmac = crypto.createHmac('sha256', AUTH_SECRET).update(b64).digest('hex');
+  const token = `${b64}.${hmac}`;
+  sessions.set(token, {
+    adminId: admin.id,
+    username: admin.username,
+    name: admin.name || 'Admin',
+    role: admin.role || 'SUPER_ADMIN',
+    expiresAt
+  });
+  return token;
+}
+
 // Authentication middleware
 function getAuthenticatedAdmin(req) {
   const authHeader = req.headers['authorization'];
@@ -100,12 +124,27 @@ function getAuthenticatedAdmin(req) {
   const token = parts[1];
 
   const session = sessions.get(token);
-  if (!session) return null;
-  if (session.expiresAt < Date.now()) {
-    sessions.delete(token);
+  if (session) {
+    if (session.expiresAt < Date.now()) {
+      sessions.delete(token);
+      return null;
+    }
+    return session;
+  }
+
+  // Stateless HMAC verification fallback
+  try {
+    const [b64, hmac] = token.split('.');
+    if (!b64 || !hmac) return null;
+    const expected = crypto.createHmac('sha256', AUTH_SECRET).update(b64).digest('hex');
+    if (expected !== hmac) return null;
+    const data = JSON.parse(Buffer.from(b64, 'base64url').toString('utf8'));
+    if (!data || !data.expiresAt || data.expiresAt < Date.now()) return null;
+    sessions.set(token, data);
+    return data;
+  } catch {
     return null;
   }
-  return session;
 }
 
 function getAuthenticatedCustomer(req) {
@@ -563,15 +602,7 @@ const server = http.createServer(async (req, res) => {
           return errorResponse(res, 401, 'ভুল ইউজারনেম বা পাসওয়ার্ড (Invalid credentials)');
         }
 
-        const token = generateToken();
-        const expiresAt = Date.now() + (24 * 60 * 60 * 1000); // 24 hours
-        sessions.set(token, {
-          adminId: admin.id,
-          username: admin.username,
-          name: admin.name,
-          role: admin.role,
-          expiresAt
-        });
+        const token = generateAdminToken(admin);
 
         return jsonResponse(res, 200, {
           success: true,

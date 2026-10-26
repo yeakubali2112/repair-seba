@@ -236,141 +236,100 @@ function renderAdminStats(s) {
   if (badgeTotal) badgeTotal.textContent = `${s.total_orders}টি মোট`;
 
   container.innerHTML = `
-    <!-- Card 1: মোট অর্ডার (নিবন্ধিত) - Mint Green -->
-    <div class="bg-[#ecfdf5] border border-[#a7f3d0] rounded-xl p-2.5 sm:p-3 shadow-2xs flex flex-col justify-between">
-      <div>
-        <div class="flex items-center justify-between text-[11px] font-bold text-emerald-800 mb-1">
-          <span>মোট অর্ডার (নিবন্ধিত)</span>
-          <span class="text-xs">👥</span>
-        </div>
-        <div class="flex items-baseline gap-1.5">
-          <span class="text-lg sm:text-xl font-black text-slate-900 leading-tight">${s.total_orders} জন</span>
-          <span class="px-1.5 py-0.2 text-[9px] font-bold rounded bg-emerald-200/70 text-emerald-900 border border-emerald-300">রিয়েল ডাটা</span>
-        </div>
-        <div class="text-[10px] text-slate-600 mt-0.5 truncate">পিকআপ: ${s.pending_pickup} জন • ল্যাব: ${s.in_lab || 1} জন</div>
+    <!-- Card 1: মোট অর্ডার - Mint Green -->
+    <div class="bg-[#ecfdf5] border border-[#a7f3d0] rounded-xl p-2 sm:p-2.5 shadow-2xs flex flex-col justify-center min-w-0">
+      <div class="flex items-center justify-between text-[11px] font-bold text-emerald-800 mb-1">
+        <span class="truncate">মোট অর্ডার</span>
+        <span class="text-xs shrink-0">👥</span>
       </div>
-      <div class="text-[9px] text-emerald-700 font-semibold mt-1.5 pt-1 border-t border-emerald-200/60 truncate">
-        (অগ্রাধিকার লক্ষ্যমাত্রা: ১০০%)
+      <div class="flex items-baseline gap-1">
+        <span class="text-base sm:text-lg font-black text-slate-900 leading-none">${s.total_orders}</span>
+        <span class="text-[10px] font-bold text-slate-600">জন</span>
+        <span class="px-1 py-0.2 text-[8px] font-bold rounded bg-emerald-200/70 text-emerald-900 border border-emerald-300">রিয়েল</span>
       </div>
     </div>
 
-    <!-- Card 2: পিকআপ অপেক্ষমাণ (অনলাইন) - Amber/Cream -->
-    <div class="bg-[#fffbeb] border border-[#fde68a] rounded-xl p-2.5 sm:p-3 shadow-2xs flex flex-col justify-between">
-      <div>
-        <div class="flex items-center justify-between text-[11px] font-bold text-amber-800 mb-1">
-          <span>পিকআপ অপেক্ষমাণ (অনলাইন)</span>
-          <span class="text-xs">📦</span>
-        </div>
-        <div class="flex items-baseline gap-1.5">
-          <span class="text-lg sm:text-xl font-black text-slate-900 leading-tight">${s.pending_pickup} টি</span>
-          <span class="px-1.5 py-0.2 text-[9px] font-bold rounded bg-amber-200/70 text-amber-900 border border-amber-300">১ নতুন</span>
-        </div>
-        <div class="text-[10px] text-slate-600 mt-0.5 truncate">${s.pending_pickup}টি অপেক্ষমাণ • রাইডার নির্ধারিত</div>
+    <!-- Card 2: অপেক্ষমাণ - Amber/Cream -->
+    <div class="bg-[#fffbeb] border border-[#fde68a] rounded-xl p-2 sm:p-2.5 shadow-2xs flex flex-col justify-center min-w-0">
+      <div class="flex items-center justify-between text-[11px] font-bold text-amber-800 mb-1">
+        <span class="truncate">অপেক্ষমাণ</span>
+        <span class="text-xs shrink-0">📦</span>
       </div>
-      <div class="mt-1.5 pt-1 border-t border-amber-200/60">
-        <a href="javascript:void(0)" onclick="filterOrders('PENDING_PICKUP')" class="text-[10px] text-amber-800 font-bold hover:underline block truncate">অনলাইন আবেদন যাচাই করুন →</a>
+      <div class="flex items-baseline gap-1">
+        <span class="text-base sm:text-lg font-black text-slate-900 leading-none">${s.pending_pickup}</span>
+        <span class="text-[10px] font-bold text-slate-600">টি</span>
+        <span class="px-1 py-0.2 text-[8px] font-bold rounded bg-amber-200/70 text-amber-900 border border-amber-300">১ নতুন</span>
       </div>
     </div>
 
-    <!-- Card 3: মেরামত ও ল্যাব পরীক্ষা - Soft Blue -->
-    <div class="bg-[#eff6ff] border border-[#bfdbfe] rounded-xl p-2.5 sm:p-3 shadow-2xs flex flex-col justify-between">
-      <div>
-        <div class="flex items-center justify-between text-[11px] font-bold text-blue-800 mb-1">
-          <span>মেরামত ও কোয়ালিটি টেস্ট</span>
-          <span class="text-xs">🔬</span>
-        </div>
-        <div class="flex items-baseline gap-1.5">
-          <span class="text-lg sm:text-xl font-black text-slate-900 leading-tight">${s.in_repair + (s.in_lab || 0)} জন</span>
-        </div>
-        <div class="text-[10px] text-slate-600 mt-0.5 truncate">মেরামত: ${s.in_repair} জন • ল্যাব: ${s.in_lab || 0} জন</div>
+    <!-- Card 3: মেরামত ও ল্যাব - Soft Blue -->
+    <div class="bg-[#eff6ff] border border-[#bfdbfe] rounded-xl p-2 sm:p-2.5 shadow-2xs flex flex-col justify-center min-w-0">
+      <div class="flex items-center justify-between text-[11px] font-bold text-blue-800 mb-1">
+        <span class="truncate">মেরামত ও ল্যাব</span>
+        <span class="text-xs shrink-0">🔬</span>
       </div>
-      <div class="mt-1.5 pt-1 border-t border-blue-200/60">
-        <a href="javascript:void(0)" onclick="filterOrders('IN_REPAIR')" class="text-[10px] text-blue-800 font-bold hover:underline block truncate">ল্যাব মেরামত তালিকা দেখুন →</a>
+      <div class="flex items-baseline gap-1">
+        <span class="text-base sm:text-lg font-black text-slate-900 leading-none">${s.in_repair + (s.in_lab || 0)}</span>
+        <span class="text-[10px] font-bold text-slate-600">জন</span>
       </div>
     </div>
 
-    <!-- Card 4: মূল্য অনুমোদন অপেক্ষমাণ - Soft Purple -->
-    <div class="bg-[#faf5ff] border border-[#e9d5ff] rounded-xl p-2.5 sm:p-3 shadow-2xs flex flex-col justify-between">
-      <div>
-        <div class="flex items-center justify-between text-[11px] font-bold text-purple-800 mb-1">
-          <span>মূল্য অনুমোদন অপেক্ষমাণ</span>
-          <span class="text-xs">🔔</span>
-        </div>
-        <div class="flex items-baseline gap-1.5">
-          <span class="text-lg sm:text-xl font-black text-slate-900 leading-tight">${s.quote_pending} টি</span>
-        </div>
-        <div class="text-[10px] text-slate-600 mt-0.5 truncate">সম্মতির জন্য ${s.quote_pending}টি অর্ডার</div>
+    <!-- Card 4: অনুমোদন বাকি - Soft Purple -->
+    <div class="bg-[#faf5ff] border border-[#e9d5ff] rounded-xl p-2 sm:p-2.5 shadow-2xs flex flex-col justify-center min-w-0">
+      <div class="flex items-center justify-between text-[11px] font-bold text-purple-800 mb-1">
+        <span class="truncate">অনুমোদন বাকি</span>
+        <span class="text-xs shrink-0">🔔</span>
       </div>
-      <div class="mt-1.5 pt-1 border-t border-purple-200/60">
-        <a href="javascript:void(0)" onclick="filterOrders('QUOTE_PENDING')" class="text-[10px] text-purple-800 font-bold hover:underline block truncate">কোটেশন ও অনুমোদন দেখুন →</a>
+      <div class="flex items-baseline gap-1">
+        <span class="text-base sm:text-lg font-black text-slate-900 leading-none">${s.quote_pending}</span>
+        <span class="text-[10px] font-bold text-slate-600">টি</span>
       </div>
     </div>
 
-    <!-- Card 5: প্রাপ্ত বার্তা ও ইনকোয়ারি - Soft Rose -->
-    <div class="bg-[#fff1f2] border border-[#fecdd3] rounded-xl p-2.5 sm:p-3 shadow-2xs flex flex-col justify-between">
-      <div>
-        <div class="flex items-center justify-between text-[11px] font-bold text-rose-800 mb-1">
-          <span>প্রাপ্ত বার্তা ও ইনকোয়ারি</span>
-          <span class="text-xs">💬</span>
-        </div>
-        <div class="flex items-baseline gap-1.5">
-          <span class="text-lg sm:text-xl font-black text-slate-900 leading-tight" id="stat-card-inq-count">২ টি</span>
-        </div>
-        <div class="text-[10px] text-rose-700 font-semibold mt-0.5 truncate">সকল বার্তা পর্যালোচনা সম্পন্ন</div>
+    <!-- Card 5: প্রাপ্ত বার্তা - Soft Rose -->
+    <div class="bg-[#fff1f2] border border-[#fecdd3] rounded-xl p-2 sm:p-2.5 shadow-2xs flex flex-col justify-center min-w-0">
+      <div class="flex items-center justify-between text-[11px] font-bold text-rose-800 mb-1">
+        <span class="truncate">প্রাপ্ত বার্তা</span>
+        <span class="text-xs shrink-0">💬</span>
       </div>
-      <div class="mt-1.5 pt-1 border-t border-rose-200/60">
-        <a href="javascript:void(0)" onclick="switchTab('inquiries')" class="text-[10px] text-rose-800 font-bold hover:underline block truncate">গ্রাহকদের মেসেজ পড়ুন →</a>
+      <div class="flex items-baseline gap-1">
+        <span class="text-base sm:text-lg font-black text-slate-900 leading-none" id="stat-card-inq-count">২</span>
+        <span class="text-[10px] font-bold text-slate-600">টি</span>
       </div>
     </div>
 
-    <!-- Card 6: পুরাতন ডিভাইস (Alumni) - Soft Teal -->
-    <div class="bg-[#f0fdfa] border border-[#99f6e4] rounded-xl p-2.5 sm:p-3 shadow-2xs flex flex-col justify-between">
-      <div>
-        <div class="flex items-center justify-between text-[11px] font-bold text-teal-800 mb-1">
-          <span>পুরাতন ডিভাইস (Alumni)</span>
-          <span class="text-xs">🎓</span>
-        </div>
-        <div class="flex items-baseline gap-1.5">
-          <span class="text-lg sm:text-xl font-black text-slate-900 leading-tight">${s.completed} জন</span>
-        </div>
-        <div class="text-[10px] text-teal-700 font-semibold mt-0.5 truncate">ওয়ারেন্টি সম্পন্ন ডিভাইস রেজিস্ট্রি</div>
+    <!-- Card 6: পুরাতন (Alumni) - Soft Teal -->
+    <div class="bg-[#f0fdfa] border border-[#99f6e4] rounded-xl p-2 sm:p-2.5 shadow-2xs flex flex-col justify-center min-w-0">
+      <div class="flex items-center justify-between text-[11px] font-bold text-teal-800 mb-1">
+        <span class="truncate">পুরাতন ডিভাইস</span>
+        <span class="text-xs shrink-0">🎓</span>
       </div>
-      <div class="mt-1.5 pt-1 border-t border-teal-200/60">
-        <a href="javascript:void(0)" onclick="filterOrders('COMPLETED')" class="text-[10px] text-teal-800 font-bold hover:underline block truncate">সম্পন্ন গ্রাহক তালিকা →</a>
+      <div class="flex items-baseline gap-1">
+        <span class="text-base sm:text-lg font-black text-slate-900 leading-none">${s.completed}</span>
+        <span class="text-[10px] font-bold text-slate-600">জন</span>
       </div>
     </div>
 
-    <!-- Card 7: সক্রিয় সার্ভিসসমূহ - Soft Sky -->
-    <div class="bg-[#f0f9ff] border border-[#bae6fd] rounded-xl p-2.5 sm:p-3 shadow-2xs flex flex-col justify-between">
-      <div>
-        <div class="flex items-center justify-between text-[11px] font-bold text-sky-800 mb-1">
-          <span>সক্রিয় সার্ভিস ক্যাটাগরি</span>
-          <span class="text-xs">🛠️</span>
-        </div>
-        <div class="flex items-baseline gap-1.5">
-          <span class="text-lg sm:text-xl font-black text-slate-900 leading-tight" id="stat-card-serv-count">৯ টি</span>
-        </div>
-        <div class="text-[10px] text-slate-600 mt-0.5 truncate">ক্যাটাগরিভিত্তিক সাপ্তাহিক শিডিউল</div>
+    <!-- Card 7: সার্ভিসসমূহ - Soft Sky -->
+    <div class="bg-[#f0f9ff] border border-[#bae6fd] rounded-xl p-2 sm:p-2.5 shadow-2xs flex flex-col justify-center min-w-0">
+      <div class="flex items-center justify-between text-[11px] font-bold text-sky-800 mb-1">
+        <span class="truncate">সার্ভিস ক্যাটাগরি</span>
+        <span class="text-xs shrink-0">🛠️</span>
       </div>
-      <div class="mt-1.5 pt-1 border-t border-sky-200/60">
-        <a href="javascript:void(0)" onclick="switchTab('services')" class="text-[10px] text-sky-800 font-bold hover:underline block truncate">সার্ভিস সম্পাদনা ও রেটকার্ড →</a>
+      <div class="flex items-baseline gap-1">
+        <span class="text-base sm:text-lg font-black text-slate-900 leading-none" id="stat-card-serv-count">৯</span>
+        <span class="text-[10px] font-bold text-slate-600">টি</span>
       </div>
     </div>
 
-    <!-- Card 8: মোট আদায়কৃত আয় - Mint Emerald -->
-    <div class="bg-[#ecfdf5] border border-[#a7f3d0] rounded-xl p-2.5 sm:p-3 shadow-2xs flex flex-col justify-between">
-      <div>
-        <div class="flex items-center justify-between text-[11px] font-bold text-emerald-800 mb-1">
-          <span>মোট আদায়কৃত আয়</span>
-          <span class="text-xs">💰</span>
-        </div>
-        <div class="flex items-baseline gap-1.5">
-          <span class="text-lg sm:text-xl font-black text-slate-900 leading-tight">৳${s.total_revenue.toLocaleString()}</span>
-        </div>
-        <div class="text-[10px] text-slate-600 mt-0.5 truncate">ক্যাশ অন ডেলিভারি ও অনলাইন</div>
+    <!-- Card 8: মোট আদায় - Mint Emerald -->
+    <div class="bg-[#ecfdf5] border border-[#a7f3d0] rounded-xl p-2 sm:p-2.5 shadow-2xs flex flex-col justify-center min-w-0">
+      <div class="flex items-center justify-between text-[11px] font-bold text-emerald-800 mb-1">
+        <span class="truncate">মোট আদায়</span>
+        <span class="text-xs shrink-0">💰</span>
       </div>
-      <div class="mt-1.5 pt-1 border-t border-emerald-200/60">
-        <span class="text-[10px] text-emerald-800 font-bold block truncate">আর্থিক স্থিতি ও হিসাব রিপোর্ট →</span>
+      <div class="flex items-baseline gap-1">
+        <span class="text-sm sm:text-base font-black text-slate-900 leading-none truncate">৳${s.total_revenue.toLocaleString()}</span>
       </div>
     </div>
   `;
@@ -411,7 +370,11 @@ async function loadAdminOrders() {
       adminOrdersCache = data.orders;
       renderAdminOrdersTable(data.orders);
     } else {
-      tbody.innerHTML = `<tr><td colspan="6" class="text-center py-6 text-rose-400">${data.error}</td></tr>`;
+      if (res.status === 401 || data.error?.includes('Unauthorized') || data.error?.includes('প্রবেশাধিকার')) {
+        adminLogout();
+        return;
+      }
+      tbody.innerHTML = `<tr><td colspan="7" class="text-center py-6 text-rose-400">${data.error}</td></tr>`;
     }
   } catch (err) {
     console.error('Error loading admin orders:', err);
