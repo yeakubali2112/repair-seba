@@ -299,8 +299,8 @@ const server = http.createServer(async (req, res) => {
         try {
           let existingUser = db.prepare('SELECT id, address, area FROM users WHERE phone = ?').get(cleanPhone);
           if (!existingUser) {
-            db.prepare('INSERT INTO users (phone, name, email, address, area, city, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)')
-              .run(cleanPhone, customer_name.trim(), '', address.trim(), area.trim(), city.trim() || 'Dhaka', now, now);
+            db.prepare('INSERT INTO users (phone, name, email, avatar, address, area, city, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)')
+              .run(cleanPhone, customer_name.trim(), '', '', address.trim(), area.trim(), city.trim() || 'Dhaka', now, now);
           } else if (!existingUser.address) {
             db.prepare('UPDATE users SET address = ?, area = ?, updated_at = ? WHERE id = ?')
               .run(address.trim(), area.trim(), now, existingUser.id);
@@ -452,12 +452,28 @@ const server = http.createServer(async (req, res) => {
 
         if (!user) {
           const userName = (body.name || '').trim() || 'সম্মানিত গ্রাহক';
-          const stmt = db.prepare('INSERT INTO users (phone, name, email, address, area, city, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)');
-          const info = stmt.run(phone, userName, '', '', '', 'Dhaka', now, now);
+          const userAvatar = (body.avatar || '').trim();
+          const stmt = db.prepare('INSERT INTO users (phone, name, email, avatar, address, area, city, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)');
+          const info = stmt.run(phone, userName, '', userAvatar, '', '', 'Dhaka', now, now);
           user = db.prepare('SELECT * FROM users WHERE id = ?').get(info.lastInsertRowid);
-        } else if (body.name && body.name.trim() && (user.name === 'সম্মানিত গ্রাহক' || !user.name)) {
-          db.prepare('UPDATE users SET name = ?, updated_at = ? WHERE id = ?').run(body.name.trim(), now, user.id);
-          user.name = body.name.trim();
+        } else {
+          let needsUpdate = false;
+          let newName = user.name;
+          let newAvatar = user.avatar || '';
+
+          if (body.name && body.name.trim() && (user.name === 'সম্মানিত গ্রাহক' || !user.name)) {
+            newName = body.name.trim();
+            needsUpdate = true;
+          }
+          if (body.avatar && body.avatar.trim() && !user.avatar) {
+            newAvatar = body.avatar.trim();
+            needsUpdate = true;
+          }
+          if (needsUpdate) {
+            db.prepare('UPDATE users SET name = ?, avatar = ?, updated_at = ? WHERE id = ?').run(newName, newAvatar, now, user.id);
+            user.name = newName;
+            user.avatar = newAvatar;
+          }
         }
 
         const token = generateToken();
@@ -476,6 +492,7 @@ const server = http.createServer(async (req, res) => {
             phone: user.phone,
             name: user.name,
             email: user.email || '',
+            avatar: user.avatar || '',
             address: user.address || '',
             area: user.area || '',
             city: user.city || 'Dhaka'
@@ -500,6 +517,7 @@ const server = http.createServer(async (req, res) => {
             phone: user.phone,
             name: user.name,
             email: user.email || '',
+            avatar: user.avatar || '',
             address: user.address || '',
             area: user.area || '',
             city: user.city || 'Dhaka'
@@ -507,7 +525,7 @@ const server = http.createServer(async (req, res) => {
         });
       }
 
-      // 3. Customer Profile Update (Allows user to edit name, email, address, area anytime)
+      // 3. Customer Profile Update (Allows user to edit name, email, avatar, address, area anytime)
       if (pathname === '/api/user/profile' && method === 'PUT') {
         const session = getAuthenticatedCustomer(req);
         if (!session) {
@@ -516,6 +534,7 @@ const server = http.createServer(async (req, res) => {
         const body = await parseBody(req);
         const name = (body.name || '').trim();
         const email = (body.email || '').trim();
+        const avatar = typeof body.avatar === 'string' ? body.avatar.trim() : '';
         const address = (body.address || '').trim();
         const area = (body.area || '').trim();
         const city = (body.city || 'Dhaka').trim();
@@ -527,9 +546,9 @@ const server = http.createServer(async (req, res) => {
 
         db.prepare(`
           UPDATE users 
-          SET name = ?, email = ?, address = ?, area = ?, city = ?, updated_at = ?
+          SET name = ?, email = ?, avatar = ?, address = ?, area = ?, city = ?, updated_at = ?
           WHERE id = ?
-        `).run(name, email, address, area, city, now, session.userId);
+        `).run(name, email, avatar, address, area, city, now, session.userId);
 
         const updatedUser = db.prepare('SELECT * FROM users WHERE id = ?').get(session.userId);
 
@@ -541,6 +560,7 @@ const server = http.createServer(async (req, res) => {
             phone: updatedUser.phone,
             name: updatedUser.name,
             email: updatedUser.email || '',
+            avatar: updatedUser.avatar || '',
             address: updatedUser.address || '',
             area: updatedUser.area || '',
             city: updatedUser.city || 'Dhaka'
@@ -1084,6 +1104,37 @@ const server = http.createServer(async (req, res) => {
 
         db.prepare('DELETE FROM admins WHERE id = ?').run(userId);
         return jsonResponse(res, 200, { success: true, message: 'প্রোফাইল মুছে ফেলা হয়েছে' });
+      }
+
+      // -------------------------------------------------------------
+      // WEBSITE REGISTERED CUSTOMERS (Admin Management)
+      // -------------------------------------------------------------
+      if (pathname === '/api/admin/customers' && method === 'GET') {
+        const admin = getAuthenticatedAdmin(req);
+        if (!admin) return errorResponse(res, 401, 'Unauthorized');
+
+        const rows = db.prepare(`
+          SELECT 
+            u.id, u.phone, u.name, u.email, u.avatar, u.address, u.area, u.city, u.created_at, u.updated_at,
+            (SELECT COUNT(*) FROM orders o WHERE o.customer_phone = u.phone) as total_orders
+          FROM users u
+          ORDER BY u.id DESC
+        `).all();
+
+        return jsonResponse(res, 200, {
+          success: true,
+          customers: rows
+        });
+      }
+
+      if (pathname.startsWith('/api/admin/customers/') && method === 'DELETE') {
+        const admin = getAuthenticatedAdmin(req);
+        if (!admin) return errorResponse(res, 401, 'Unauthorized');
+        const customerId = parseInt(pathname.split('/')[4], 10);
+        if (!customerId) return errorResponse(res, 400, 'Invalid customer ID');
+
+        db.prepare('DELETE FROM users WHERE id = ?').run(customerId);
+        return jsonResponse(res, 200, { success: true, message: 'গ্রাহক প্রোফাইল মুছে ফেলা হয়েছে' });
       }
 
       return errorResponse(res, 404, 'API endpoint not found: ' + pathname);

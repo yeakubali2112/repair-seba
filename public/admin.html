@@ -833,93 +833,168 @@
             </div>
           </div>
 
-          <!-- CARD 1: MY ACTIVE PROFILE CARD -->
-          <div class="bg-gradient-to-r from-teal-900 via-[#0f766e] to-teal-800 rounded-2xl p-5 sm:p-6 text-white shadow-md shadow-teal-900/10 border border-teal-700/50">
-            <div class="flex flex-col md:flex-row md:items-center justify-between gap-5">
-              <div class="flex items-center gap-4">
-                <div class="relative w-16 h-16 sm:w-18 sm:h-18 rounded-2xl overflow-hidden bg-white/10 border-2 border-white/30 flex items-center justify-center font-black text-2xl shadow-inner shrink-0">
-                  <img id="my-card-avatar" src="" alt="Avatar" class="w-full h-full object-cover hidden">
-                  <span id="my-card-initial">প্র</span>
-                </div>
-                <div class="space-y-1">
-                  <div class="flex flex-wrap items-center gap-2">
-                    <span class="text-[10px] font-bold uppercase tracking-wider bg-white/20 px-2 py-0.5 rounded-md text-teal-100">বর্তমান লগইন প্রোফাইল</span>
-                    <span id="my-card-role-badge" class="px-2 py-0.5 text-[10px] font-bold rounded-md bg-emerald-400/20 text-emerald-200 border border-emerald-400/30">সুপার অ্যাডমিন</span>
-                  </div>
-                  <h3 id="my-card-name" class="text-lg sm:text-xl font-black tracking-tight text-white">Yeakub Ali</h3>
-                  <div class="flex flex-wrap items-center gap-3 text-xs text-teal-100 font-mono">
-                    <span id="my-card-username" class="font-bold">@admin</span>
-                    <span>•</span>
-                    <span id="my-card-phone" class="font-sans">০১৭১১-০০২২৩৩</span>
-                    <span>•</span>
-                    <span id="my-card-email" class="font-sans">support@repairseba.com</span>
-                  </div>
-                </div>
-              </div>
-              <div class="flex items-center gap-2 self-start md:self-auto shrink-0">
-                <button onclick="openAdminProfileModal()" class="px-4 py-2.5 rounded-xl bg-white text-[#0f766e] hover:bg-teal-50 font-bold text-xs shadow-md transition flex items-center gap-2">
-                  <span>✏️</span> <span>প্রোফাইল ও পাসওয়ার্ড পরিবর্তন</span>
-                </button>
-              </div>
-            </div>
+          <!-- User Management Subtabs (Admins vs Website Customers) -->
+          <div class="flex items-center gap-3 border-b border-slate-200/80 pb-3">
+            <button onclick="switchUserSubTab('admins')" id="subtab-btn-admins" type="button" class="px-4 py-2 rounded-xl text-xs font-bold bg-[#0f766e] text-white shadow-xs transition flex items-center gap-2">
+              <span>👥 টিম ও অ্যাডমিন প্রোফাইল</span>
+              <span id="badge-users-count" class="px-2 py-0.5 text-[10px] font-black rounded-md bg-teal-800 text-teal-100">১ জন</span>
+            </button>
+            <button onclick="switchUserSubTab('customers')" id="subtab-btn-customers" type="button" class="px-4 py-2 rounded-xl text-xs font-bold bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200 transition flex items-center gap-2">
+              <span>🛒 ওয়েবসাইট গ্রাহক / কাস্টমার একাউন্ট</span>
+              <span id="badge-customers-count" class="px-2 py-0.5 text-[10px] font-black rounded-md bg-amber-100 text-amber-800 border border-amber-200">০ জন</span>
+            </button>
           </div>
 
-          <!-- CARD 2: OTHER PROFILES & ACCESS CONTROL MANAGEMENT -->
-          <div class="bg-white border border-slate-200/90 rounded-2xl shadow-sm overflow-hidden space-y-4">
+          <!-- SUBTAB 1: ADMINS & TEAM MEMBERS -->
+          <div id="subtab-content-admins" class="space-y-6">
+
+            <!-- CARD 1: MY ACTIVE PROFILE CARD -->
+            <div class="bg-gradient-to-r from-teal-900 via-[#0f766e] to-teal-800 rounded-2xl p-5 sm:p-6 text-white shadow-md shadow-teal-900/10 border border-teal-700/50">
+              <div class="flex flex-col md:flex-row md:items-center justify-between gap-5">
+                <div class="flex items-center gap-4">
+                  <div class="relative w-16 h-16 sm:w-18 sm:h-18 rounded-2xl overflow-hidden bg-white/10 border-2 border-white/30 flex items-center justify-center font-black text-2xl shadow-inner shrink-0">
+                    <img id="my-card-avatar" src="" alt="Avatar" class="w-full h-full object-cover hidden">
+                    <span id="my-card-initial">প্র</span>
+                  </div>
+                  <div class="space-y-1">
+                    <div class="flex flex-wrap items-center gap-2">
+                      <span class="text-[10px] font-bold uppercase tracking-wider bg-white/20 px-2 py-0.5 rounded-md text-teal-100">বর্তমান লগইন প্রোফাইল</span>
+                      <span id="my-card-role-badge" class="px-2 py-0.5 text-[10px] font-bold rounded-md bg-emerald-400/20 text-emerald-200 border border-emerald-400/30">সুপার অ্যাডমিন</span>
+                    </div>
+                    <h3 id="my-card-name" class="text-lg sm:text-xl font-black tracking-tight text-white">Yeakub Ali</h3>
+                    <div class="flex flex-wrap items-center gap-3 text-xs text-teal-100 font-mono">
+                      <span id="my-card-username" class="font-bold">@admin</span>
+                      <span>•</span>
+                      <span id="my-card-phone" class="font-sans">০১৭১১-০০২২৩৩</span>
+                      <span>•</span>
+                      <span id="my-card-email" class="font-sans">support@repairseba.com</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="flex items-center gap-2 self-start md:self-auto shrink-0">
+                  <button onclick="openAdminProfileModal()" class="px-4 py-2.5 rounded-xl bg-white text-[#0f766e] hover:bg-teal-50 font-bold text-xs shadow-md transition flex items-center gap-2">
+                    <span>✏️</span> <span>প্রোফাইল ও পাসওয়ার্ড পরিবর্তন</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- CARD 2: OTHER PROFILES & ACCESS CONTROL MANAGEMENT -->
+            <div class="bg-white border border-slate-200/90 rounded-2xl shadow-sm overflow-hidden space-y-4">
+              
+              <!-- Information Banner -->
+              <div class="m-4 sm:m-5 p-4 rounded-xl bg-teal-50/70 border border-teal-200/80 flex items-start gap-3">
+                <span class="text-xl shrink-0 mt-0.5">💡</span>
+                <div class="text-xs text-teal-950 leading-relaxed">
+                  <div class="font-bold mb-0.5">ইউজার পারমিশন কন্ট্রোল কীভাবে কাজ করে?</div>
+                  <div>নতুন যেকোনো প্রোফাইল তৈরি বা সম্পাদনা করার সময় আপনি নির্ধারণ করতে পারেন এই ইউজার অ্যাডমিন প্যানেলে কি কি অপশন ব্যবহার করতে পারবে। যেমন: কাউকে শুধু <strong>অর্ডার ম্যানেজমেন্ট</strong> দিলে সে লগইন করলে শুধু অর্ডার ও কোটেশন দেখতে পারবে, কিন্তু <strong>সার্ভিস</strong> বা <strong>অফিস সেটিংস</strong> বা <strong>প্রোফাইল কন্ট্রোল</strong> মেনু দেখতে পাবে না।</div>
+                </div>
+              </div>
+
+              <!-- Toolbar: Search, Filters, Refresh, Add User -->
+              <div class="px-4 sm:px-5 pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100">
+                <div class="flex items-center gap-2.5">
+                  <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2">
+                    <span>👥 নিবন্ধিত প্রোফাইল ও টিম মেম্বারদের তালিকা</span>
+                  </h3>
+                </div>
+                
+                <div class="flex flex-wrap items-center gap-2">
+                  <!-- Search Box -->
+                  <div class="relative">
+                    <input type="text" id="users-search-input" placeholder="নাম বা ইউজারনেম দিয়ে খুঁজুন..." oninput="handleSearchAdminUsers(this.value)" class="pl-8 pr-3 py-1.5 rounded-xl bg-slate-50 border border-slate-200 text-xs focus:bg-white focus:border-teal-600 focus:outline-none transition w-48 sm:w-56">
+                    <span class="absolute left-2.5 top-2 text-slate-400 text-xs">🔍</span>
+                  </div>
+
+                  <!-- Refresh Button -->
+                  <button onclick="loadAdminUsers()" class="p-2 rounded-xl text-slate-500 hover:text-slate-800 hover:bg-slate-100 border border-slate-200 transition text-xs" title="রিফ্রেশ">
+                    <span>🔄</span>
+                  </button>
+
+                  <!-- Add New User Button -->
+                  <button onclick="openCreateUserModal()" class="px-3.5 py-1.5 rounded-xl bg-[#0f766e] hover:bg-[#115e59] text-white font-bold text-xs shadow-xs transition flex items-center gap-1.5">
+                    <span>+ নতুন মেম্বার</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Users List Table -->
+              <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs">
+                  <thead class="bg-slate-50 text-slate-600 font-bold uppercase tracking-wider border-b border-slate-200">
+                    <tr>
+                      <th class="py-3 px-4">প্রোফাইল ছবি ও নাম</th>
+                      <th class="py-3 px-4">ইউজারনেম (Login ID)</th>
+                      <th class="py-3 px-4">রোল / পদবী</th>
+                      <th class="py-3 px-4">অনুমোদিত অ্যাডমিন প্যানেল অপশনসমূহ</th>
+                      <th class="py-3 px-4 text-right">অ্যাকশন</th>
+                    </tr>
+                  </thead>
+                  <tbody id="admin-users-table-body" class="divide-y divide-slate-100 text-slate-800">
+                    <!-- Populated by admin.js -->
+                  </tbody>
+                </table>
+              </div>
+
+            </div>
+
+          </div>
+
+          <!-- SUBTAB 2: REGISTERED WEBSITE CUSTOMERS -->
+          <div id="subtab-content-customers" class="hidden space-y-4">
             
             <!-- Information Banner -->
-            <div class="m-4 sm:m-5 p-4 rounded-xl bg-teal-50/70 border border-teal-200/80 flex items-start gap-3">
-              <span class="text-xl shrink-0 mt-0.5">💡</span>
+            <div class="p-4 rounded-xl bg-teal-50/70 border border-teal-200/80 flex items-start gap-3">
+              <span class="text-xl shrink-0 mt-0.5">🛒</span>
               <div class="text-xs text-teal-950 leading-relaxed">
-                <div class="font-bold mb-0.5">ইউজার পারমিশন কন্ট্রোল কীভাবে কাজ করে?</div>
-                <div>নতুন যেকোনো প্রোফাইল তৈরি বা সম্পাদনা করার সময় আপনি নির্ধারণ করতে পারেন এই ইউজার অ্যাডমিন প্যানেলে কি কি অপশন ব্যবহার করতে পারবে। যেমন: কাউকে শুধু <strong>অর্ডার ম্যানেজমেন্ট</strong> দিলে সে লগইন করলে শুধু অর্ডার ও কোটেশন দেখতে পারবে, কিন্তু <strong>সার্ভিস</strong> বা <strong>অফিস সেটিংস</strong> বা <strong>প্রোফাইল কন্ট্রোল</strong> মেনু দেখতে পাবে না।</div>
+                <div class="font-bold mb-0.5">ওয়েবসাইট গ্রাহক প্রোফাইল তালিকা</div>
+                <div>গ্রাহকরা ওয়েবসাইট থেকে যখন একাউন্ট তৈরি করবে, ফোন দিয়ে লগইন করবে বা অর্ডার বুক করবে, তখন তাদের ছবি, নাম, মোবাইল নম্বর, ঠিকানা এবং সর্বমোট অর্ডারের হিসাব এখানে স্বয়ংক্রিয়ভাবে সংরক্ষিত ও প্রদর্শিত হবে।</div>
               </div>
             </div>
 
-            <!-- Toolbar: Search, Filters, Refresh, Add User -->
-            <div class="px-4 sm:px-5 pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100">
-              <div class="flex items-center gap-2.5">
-                <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2">
-                  <span>👥 নিবন্ধিত প্রোফাইল ও টিম মেম্বারদের তালিকা</span>
-                  <span id="badge-users-count" class="px-2 py-0.5 text-[10px] font-bold rounded-md bg-teal-100 text-teal-800 border border-teal-200">১ জন</span>
-                </h3>
-              </div>
-              
-              <div class="flex flex-wrap items-center gap-2">
-                <!-- Search Box -->
-                <div class="relative">
-                  <input type="text" id="users-search-input" placeholder="নাম বা ইউজারনেম দিয়ে খুঁজুন..." oninput="handleSearchAdminUsers(this.value)" class="pl-8 pr-3 py-1.5 rounded-xl bg-slate-50 border border-slate-200 text-xs focus:bg-white focus:border-teal-600 focus:outline-none transition w-48 sm:w-56">
-                  <span class="absolute left-2.5 top-2 text-slate-400 text-xs">🔍</span>
+            <!-- Toolbar: Search & Refresh -->
+            <div class="bg-white border border-slate-200/90 rounded-2xl shadow-sm overflow-hidden">
+              <div class="p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100">
+                <div class="flex items-center gap-2.5">
+                  <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2">
+                    <span>👥 ওয়েবসাইটে নিবন্ধিত কাস্টমার তালিকা</span>
+                  </h3>
                 </div>
 
-                <!-- Refresh Button -->
-                <button onclick="loadAdminUsers()" class="p-2 rounded-xl text-slate-500 hover:text-slate-800 hover:bg-slate-100 border border-slate-200 transition text-xs" title="রিফ্রেশ">
-                  <span>🔄</span>
-                </button>
+                <div class="flex flex-wrap items-center gap-2">
+                  <!-- Search Box -->
+                  <div class="relative">
+                    <input type="text" id="customers-search-input" placeholder="গ্রাহকের নাম বা ফোন দিয়ে খুঁজুন..." oninput="handleSearchCustomers(this.value)" class="pl-8 pr-3 py-1.5 rounded-xl bg-slate-50 border border-slate-200 text-xs focus:bg-white focus:border-teal-600 focus:outline-none transition w-56 sm:w-64">
+                    <span class="absolute left-2.5 top-2 text-slate-400 text-xs">🔍</span>
+                  </div>
 
-                <!-- Add New User Button -->
-                <button onclick="openCreateUserModal()" class="px-3.5 py-1.5 rounded-xl bg-[#0f766e] hover:bg-[#115e59] text-white font-bold text-xs shadow-xs transition flex items-center gap-1.5">
-                  <span>+ নতুন মেম্বার</span>
-                </button>
+                  <!-- Refresh Button -->
+                  <button onclick="loadAdminCustomers()" class="p-2 rounded-xl text-slate-500 hover:text-slate-800 hover:bg-slate-100 border border-slate-200 transition text-xs" title="রিফ্রেশ">
+                    <span>🔄</span>
+                  </button>
+                </div>
               </div>
-            </div>
 
-            <!-- Users List Table -->
-            <div class="overflow-x-auto">
-              <table class="w-full text-left text-xs">
-                <thead class="bg-slate-50 text-slate-600 font-bold uppercase tracking-wider border-b border-slate-200">
-                  <tr>
-                    <th class="py-3 px-4">প্রোফাইল ছবি ও নাম</th>
-                    <th class="py-3 px-4">ইউজারনেম (Login ID)</th>
-                    <th class="py-3 px-4">রোল / পদবী</th>
-                    <th class="py-3 px-4">অনুমোদিত অ্যাডমিন প্যানেল অপশনসমূহ</th>
-                    <th class="py-3 px-4 text-right">অ্যাকশন</th>
-                  </tr>
-                </thead>
-                <tbody id="admin-users-table-body" class="divide-y divide-slate-100 text-slate-800">
-                  <!-- Populated by admin.js -->
-                </tbody>
-              </table>
+              <!-- Customers Table -->
+              <div class="w-full overflow-x-auto">
+                <table class="w-full text-left text-xs table-auto">
+                  <thead class="bg-slate-50 text-slate-600 font-bold uppercase tracking-wider border-b border-slate-200">
+                    <tr>
+                      <th class="py-3 px-4">গ্রাহকের প্রোফাইল ও নাম</th>
+                      <th class="py-3 px-4 whitespace-nowrap">মোবাইল নম্বর</th>
+                      <th class="py-3 px-4">ইমেইল</th>
+                      <th class="py-3 px-4">ঠিকানা ও এলাকা</th>
+                      <th class="py-3 px-4 text-center whitespace-nowrap">সর্বমোট অর্ডার</th>
+                      <th class="py-3 px-4 whitespace-nowrap">রেজিস্ট্রেশন তারিখ</th>
+                      <th class="py-3 px-4 text-center whitespace-nowrap">যোগাযোগ</th>
+                    </tr>
+                  </thead>
+                  <tbody id="admin-customers-table-body" class="divide-y divide-slate-100 text-slate-800">
+                    <!-- Populated by admin.js -->
+                  </tbody>
+                </table>
+              </div>
+
             </div>
 
           </div>

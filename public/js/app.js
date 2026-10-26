@@ -1291,22 +1291,101 @@ function updateNavUserUI(isLoggedIn) {
   const loginBtn = document.getElementById('nav-btn-login');
   const userDropdown = document.getElementById('nav-user-dropdown');
   const displayName = document.getElementById('nav-user-display-name');
+  const userSub = document.getElementById('nav-user-sub');
+  const userAvatarImg = document.getElementById('nav-user-avatar');
+  const userInitial = document.getElementById('nav-user-initial');
   const dropdownName = document.getElementById('dropdown-user-name');
   const dropdownPhone = document.getElementById('dropdown-user-phone');
+  const dropdownAvatarImg = document.getElementById('dropdown-user-avatar');
+  const dropdownInitial = document.getElementById('dropdown-user-initial');
 
   if (isLoggedIn && currentCustomer) {
     if (loginBtn) loginBtn.classList.add('hidden');
-    if (userDropdown) userDropdown.classList.remove('hidden');
+    if (userDropdown) {
+      userDropdown.classList.remove('hidden');
+      userDropdown.style.display = 'flex';
+    }
 
-    const name = currentCustomer.name || currentCustomer.phone;
+    const name = currentCustomer.name || 'সম্মানিত গ্রাহক';
+    const initial = (name.trim().charAt(0) || 'গ').toUpperCase();
+
     if (displayName) displayName.textContent = name;
-    if (dropdownName) dropdownName.textContent = currentCustomer.name || 'গ্রাহক';
-    if (dropdownPhone) dropdownPhone.textContent = currentCustomer.phone;
+    if (userSub) userSub.textContent = currentCustomer.phone || '';
+    if (dropdownName) dropdownName.textContent = name;
+    if (dropdownPhone) dropdownPhone.textContent = currentCustomer.phone || '';
+
+    // Handle Nav Avatar
+    if (currentCustomer.avatar && currentCustomer.avatar.trim()) {
+      if (userAvatarImg) {
+        userAvatarImg.src = currentCustomer.avatar;
+        userAvatarImg.classList.remove('hidden');
+      }
+      if (userInitial) userInitial.classList.add('hidden');
+      if (dropdownAvatarImg) {
+        dropdownAvatarImg.src = currentCustomer.avatar;
+        dropdownAvatarImg.classList.remove('hidden');
+      }
+      if (dropdownInitial) dropdownInitial.classList.add('hidden');
+    } else {
+      if (userAvatarImg) {
+        userAvatarImg.src = '';
+        userAvatarImg.classList.add('hidden');
+      }
+      if (userInitial) {
+        userInitial.textContent = initial;
+        userInitial.classList.remove('hidden');
+      }
+      if (dropdownAvatarImg) {
+        dropdownAvatarImg.src = '';
+        dropdownAvatarImg.classList.add('hidden');
+      }
+      if (dropdownInitial) {
+        dropdownInitial.textContent = initial;
+        dropdownInitial.classList.remove('hidden');
+      }
+    }
   } else {
     if (loginBtn) loginBtn.classList.remove('hidden');
-    if (userDropdown) userDropdown.classList.add('hidden');
+    if (userDropdown) {
+      userDropdown.classList.add('hidden');
+      userDropdown.style.display = 'none';
+    }
   }
 }
+
+function updateProfileAvatarPreview(url) {
+  const preview = document.getElementById('profile-modal-avatar-preview');
+  const initial = document.getElementById('profile-modal-avatar-initial');
+  if (url && url.trim()) {
+    if (preview) {
+      preview.src = url.trim();
+      preview.classList.remove('hidden');
+    }
+    if (initial) initial.classList.add('hidden');
+  } else {
+    if (preview) {
+      preview.src = '';
+      preview.classList.add('hidden');
+    }
+    if (initial) initial.classList.remove('hidden');
+  }
+}
+
+function clearProfileAvatar() {
+  const input = document.getElementById('profile-edit-avatar');
+  if (input) input.value = '';
+  updateProfileAvatarPreview('');
+}
+
+function selectAvatarPreset(url) {
+  const input = document.getElementById('profile-edit-avatar');
+  if (input) input.value = url;
+  updateProfileAvatarPreview(url);
+}
+
+window.updateProfileAvatarPreview = updateProfileAvatarPreview;
+window.clearProfileAvatar = clearProfileAvatar;
+window.selectAvatarPreset = selectAvatarPreset;
 
 function openUserLoginModal() {
   const modal = document.getElementById('user-login-modal');
@@ -1409,10 +1488,18 @@ function openUserProfileModal(tab = 'profile') {
 
   setVal('profile-edit-phone', currentCustomer.phone);
   setVal('profile-edit-name', currentCustomer.name === 'সম্মানিত গ্রাহক' ? '' : currentCustomer.name);
+  setVal('profile-edit-avatar', currentCustomer.avatar || '');
   setVal('profile-edit-email', currentCustomer.email);
   setVal('profile-edit-address', currentCustomer.address);
   setVal('profile-edit-area', currentCustomer.area);
   setVal('profile-edit-city', currentCustomer.city || 'Dhaka');
+
+  // Update top modal profile card
+  const modalName = document.getElementById('profile-modal-display-name');
+  const modalPhone = document.getElementById('profile-modal-display-phone');
+  if (modalName) modalName.textContent = currentCustomer.name || 'সম্মানিত গ্রাহক';
+  if (modalPhone) modalPhone.textContent = currentCustomer.phone || '';
+  updateProfileAvatarPreview(currentCustomer.avatar || '');
 
   switchProfileModalTab(tab);
   modal.classList.remove('hidden');
@@ -1461,6 +1548,7 @@ async function handleUserProfileSave(e) {
   }
 
   const name = document.getElementById('profile-edit-name')?.value.trim();
+  const avatar = document.getElementById('profile-edit-avatar')?.value.trim() || '';
   const email = document.getElementById('profile-edit-email')?.value.trim();
   const address = document.getElementById('profile-edit-address')?.value.trim();
   const area = document.getElementById('profile-edit-area')?.value.trim();
@@ -1486,7 +1574,7 @@ async function handleUserProfileSave(e) {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${customerToken}`
       },
-      body: JSON.stringify({ name, email, address, area, city })
+      body: JSON.stringify({ name, email, avatar, address, area, city })
     });
     const data = await res.json();
 

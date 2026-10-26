@@ -806,7 +806,10 @@ function switchTab(tab) {
   if (tab === 'inquiries') loadAdminContacts();
   if (tab === 'hero') loadAdminHeroSettings();
   if (tab === 'footer') loadAdminFooterSettings();
-  if (tab === 'users') loadAdminUsers();
+  if (tab === 'users') {
+    loadAdminUsers();
+    loadAdminCustomers();
+  }
 }
 
 async function createNewDemoOrder() {
@@ -1747,6 +1750,175 @@ window.closeUserModal = closeUserModal;
 window.toggleAllPermissions = toggleAllPermissions;
 window.handleSaveAdminUser = handleSaveAdminUser;
 window.deleteAdminUser = deleteAdminUser;
+
+// -------------------------------------------------------------
+// REGISTERED WEBSITE CUSTOMERS MANAGEMENT (SUBTAB)
+// -------------------------------------------------------------
+let cachedAdminCustomers = [];
+let currentCustomerSubTab = 'admins';
+
+function switchUserSubTab(subtab) {
+  currentCustomerSubTab = subtab;
+  const adminsBtn = document.getElementById('subtab-btn-admins');
+  const customersBtn = document.getElementById('subtab-btn-customers');
+  const adminsContent = document.getElementById('subtab-content-admins');
+  const customersContent = document.getElementById('subtab-content-customers');
+
+  if (subtab === 'admins') {
+    adminsBtn?.classList.add('bg-[#0f766e]', 'text-white', 'shadow-xs');
+    adminsBtn?.classList.remove('bg-slate-100', 'text-slate-700', 'border');
+    customersBtn?.classList.remove('bg-[#0f766e]', 'text-white', 'shadow-xs');
+    customersBtn?.classList.add('bg-slate-100', 'text-slate-700', 'border');
+
+    adminsContent?.classList.remove('hidden');
+    customersContent?.classList.add('hidden');
+    loadAdminUsers();
+  } else {
+    customersBtn?.classList.add('bg-[#0f766e]', 'text-white', 'shadow-xs');
+    customersBtn?.classList.remove('bg-slate-100', 'text-slate-700', 'border');
+    adminsBtn?.classList.remove('bg-[#0f766e]', 'text-white', 'shadow-xs');
+    adminsBtn?.classList.add('bg-slate-100', 'text-slate-700', 'border');
+
+    adminsContent?.classList.add('hidden');
+    customersContent?.classList.remove('hidden');
+    loadAdminCustomers();
+  }
+}
+
+async function loadAdminCustomers() {
+  const tbody = document.getElementById('admin-customers-table-body');
+  if (!tbody) return;
+
+  tbody.innerHTML = `<tr><td colspan="7" class="text-center py-6 text-slate-500">গ্রাহক তালিকা লোড হচ্ছে...</td></tr>`;
+
+  try {
+    const res = await fetch('/api/admin/customers', {
+      headers: { 'Authorization': `Bearer ${adminToken}` }
+    });
+    const data = await res.json();
+    if (data.success) {
+      cachedAdminCustomers = data.customers;
+      renderAdminCustomersTable(data.customers);
+      const badge = document.getElementById('badge-customers-count');
+      if (badge) badge.textContent = `${data.customers.length} জন`;
+    } else {
+      tbody.innerHTML = `<tr><td colspan="7" class="text-center py-6 text-rose-500">${data.error}</td></tr>`;
+    }
+  } catch (err) {
+    console.error('Error loading customers:', err);
+    tbody.innerHTML = `<tr><td colspan="7" class="text-center py-6 text-rose-500">গ্রাহক তালিকা লোড করতে সমস্যা হয়েছে।</td></tr>`;
+  }
+}
+
+function renderAdminCustomersTable(customers) {
+  const tbody = document.getElementById('admin-customers-table-body');
+  if (!tbody) return;
+
+  if (customers.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="7" class="text-center py-10 text-slate-500 font-medium">বর্তমানে কোনো নিবন্ধিত ওয়েবসাইট গ্রাহক নেই।</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = customers.map(c => {
+    const initial = (c.name || 'গ').charAt(0).toUpperCase();
+    const avatarHtml = c.avatar && c.avatar.trim() 
+      ? `<img src="${c.avatar}" alt="${c.name || 'গ্রাহক'}" class="w-full h-full object-cover">`
+      : `<span>${initial}</span>`;
+    
+    const regDate = c.created_at ? new Date(c.created_at).toLocaleDateString('bn-BD', { year: 'numeric', month: 'short', day: 'numeric' }) : 'অজানা';
+    const totalOrders = c.total_orders || 0;
+
+    return `
+      <tr class="hover:bg-slate-50/80 transition text-slate-800 text-xs">
+        <td class="py-3 px-4">
+          <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-full overflow-hidden bg-[#0f766e] text-white flex items-center justify-center font-bold text-xs shrink-0 border border-teal-300 shadow-2xs">
+              ${avatarHtml}
+            </div>
+            <div>
+              <div class="font-bold text-slate-900">${c.name || 'সম্মানিত গ্রাহক'}</div>
+              <div class="text-[10px] text-teal-800 font-medium">আইডি: #${c.id}</div>
+            </div>
+          </div>
+        </td>
+
+        <td class="py-3 px-4 font-mono font-semibold text-slate-800 whitespace-nowrap">
+          ${c.phone}
+        </td>
+
+        <td class="py-3 px-4 text-slate-600">
+          ${c.email ? `<span class="font-sans">${c.email}</span>` : `<span class="text-slate-400 font-sans italic">দেওয়া হয়নি</span>`}
+        </td>
+
+        <td class="py-3 px-4 text-slate-700">
+          <div class="truncate max-w-[200px]" title="${c.address || ''}">
+            ${c.address || c.area ? `📍 ${[c.address, c.area].filter(Boolean).join(', ')}` : '<span class="text-slate-400 italic">ঠিকানা যুক্ত হয়নি</span>'}
+          </div>
+        </td>
+
+        <td class="py-3 px-4 text-center whitespace-nowrap">
+          <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold ${totalOrders > 0 ? 'bg-emerald-50 text-emerald-800 border border-emerald-200' : 'bg-slate-100 text-slate-600 border border-slate-200'}">
+            ${totalOrders}টি অর্ডার
+          </span>
+        </td>
+
+        <td class="py-3 px-4 text-slate-500 whitespace-nowrap font-sans">
+          ${regDate}
+        </td>
+
+        <td class="py-3 px-4 text-center whitespace-nowrap space-x-1.5">
+          <a href="https://wa.me/88${c.phone}?text=${encodeURIComponent(`Assalamu Alaikum ${c.name || ''}, Repair Seba থেকে আপনার সাথে যোগাযোগ করছি।`)}" target="_blank" class="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs transition inline-flex items-center gap-1 shadow-2xs" title="WhatsApp Chat">
+            <span>💬</span> <span>চ্যাট</span>
+          </a>
+          <button onclick="deleteAdminCustomer(${c.id}, '${(c.name || c.phone).replace(/'/g, "\\'")}')" class="px-2 py-1 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-bold text-xs transition inline-flex items-center gap-0.5" title="গ্রাহক মুছে ফেলুন">
+            🗑️
+          </button>
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+function handleSearchCustomers(query) {
+  const q = (query || '').toLowerCase().trim();
+  if (!q) {
+    renderAdminCustomersTable(cachedAdminCustomers);
+    return;
+  }
+  const filtered = cachedAdminCustomers.filter(c => 
+    (c.name && c.name.toLowerCase().includes(q)) ||
+    (c.phone && c.phone.includes(q)) ||
+    (c.email && c.email.toLowerCase().includes(q)) ||
+    (c.address && c.address.toLowerCase().includes(q)) ||
+    (c.area && c.area.toLowerCase().includes(q))
+  );
+  renderAdminCustomersTable(filtered);
+}
+
+async function deleteAdminCustomer(customerId, customerName) {
+  if (!confirm(`আপনি কি নিশ্চিত যে গ্রাহক "${customerName}" এর প্রোফাইল মুছে ফেলতে চান?`)) return;
+
+  try {
+    const res = await fetch(`/api/admin/customers/${customerId}`, {
+      method: 'DELETE',
+      headers: { 'Authorization': `Bearer ${adminToken}` }
+    });
+    const data = await res.json();
+    if (data.success) {
+      loadAdminCustomers();
+    } else {
+      alert(data.error || 'মুছে ফেলা যায়নি');
+    }
+  } catch (err) {
+    console.error('Delete customer error:', err);
+    alert('সার্ভার এরর');
+  }
+}
+
+window.switchUserSubTab = switchUserSubTab;
+window.loadAdminCustomers = loadAdminCustomers;
+window.handleSearchCustomers = handleSearchCustomers;
+window.deleteAdminCustomer = deleteAdminCustomer;
 
 
 

@@ -108,6 +108,7 @@ function initDb() {
       phone TEXT UNIQUE NOT NULL,
       name TEXT,
       email TEXT,
+      avatar TEXT DEFAULT '',
       address TEXT,
       area TEXT,
       city TEXT DEFAULT 'Dhaka',
@@ -115,6 +116,16 @@ function initDb() {
       updated_at TEXT NOT NULL
     );
   `);
+
+  // Migrate users table columns safely if they do not exist
+  const userCols = [
+    { name: 'avatar', def: "TEXT DEFAULT ''" }
+  ];
+  for (const c of userCols) {
+    try {
+      db.exec(`ALTER TABLE users ADD COLUMN ${c.name} ${c.def};`);
+    } catch (_) {}
+  }
 
   // Migrate admins table columns safely if they do not exist
   const adminCols = [
