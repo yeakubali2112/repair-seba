@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Repair Seba - Admin Management Portal</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen antialiased selection:bg-cyan-500 selection:text-white font-sans">
+
+  <!-- Printable Container -->
+  <div id="printable-receipt" class="hidden"></div>
+
+  <!-- 1. LOGIN SCREEN (Visible when logged out) -->
+  <div id="admin-login-screen" class="min-h-screen flex items-center justify-center p-4 bg-slate-100">
+    <div class="bg-white border border-slate-200 rounded-3xl p-8 max-w-md w-full shadow-xl">
+      <div class="text-center mb-8">
+        <div class="w-16 h-16 rounded-2xl bg-cyan-50 text-cyan-600 border border-cyan-200 flex items-center justify-center text-3xl mx-auto mb-4 shadow-sm">
+          🛠️
+        </div>
+        <h2 class="text-2xl font-black text-slate-900">Repair Seba Admin</h2>
+        <p class="text-xs text-slate-500 mt-1">ল্যাব ও ডোরস্টেপ রিপেয়ার ম্যানেজমেন্ট প্যানেল</p>
+      </div>
+
+      <form id="admin-login-form" class="space-y-4" onsubmit="handleAdminLoginSubmit(event); return false;">
+        <div>
+          <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">ইউজারনেম / Username</label>
+          <input type="text" id="login-username" value="admin" required class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-300 text-slate-900 text-sm focus:bg-white focus:border-cyan-600 focus:outline-none focus:ring-1 focus:ring-cyan-500 transition">
+        </div>
+        <div>
+          <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">পাসওয়ার্ড / Password</label>
+          <input type="password" id="login-password" value="admin123" required class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-300 text-slate-900 text-sm focus:bg-white focus:border-cyan-600 focus:outline-none focus:ring-1 focus:ring-cyan-500 transition">
+        </div>
+
+        <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 text-xs text-slate-600">
+          🔑 ডিফল্ট লগইন: <span class="text-cyan-700 font-mono font-bold">admin</span> / <span class="text-cyan-700 font-mono font-bold">admin123</span>
+        </div>
+
+        <button type="submit" class="w-full py-3.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-sm transition shadow-md shadow-cyan-600/20">
+          লগইন করুন (Sign In)
+        </button>
+
+        <div class="text-center pt-2">
+          <a href="/" class="text-xs text-slate-500 hover:text-slate-800 transition">← মূল ওয়েবসাইটে ফিরে যান</a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 2. MAIN ADMIN DASHBOARD (Visible when logged in) -->
+  <div id="admin-dashboard-screen" class="hidden min-h-screen flex bg-slate-50 text-slate-800">
+    
+    <!-- Mobile Sidebar Backdrop Overlay -->
+    <div id="sidebar-backdrop" onclick="toggleAdminSidebar(false)" class="fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-40 lg:hidden hidden transition-opacity"></div>
+
+    <!-- LEFT SIDEBAR (Sidebar Navigation as requested) -->
+    <aside id="admin-sidebar" class="fixed lg:sticky top-0 left-0 z-50 h-screen w-64 lg:w-72 bg-white border-r border-slate-200 flex flex-col justify-between shrink-0 shadow-lg lg:shadow-none -translate-x-full lg:translate-x-0 transition-transform duration-200 ease-in-out">
+      
+      <!-- Top Brand Header in Sidebar (Height matched to top bar for seamless horizontal line) -->
+      <div class="h-20 px-5 border-b border-slate-200 flex items-center justify-between shrink-0">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-cyan-600 text-white flex items-center justify-center font-black text-xl shadow-md shadow-cyan-600/20">
+            🛠️
+          </div>
+          <div>
+            <h1 class="text-lg font-black tracking-tight text-slate-900">
+              Repair Seba
+            </h1>
+          </div>
+        </div>
+        <!-- Close button for mobile screen -->
+        <button onclick="toggleAdminSidebar(false)" class="lg:hidden p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100" title="Close Sidebar">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <!-- Navigation Menu in Sidebar -->
+      <div class="flex-1 overflow-y-auto px-4 py-5 space-y-6">
+        <div>
+          <nav class="space-y-1.5">
+            <button onclick="switchTab('orders'); toggleAdminSidebar(false);" id="tab-btn-orders" class="w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-bold bg-cyan-600 text-white shadow-md shadow-cyan-600/20 transition-all text-left">
+              <span class="text-lg">📦</span>
+              <span class="flex-1">অর্ডারসমূহ (Orders)</span>
+            </button>
+
+            <button onclick="switchTab('services'); toggleAdminSidebar(false);" id="tab-btn-services" class="w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-all text-left">
+              <span class="text-lg">⚙️</span>
+              <span class="flex-1">সার্ভিস কনফিগ (Services)</span>
+            </button>
+
+            <button onclick="switchTab('inquiries'); toggleAdminSidebar(false);" id="tab-btn-inquiries" class="w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-all text-left">
+              <span class="text-lg">💬</span>
+              <span class="flex-1">গ্রাহক মেসেজ (Inquiries)</span>
+            </button>
+
+            <button onclick="switchTab('hero'); toggleAdminSidebar(false);" id="tab-btn-hero" class="w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-all text-left">
+              <span class="text-lg">🎨</span>
+              <span class="flex-1">হিরো ব্যানার (Hero)</span>
+            </button>
+
+            <button onclick="switchTab('footer'); toggleAdminSidebar(false);" id="tab-btn-footer" class="w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-all text-left">
+              <span class="text-lg">👣</span>
+              <span class="flex-1">ফুটার ম্যানেজমেন্ট (Footer)</span>
+            </button>
+          </nav>
+        </div>
+      </div>
+
+      <!-- Bottom Logout Section in Sidebar -->
+      <div class="p-4 border-t border-slate-100 bg-slate-50/70">
+        <button onclick="adminLogout()" class="w-full py-2.5 px-3 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-xs font-bold transition flex items-center justify-center gap-2">
+          <span>🚪</span> লগআউট (Logout)
+        </button>
+      </div>
+
+    </aside>
+
+    <!-- RIGHT MAIN CONTENT WRAPPER -->
+    <div class="flex-1 flex flex-col min-w-0 bg-slate-50 min-h-screen">
+      
+      <!-- Top Header Bar (Height matched to sidebar header for seamless horizontal line) -->
+      <header class="h-20 bg-white border-b border-slate-200 sticky top-0 z-30 px-4 sm:px-6 flex items-center justify-between shrink-0">
+        
+        <!-- Left: Mobile Hamburger & Current Page Title -->
+        <div class="flex items-center gap-3">
+          <button onclick="toggleAdminSidebar(true)" class="lg:hidden p-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 border border-slate-200" title="Open Menu">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+          </button>
+          <div>
+            <h2 id="top-bar-title" class="text-base sm:text-lg font-black text-slate-900 flex items-center gap-2">
+              <span>📦</span> অর্ডার ম্যানেজমেন্ট ড্যাশবোর্ড
+            </h2>
+            <p class="text-xs text-slate-500 hidden sm:block">ডোরস্টেপ সেবা কন্ট্রোল সেন্টার ও ম্যানেজমেন্ট</p>
+          </div>
+        </div>
+
+        <!-- Right Side Empty Placeholder -->
+        <div></div>
+      </header>
+
+      <!-- Main Content Area -->
+      <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+        <!-- Metrics Row -->
+        <div id="stats-container" class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3 mb-8">
+          <!-- Rendered by admin.js with light cards -->
+        </div>
+
+        <!-- TAB 1: ORDERS MANAGEMENT -->
+        <section id="tab-orders" class="space-y-6">
+          
+          <!-- Filter and Search Toolbar -->
+          <div class="bg-white border border-slate-200 p-4 rounded-2xl shadow-xs flex flex-col lg:flex-row items-center justify-between gap-4">
+            
+            <!-- Status Filter Tabs -->
+            <div class="flex items-center gap-1.5 overflow-x-auto w-full lg:w-auto pb-2 lg:pb-0 scrollbar-none">
+              <button onclick="filterOrders('ALL')" class="order-status-tab active px-3.5 py-1.5 rounded-xl text-xs font-bold bg-cyan-600 text-white shadow-xs whitespace-nowrap transition">
+                সবগুলো (<span id="count-all">0</span>)
+              </button>
+              <button onclick="filterOrders('PENDING_PICKUP')" class="order-status-tab px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200 whitespace-nowrap transition">
+                পিকআপ বাকি
+              </button>
+              <button onclick="filterOrders('QUOTE_PENDING')" class="order-status-tab px-3.5 py-1.5 rounded-xl text-xs font-bold bg-orange-50 text-orange-700 border border-orange-300 hover:bg-orange-100 whitespace-nowrap transition animate-pulse">
+                ⚠️ মূল্য অনুমোদন অপেক্ষমাণ
+              </button>
+              <button onclick="filterOrders('IN_REPAIR')" class="order-status-tab px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200 whitespace-nowrap transition">
+                মেরামত চলছে
+              </button>
+              <button onclick="filterOrders('OUT_FOR_DELIVERY')" class="order-status-tab px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200 whitespace-nowrap transition">
+                ডেলিভারিতে
+              </button>
+              <button onclick="filterOrders('COMPLETED')" class="order-status-tab px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200 whitespace-nowrap transition">
+                সম্পন্ন
+              </button>
+            </div>
+
+            <!-- Search & Refresh -->
+            <div class="flex items-center gap-3 w-full lg:w-auto">
+              <div class="relative flex-1 lg:w-72">
+                <input type="text" id="order-search-input" placeholder="অর্ডার আইডি, নাম, ফোন বা ব্র্যান্ড..." class="w-full px-4 py-2 text-xs rounded-xl bg-slate-50 border border-slate-300 text-slate-900 focus:bg-white focus:outline-none focus:border-cyan-600 focus:ring-1 focus:ring-cyan-500 transition">
+              </div>
+              <button onclick="loadAdminOrders()" class="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-300 text-xs font-bold text-slate-700 transition">
+                🔄 রিফ্রেশ
+              </button>
+            </div>
+
+          </div>
+
+          <!-- Orders Table -->
+          <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-xs">
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-xs">
+                <thead class="bg-slate-50 text-slate-600 font-bold uppercase tracking-wider border-b border-slate-200">
+                  <tr>
+                    <th class="py-3.5 px-4">অর্ডার নং ও তারিখ</th>
+                    <th class="py-3.5 px-4">গ্রাহকের তথ্য ও ঠিকানা</th>
+                    <th class="py-3.5 px-4">ডিভাইস ও সমস্যা</th>
+                    <th class="py-3.5 px-4">বর্তমান স্ট্যাটাস</th>
+                    <th class="py-3.5 px-4">খরচ ও সম্মতি</th>
+                    <th class="py-3.5 px-4 text-right">একশন</th>
+                  </tr>
+                </thead>
+                <tbody id="orders-table-body" class="divide-y divide-slate-100 text-slate-800">
+                  <!-- Rows loaded by admin.js -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </section>
+
+        <!-- TAB 2: SERVICES CONFIG -->
+        <section id="tab-services" class="hidden space-y-6">
+          <div class="flex items-center justify-between bg-white border border-slate-200 p-5 rounded-2xl shadow-xs">
+            <div>
+              <h2 class="text-xl font-bold text-slate-900">রিপেয়ার সার্ভিস ও মূল্য তালিকা</h2>
+              <p class="text-xs text-slate-500 mt-0.5">গ্রাহকদের জন্য হোমপেজে প্রদর্শিত সার্ভিস ও প্রারম্ভিক ফি</p>
+            </div>
+            <button onclick="openAddServiceModal()" class="px-4 py-2.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-xs transition shadow-sm">
+              + নতুন সার্ভিস যোগ করুন
+            </button>
+          </div>
+          <div id="admin-services-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <!-- Populated by JS -->
+          </div>
+        </section>
+
+        <!-- TAB 3: CONTACT INQUIRIES -->
+        <section id="tab-inquiries" class="hidden space-y-6">
+          <div class="bg-white border border-slate-200 p-5 rounded-2xl shadow-xs">
+            <h2 class="text-xl font-bold text-slate-900">গ্রাহকদের মেসেজ ও যোগাযোগ</h2>
+            <p class="text-xs text-slate-500 mt-0.5">কন্টাক্ট ফর্মের মাধ্যমে পাঠানো কাস্টমার অনুসন্ধানসমূহ</p>
+          </div>
+          <div id="admin-contacts-list" class="space-y-3">
+            <!-- Populated by JS -->
+          </div>
+        </section>
+
+        <!-- TAB 4: HERO BANNER SETTINGS -->
+        <section id="tab-hero" class="hidden space-y-6">
+          <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-white border border-slate-200 p-6 rounded-2xl shadow-xs">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="text-2xl">🎨</span>
+                <h2 class="text-xl font-bold text-slate-900">হিরো ব্যানার ও বাইক অ্যানিমেশন কন্ট্রোল</h2>
+              </div>
+              <p class="text-xs text-slate-500 mt-1">ওয়েবসাইটের হোমপেজের হিরো ব্যানার, ডেলিভারি বাইক, গতি ও টেক্সট কাস্টমাইজ করুন</p>
+            </div>
+            <div class="flex items-center gap-3">
+              <button onclick="resetAdminHeroSettings()" type="button" class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition border border-slate-300">
+                🔄 ডিফল্ট রিস্টোর
+              </button>
+              <button onclick="saveAdminHeroSettings()" type="button" id="btn-save-hero" class="px-6 py-2.5 rounded-xl bg-gradient-to-r from-cyan-600 to-sky-600 hover:from-cyan-500 hover:to-sky-500 text-white font-bold text-xs shadow-md shadow-cyan-600/20 transition flex items-center gap-2">
+                <span>💾</span> পরিবর্তন সংরক্ষণ করুন
+              </button>
+            </div>
+          </div>
+
+          <form id="hero-settings-form" class="space-y-6" onsubmit="event.preventDefault(); saveAdminHeroSettings();">
+            
+            <!-- Visual & Animation Controls Card -->
+            <div class="bg-white border border-slate-200 p-6 rounded-2xl shadow-xs space-y-6">
+              <div class="border-b border-slate-100 pb-3 flex items-center justify-between">
+                <h3 class="text-sm font-bold uppercase tracking-wider text-cyan-700 flex items-center gap-2">
+                  <span>🛵</span> ১. বাইক ও অ্যানিমেশন ভিজ্যুয়াল কন্ট্রোল
+                </h3>
+                <span class="text-xs text-slate-500">রিয়েল-টাইম নিয়ন্ত্রণ</span>
+              </div>
+
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                
+                <!-- Bike Visibility Toggle -->
+                <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 flex items-center justify-between">
+                  <div>
+                    <label class="block text-sm font-bold text-slate-800 mb-0.5">ডেলিভারি বাইক (Delivery Bike)</label>
+                    <p class="text-[11px] text-slate-500">রাস্তায় চলমান ডেলিভারি বাইক প্রদর্শন</p>
+                  </div>
+                  <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" id="hero-cfg-show-bike" class="sr-only peer" checked>
+                    <div class="w-11 h-6 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-cyan-600"></div>
+                  </label>
+                </div>
+
+                <!-- Background City Animations Toggle -->
+                <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 flex items-center justify-between">
+                  <div>
+                    <label class="block text-sm font-bold text-slate-800 mb-0.5">শহরের অ্যানিমেশন (City & Metro)</label>
+                    <p class="text-[11px] text-slate-500">মেট্রোরেল, মেঘ ও আলোর অ্যানিমেশন</p>
+                  </div>
+                  <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" id="hero-cfg-show-anim" class="sr-only peer" checked>
+                    <div class="w-11 h-6 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-cyan-600"></div>
+                  </label>
+                </div>
+
+                <!-- Floating Landmark Tags Toggle -->
+                <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 flex items-center justify-between">
+                  <div>
+                    <label class="block text-sm font-bold text-slate-800 mb-0.5">রোড ল্যান্ডমার্ক ট্যাগ (Landmarks)</label>
+                    <p class="text-[11px] text-slate-500">গ্রাহকের বাসা, সিটি রুট ও ল্যাব ট্যাগ</p>
+                  </div>
+                  <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" id="hero-cfg-show-tags" class="sr-only peer" checked>
+                    <div class="w-11 h-6 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-cyan-600"></div>
+                  </label>
+                </div>
+
+              </div>
+
+              <!-- Bike Size & Speed Controls -->
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
+                
+                <!-- Bike Size -->
+                <div class="bg-slate-50 p-5 rounded-xl border border-slate-200">
+                  <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
+                    বাইকের আকার স্কেলিং (Bike Size)
+                  </label>
+                  <div class="grid grid-cols-3 gap-2">
+                    <label class="cursor-pointer border border-slate-200 bg-white rounded-xl p-3 text-center transition hover:border-cyan-500 has-[:checked]:border-cyan-600 has-[:checked]:bg-cyan-50 shadow-xs">
+                      <input type="radio" name="hero_bike_size" value="compact" class="sr-only">
+                      <div class="text-xs font-bold text-slate-800">অতি ছোট (Compact)</div>
+                      <div class="text-[10px] text-slate-500 mt-0.5">০.৪২ স্কেল</div>
+                    </label>
+                    <label class="cursor-pointer border border-slate-200 bg-white rounded-xl p-3 text-center transition hover:border-cyan-500 has-[:checked]:border-cyan-600 has-[:checked]:bg-cyan-50 shadow-xs">
+                      <input type="radio" name="hero_bike_size" value="normal" checked class="sr-only">
+                      <div class="text-xs font-bold text-cyan-700">স্বাভাবিক (Proportional)</div>
+                      <div class="text-[10px] text-slate-500 mt-0.5">০.৪৮ স্কেল</div>
+                    </label>
+                    <label class="cursor-pointer border border-slate-200 bg-white rounded-xl p-3 text-center transition hover:border-cyan-500 has-[:checked]:border-cyan-600 has-[:checked]:bg-cyan-50 shadow-xs">
+                      <input type="radio" name="hero_bike_size" value="medium" class="sr-only">
+                      <div class="text-xs font-bold text-slate-800">মাঝারি (Medium)</div>
+                      <div class="text-[10px] text-slate-500 mt-0.5">০.৫৮ স্কেল</div>
+                    </label>
+                  </div>
+                </div>
+
+                <!-- Bike Speed -->
+                <div class="bg-slate-50 p-5 rounded-xl border border-slate-200">
+                  <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
+                    বাইকের চলার গতি (Bike Speed)
+                  </label>
+                  <div class="grid grid-cols-3 gap-2">
+                    <label class="cursor-pointer border border-slate-200 bg-white rounded-xl p-3 text-center transition hover:border-cyan-500 has-[:checked]:border-cyan-600 has-[:checked]:bg-cyan-50 shadow-xs">
+                      <input type="radio" name="hero_bike_speed" value="slow" class="sr-only">
+                      <div class="text-xs font-bold text-slate-800">🐢 ধীরগতি</div>
+                      <div class="text-[10px] text-slate-500 mt-0.5">২২ সেকেন্ড</div>
+                    </label>
+                    <label class="cursor-pointer border border-slate-200 bg-white rounded-xl p-3 text-center transition hover:border-cyan-500 has-[:checked]:border-cyan-600 has-[:checked]:bg-cyan-50 shadow-xs">
+                      <input type="radio" name="hero_bike_speed" value="normal" checked class="sr-only">
+                      <div class="text-xs font-bold text-cyan-700">⚡ স্বাভাবিক</div>
+                      <div class="text-[10px] text-slate-500 mt-0.5">১৫ সেকেন্ড</div>
+                    </label>
+                    <label class="cursor-pointer border border-slate-200 bg-white rounded-xl p-3 text-center transition hover:border-cyan-500 has-[:checked]:border-cyan-600 has-[:checked]:bg-cyan-50 shadow-xs">
+                      <input type="radio" name="hero_bike_speed" value="fast" class="sr-only">
+                      <div class="text-xs font-bold text-slate-800">🚀 দ্রুতগতি</div>
+                      <div class="text-[10px] text-slate-500 mt-0.5">৯ সেকেন্ড</div>
+                    </label>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+            <!-- Banner Content Text Editor Card -->
+            <div class="bg-white border border-slate-200 p-6 rounded-2xl shadow-xs space-y-6">
+              <div class="border-b border-slate-100 pb-3 flex items-center justify-between">
+                <h3 class="text-sm font-bold uppercase tracking-wider text-cyan-700 flex items-center gap-2">
+                  <span>✍️</span> ২. ব্যানার টেক্সট ও কন্টেন্ট এডিটর
+                </h3>
+                <span class="text-xs text-slate-500">হেডলাইন ও ক্যাপশন কাস্টমাইজেশন</span>
+              </div>
+
+              <div class="space-y-4">
+                
+                <!-- Badge Text -->
+                <div>
+                  <label class="block text-xs font-semibold text-slate-700 mb-1.5">
+                    টপ অ্যানাউন্সমেন্ট ব্যাজ টেক্সট (Top Badge Text)
+                  </label>
+                  <input type="text" id="hero-cfg-badge-text" class="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-300 text-slate-900 text-sm focus:bg-white focus:border-cyan-600 focus:outline-none focus:ring-1 focus:ring-cyan-500 transition" placeholder="যেমন: ✨ বাংলাদেশে প্রথম ডিজিটাল ডোরস্টেপ রিপেয়ার সেবা">
+                </div>
+
+                <!-- Main Title -->
+                <div>
+                  <label class="block text-xs font-semibold text-slate-700 mb-1.5">
+                    মূল হেডলাইন শিরোনাম (Hero Title)
+                  </label>
+                  <input type="text" id="hero-cfg-title-text" class="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-300 text-slate-900 font-bold text-base focus:bg-white focus:border-cyan-600 focus:outline-none focus:ring-1 focus:ring-cyan-500 transition" placeholder="যেমন: ঘরে বসেই নষ্ট ফোন ও ট্যাব মেরামত করুন">
+                </div>
+
+                <!-- Subtitle -->
+                <div>
+                  <label class="block text-xs font-semibold text-slate-700 mb-1.5">
+                    সাবটাইটেল ও সার্ভিস বিবরণ (Hero Subtitle)
+                  </label>
+                  <textarea id="hero-cfg-subtitle-text" rows="3" class="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-300 text-slate-900 text-sm focus:bg-white focus:border-cyan-600 focus:outline-none focus:ring-1 focus:ring-cyan-500 transition leading-relaxed" placeholder="যেমন: আপনার ঠিকানায় গিয়ে নষ্ট ফোন বা ট্যাব সংগ্রহ করব..."></textarea>
+                </div>
+
+                <!-- Trust Stats Badges -->
+                <div class="pt-2">
+                  <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-3">
+                    ৩টি ট্রাস্ট স্ট্যাটাস কার্ড (Stats Counter Badges)
+                  </label>
+                  <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200 space-y-2">
+                      <span class="text-[10px] uppercase font-bold text-cyan-700">কার্ড ১ (কাউন্টার)</span>
+                      <input type="text" id="hero-cfg-stat1-num" class="w-full px-3 py-1.5 rounded-lg bg-white border border-slate-300 text-cyan-700 font-bold text-sm focus:border-cyan-600 focus:outline-none" placeholder="১৫,০০০+">
+                      <input type="text" id="hero-cfg-stat1-lbl" class="w-full px-3 py-1.5 rounded-lg bg-white border border-slate-300 text-slate-700 text-xs focus:border-cyan-600 focus:outline-none" placeholder="মেরামতকৃত ডিভাইস">
+                    </div>
+                    <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200 space-y-2">
+                      <span class="text-[10px] uppercase font-bold text-slate-600">কার্ড ২ (ওয়ারেন্টি)</span>
+                      <input type="text" id="hero-cfg-stat2-num" class="w-full px-3 py-1.5 rounded-lg bg-white border border-slate-300 text-slate-800 font-bold text-sm focus:border-cyan-600 focus:outline-none" placeholder="৯০-১৮০ দিন">
+                      <input type="text" id="hero-cfg-stat2-lbl" class="w-full px-3 py-1.5 rounded-lg bg-white border border-slate-300 text-slate-700 text-xs focus:border-cyan-600 focus:outline-none" placeholder="সার্ভিস ওয়ারেন্টি">
+                    </div>
+                    <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200 space-y-2">
+                      <span class="text-[10px] uppercase font-bold text-emerald-700">কার্ড ৩ (ডেলিভারি)</span>
+                      <input type="text" id="hero-cfg-stat3-num" class="w-full px-3 py-1.5 rounded-lg bg-white border border-slate-300 text-emerald-700 font-bold text-sm focus:border-cyan-600 focus:outline-none" placeholder="ফ্রি পিকআপ">
+                      <input type="text" id="hero-cfg-stat3-lbl" class="w-full px-3 py-1.5 rounded-lg bg-white border border-slate-300 text-slate-700 text-xs focus:border-cyan-600 focus:outline-none" placeholder="ও ডোরস্টেপ ড্রপ">
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+            <!-- Save Bottom Bar -->
+            <div class="flex items-center justify-end gap-3 pt-2">
+              <button onclick="resetAdminHeroSettings()" type="button" class="px-5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition border border-slate-300">
+                রিসেট
+              </button>
+              <button type="submit" class="px-8 py-3 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold transition shadow-md shadow-cyan-600/20 flex items-center gap-2">
+                <span>💾</span> সংরক্ষণ করুন (Save Settings)
+              </button>
+            </div>
+
+          </form>
+        </section>
+
+        <!-- TAB 5: OFFICE & FOOTER CONTACT SETTINGS -->
+        <section id="tab-footer" class="hidden space-y-6">
+          
+          <div class="bg-white border border-slate-200 p-6 rounded-2xl shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <span class="text-xs font-bold uppercase tracking-wider text-cyan-700">Website Footer & Info Settings</span>
+              <h2 class="text-xl font-black text-slate-900 mt-1 flex items-center gap-2">
+                <span>🏢</span> অফিস ঠিকানা, যোগাযোগ নম্বর ও সোশ্যাল মিডিয়া কন্ট্রোল
+              </h2>
+              <p class="text-xs text-slate-500 mt-1">
+                ওয়েবসাইটের নিচের ফুটারে প্রদর্শিত অফিস লোকেশন, কাস্টমার হেল্পলাইন ও সোশ্যাল লিংক আপডেট করুন।
+              </p>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="px-3 py-1.5 rounded-xl bg-emerald-50 border border-emerald-200 text-xs font-bold text-emerald-700 flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> লাইভ সিংক
+              </span>
+            </div>
+          </div>
+
+          <form id="admin-footer-form" onsubmit="saveAdminFooterSettings(event)" class="space-y-6">
+            
+            <!-- 1. Office Address Card -->
+            <div class="bg-white border border-slate-200 p-6 rounded-2xl shadow-xs space-y-4">
+              <div class="border-b border-slate-100 pb-3 flex items-center justify-between">
+                <h3 class="text-sm font-bold uppercase tracking-wider text-cyan-700 flex items-center gap-2">
+                  <span>📍</span> ১. অফিস ঠিকানা ও কার্যসময় (Office Address & Hours)
+                </h3>
+                <span class="text-xs text-slate-500">লোকেশন বিবরণ</span>
+              </div>
+
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-xs font-semibold text-slate-700 mb-1.5">অফিসের টাইটেল / নাম</label>
+                  <input type="text" id="footer-cfg-office-name" class="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-300 text-slate-900 text-sm focus:bg-white focus:border-cyan-600 focus:outline-none focus:ring-1 focus:ring-cyan-500 transition" placeholder="যেমন: হেড অফিস ও সেন্ট্রাল ল্যাব:">
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-slate-700 mb-1.5">সার্ভিস ও কল সেন্টারের সময়</label>
+                  <input type="text" id="footer-cfg-office-hours" class="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-300 text-slate-900 text-sm focus:bg-white focus:border-cyan-600 focus:outline-none focus:ring-1 focus:ring-cyan-500 transition" placeholder="যেমন: প্রতিদিন সকাল ৯:০০ - রাত ৯:০০">
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1.5">পূর্ণাঙ্গ অফিস ঠিকানা (Office Address)</label>
+                <textarea id="footer-cfg-office-address" rows="2" class="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-300 text-slate-900 text-sm focus:bg-white focus:border-cyan-600 focus:outline-none focus:ring-1 focus:ring-cyan-500 transition leading-relaxed" placeholder="যেমন: লেভেল ৪, প্লট ১২, রোড ৭, ধানমন্ডি, ঢাকা - ১২০৫, বাংলাদেশ।"></textarea>
+              </div>
+
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1.5">পিকআপ কাভারেজ নোট</label>
+                <input type="text" id="footer-cfg-office-coverage" class="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-300 text-slate-900 text-sm focus:bg-white focus:border-cyan-600 focus:outline-none focus:ring-1 focus:ring-cyan-500 transition" placeholder="যেমন: ঢাকা মহানগরের সকল থানা ও এরিয়া সরাসরি আওতাভুক্ত।">
+              </div>
+            </div>
+
+            <!-- 2. Contact Numbers & Channels Card -->
+            <div class="bg-white border border-slate-200 p-6 rounded-2xl shadow-xs space-y-4">
+              <div class="border-b border-slate-100 pb-3 flex items-center justify-between">
+                <h3 class="text-sm font-bold uppercase tracking-wider text-cyan-700 flex items-center gap-2">
+                  <span>📞</span> ২. সরাসরি যোগাযোগ নম্বর ও সাপোর্ট (Helpline & WhatsApp)
+                </h3>
+                <span class="text-xs text-slate-500">কাস্টমার কেয়ার</span>
+              </div>
+
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-xs font-semibold text-slate-700 mb-1.5">প্রধান কাস্টমার হটলাইন (Primary Hotline)</label>
+                  <input type="text" id="footer-cfg-phone-primary" class="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-300 text-slate-900 text-sm focus:bg-white focus:border-cyan-600 focus:outline-none focus:ring-1 focus:ring-cyan-500 transition" placeholder="যেমন: ০১৭১১-০০২২৩৩">
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-slate-700 mb-1.5">বিকল্প হেল্পলাইন (Secondary Phone)</label>
+                  <input type="text" id="footer-cfg-phone-secondary" class="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-300 text-slate-900 text-sm focus:bg-white focus:border-cyan-600 focus:outline-none focus:ring-1 focus:ring-cyan-500 transition" placeholder="যেমন: ০১৮২২-৩৩৪৪৫৫">
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-xs font-semibold text-slate-700 mb-1.5">হোয়াটসঅ্যাপ নম্বর (WhatsApp Number)</label>
+                  <input type="text" id="footer-cfg-whatsapp-number" class="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-300 text-slate-900 text-sm focus:bg-white focus:border-cyan-600 focus:outline-none focus:ring-1 focus:ring-cyan-500 transition" placeholder="যেমন: ০১৭১১-০০২২৩৩">
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-slate-700 mb-1.5">হোয়াটসঅ্যাপ চ্যাট লিংক (Direct Chat Link)</label>
+                  <input type="text" id="footer-cfg-whatsapp-url" class="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-300 text-slate-900 text-sm focus:bg-white focus:border-cyan-600 focus:outline-none focus:ring-1 focus:ring-cyan-500 transition" placeholder="যেমন: https://wa.me/8801711002233">
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1.5">সাপোর্ট ইমেইল (Support Email)</label>
+                <input type="email" id="footer-cfg-email" class="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-300 text-slate-900 text-sm focus:bg-white focus:border-cyan-600 focus:outline-none focus:ring-1 focus:ring-cyan-500 transition" placeholder="যেমন: support@repairseba.com">
+              </div>
+            </div>
+
+            <!-- 3. Social Media Links Card -->
+            <div class="bg-white border border-slate-200 p-6 rounded-2xl shadow-xs space-y-4">
+              <div class="border-b border-slate-100 pb-3 flex items-center justify-between">
+                <h3 class="text-sm font-bold uppercase tracking-wider text-cyan-700 flex items-center gap-2">
+                  <span>🌐</span> ৩. সোশ্যাল মিডিয়া প্রোফাইল লিংকসমূহ (Social Media Links)
+                </h3>
+                <span class="text-xs text-slate-500">ফেসবুক, ইউটিউব ইত্যাদি</span>
+              </div>
+
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-xs font-semibold text-slate-700 mb-1.5">📘 ফেসবুক পেজ লিংক (Facebook URL)</label>
+                  <input type="text" id="footer-cfg-fb-url" class="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-300 text-slate-900 text-sm focus:bg-white focus:border-cyan-600 focus:outline-none focus:ring-1 focus:ring-cyan-500 transition" placeholder="https://facebook.com/repairseba">
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-slate-700 mb-1.5">▶️ ইউটিউব চ্যানেল লিংক (YouTube URL)</label>
+                  <input type="text" id="footer-cfg-yt-url" class="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-300 text-slate-900 text-sm focus:bg-white focus:border-cyan-600 focus:outline-none focus:ring-1 focus:ring-cyan-500 transition" placeholder="https://youtube.com/@repairseba">
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-xs font-semibold text-slate-700 mb-1.5">📷 ইনস্টাগ্রাম প্রোফাইল লিংক (Instagram URL)</label>
+                  <input type="text" id="footer-cfg-ig-url" class="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-300 text-slate-900 text-sm focus:bg-white focus:border-cyan-600 focus:outline-none focus:ring-1 focus:ring-cyan-500 transition" placeholder="https://instagram.com/repairseba">
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-slate-700 mb-1.5">💼 লিঙ্কডইন কোম্পানি লিংক (LinkedIn URL)</label>
+                  <input type="text" id="footer-cfg-li-url" class="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-300 text-slate-900 text-sm focus:bg-white focus:border-cyan-600 focus:outline-none focus:ring-1 focus:ring-cyan-500 transition" placeholder="https://linkedin.com/company/repairseba">
+                </div>
+              </div>
+            </div>
+
+            <!-- 4. Footer Branding & Copyright Card -->
+            <div class="bg-white border border-slate-200 p-6 rounded-2xl shadow-xs space-y-4">
+              <div class="border-b border-slate-100 pb-3 flex items-center justify-between">
+                <h3 class="text-sm font-bold uppercase tracking-wider text-cyan-700 flex items-center gap-2">
+                  <span>📝</span> ৪. ফুটার ব্র্যান্ডিং ও কপিরাইট টেক্সট (Branding & Copyright)
+                </h3>
+                <span class="text-xs text-slate-500">বর্ণনা ও টেক্সট</span>
+              </div>
+
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1.5">ফুটারের সংক্ষিপ্ত পরিচিতি বিবরণ (Footer Description)</label>
+                <textarea id="footer-cfg-brand-desc" rows="2" class="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-300 text-slate-900 text-sm focus:bg-white focus:border-cyan-600 focus:outline-none focus:ring-1 focus:ring-cyan-500 transition leading-relaxed" placeholder="বাংলাদেশের প্রথম ডিজিটাল ডোরস্টেপ গ্যাজেট রিপেয়ার প্ল্যাটফর্ম..."></textarea>
+              </div>
+
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1.5">ফুটার কপিরাইট নোটিস (Copyright Notice)</label>
+                <input type="text" id="footer-cfg-copyright" class="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-300 text-slate-900 text-sm focus:bg-white focus:border-cyan-600 focus:outline-none focus:ring-1 focus:ring-cyan-500 transition" placeholder="© ২০২৬ রিপেয়ার সেবা (Repair Seba). সর্বস্বত্ব সংরক্ষিত।">
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+                <!-- Show Social Icons Toggle -->
+                <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 flex items-center justify-between">
+                  <div>
+                    <label class="block text-sm font-bold text-slate-800 mb-0.5">সোশ্যাল মিডিয়া আইকন</label>
+                    <p class="text-[11px] text-slate-500">ফুটারের সোশ্যাল বাটনসমূহ প্রদর্শন করুন</p>
+                  </div>
+                  <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" id="footer-cfg-show-social" class="sr-only peer" checked>
+                    <div class="w-11 h-6 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-cyan-600"></div>
+                  </label>
+                </div>
+
+                <!-- Show Trust Badge Toggle -->
+                <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 flex items-center justify-between">
+                  <div>
+                    <label class="block text-sm font-bold text-slate-800 mb-0.5">নিরাপত্তা ও ট্রাস্ট ব্যাজ</label>
+                    <p class="text-[11px] text-slate-500">১০০% নিরাপদ ডেটা ও আসল পার্টস গ্যারান্টি ব্যাজ</p>
+                  </div>
+                  <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" id="footer-cfg-show-trust" class="sr-only peer" checked>
+                    <div class="w-11 h-6 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-cyan-600"></div>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <!-- Save Bottom Bar -->
+            <div class="flex items-center justify-end gap-3 pt-2">
+              <button onclick="resetAdminFooterSettings()" type="button" class="px-5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition border border-slate-300">
+                রিসেট
+              </button>
+              <button id="btn-save-footer" type="submit" class="px-8 py-3 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold transition shadow-md shadow-cyan-600/20 flex items-center gap-2">
+                <span>💾</span> সেটিংস সংরক্ষণ করুন (Save Footer Settings)
+              </button>
+            </div>
+
+          </form>
+        </section>
+
+      </main>
+
+    </div>
+
+  </div>
+
+  <!-- ORDER MANAGEMENT MODAL (For Updating Diagnosis, Quote, Status & Rider) -->
+  <div id="order-edit-modal" class="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs hidden flex items-center justify-center p-4">
+    <div class="bg-white border border-slate-200 rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl overflow-y-auto max-h-[90vh] animate-fade-in text-slate-800">
+      
+      <!-- Modal Header -->
+      <div class="flex items-center justify-between pb-4 border-b border-slate-200 mb-6">
+        <div>
+          <span class="text-xs uppercase font-bold tracking-wider text-cyan-700">Order Management</span>
+          <h3 id="modal-edit-orderno" class="text-2xl font-black text-slate-900"></h3>
+        </div>
+        <button onclick="closeEditModal()" class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-800 flex items-center justify-center text-lg transition">
+          ✕
+        </button>
+      </div>
+
+      <form id="order-edit-form" class="space-y-6">
+        <input type="hidden" id="edit-order-id">
+
+        <!-- Status Controller -->
+        <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200">
+          <label class="block text-xs font-bold uppercase tracking-wider text-cyan-700 mb-2">
+            ১. বর্তমান অর্ডার স্ট্যাটাস পরিবর্তন করুন*
+          </label>
+          <select id="edit-status" class="w-full px-4 py-3 rounded-xl bg-white border border-slate-300 text-slate-900 font-bold text-sm focus:border-cyan-600 focus:outline-none focus:ring-1 focus:ring-cyan-500 transition">
+            <option value="PENDING_PICKUP">PENDING_PICKUP (পিকআপ অপেক্ষমাণ)</option>
+            <option value="PICKUP_ASSIGNED">PICKUP_ASSIGNED (পিকআপ রাইডার নির্ধারিত)</option>
+            <option value="COLLECTED">COLLECTED (ডিভাইস সংগ্রহ সম্পন্ন - ল্যাবের পথে)</option>
+            <option value="DIAGNOSING">DIAGNOSING (ল্যাবে টেস্ট ও সমস্যা শনাক্তকরণ চলছে)</option>
+            <option value="QUOTE_PENDING" class="bg-orange-50 text-orange-800 font-bold">⚠️ QUOTE_PENDING (মূল্য নির্ধারণ - গ্রাহকের অনুমোদনের অপেক্ষায়)</option>
+            <option value="QUOTE_APPROVED">QUOTE_APPROVED (গ্রাহক খরচ অনুমোদন করেছেন)</option>
+            <option value="QUOTE_REJECTED">QUOTE_REJECTED (গ্রাহক খরচ প্রত্যাখ্যান করেছেন - ফেরত পাঠানো হবে)</option>
+            <option value="IN_REPAIR">IN_REPAIR (ল্যাবে মেরামত ও পার্টস ফিটিং চলছে)</option>
+            <option value="QUALITY_CHECK">QUALITY_CHECK (কোয়ালিটি টেস্টিং সম্পন্ন)</option>
+            <option value="OUT_FOR_DELIVERY">OUT_FOR_DELIVERY (গ্রাহকের ঠিকানায় ডেলিভারির জন্য রওনা)</option>
+            <option value="COMPLETED">COMPLETED (ডেলিভারি ও পেমেন্ট সম্পন্ন)</option>
+            <option value="CANCELLED">CANCELLED (বাতিল)</option>
+          </select>
+        </div>
+
+        <!-- 2. Laboratory Diagnosis & Price Quotation (CRUCIAL SECTION) -->
+        <div class="bg-amber-50/50 p-4 rounded-2xl border border-amber-300 space-y-4">
+          <div class="flex items-center gap-2">
+            <span class="text-amber-600 text-lg">💰</span>
+            <label class="text-xs font-bold uppercase tracking-wider text-amber-800">
+              ২. ল্যাব ডায়াগনোসিস ও খরচের হিসাব (Quotation to Customer)
+            </label>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-medium text-slate-700 mb-1">প্রস্তাবিত মোট খরচ (৳ BDT)*</label>
+              <input type="number" id="edit-estimated-cost" placeholder="যেমন: 2500" class="w-full px-4 py-2.5 rounded-xl bg-white border border-slate-300 text-emerald-700 font-bold text-base focus:border-cyan-600 focus:outline-none focus:ring-1 focus:ring-cyan-500 transition">
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-slate-700 mb-1">ওয়ারেন্টি মেয়াদ (দিন)</label>
+              <input type="number" id="edit-warranty-days" value="90" class="w-full px-4 py-2.5 rounded-xl bg-white border border-slate-300 text-slate-900 text-sm focus:border-cyan-600 focus:outline-none focus:ring-1 focus:ring-cyan-500 transition">
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-medium text-slate-700 mb-1">ডায়াগনোসিস ও পার্টস রিপ্লেসমেন্ট বিবরণ (গ্রাহক ওয়েবসাইটে দেখতে পাবেন)</label>
+            <textarea id="edit-diagnosis-notes" rows="2" placeholder="যেমন: ১) অরিজিনাল ডিসপ্লে ফিটিং ২) চার্জিং আইসি মেরামত..." class="w-full px-4 py-2.5 rounded-xl bg-white border border-slate-300 text-slate-900 text-xs focus:border-cyan-600 focus:outline-none focus:ring-1 focus:ring-cyan-500 transition"></textarea>
+          </div>
+
+          <!-- Quick Action to trigger QUOTE_PENDING -->
+          <div class="pt-1">
+            <button type="button" onclick="setAsQuoteReady()" class="w-full py-2.5 px-3 rounded-lg bg-amber-600 hover:bg-amber-500 text-white text-xs font-bold transition flex items-center justify-center gap-1.5 shadow-xs">
+              <span>⚡</span> মূল্য সেট করে সরাসরি 'QUOTE_PENDING' করুন (গ্রাহক ট্র্যাকিং পেজে অনুমোদন বাটন দেখতে পাবেন)
+            </button>
+          </div>
+        </div>
+
+        <!-- 3. Rider Assignment -->
+        <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-4">
+          <label class="block text-xs font-bold uppercase tracking-wider text-cyan-700">
+            ৩. রাইডার নির্ধারণ (Rider Assignment)
+          </label>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs text-slate-600 mb-1">পিকআপ রাইডারের নাম</label>
+              <input type="text" id="edit-pickup-name" placeholder="যেমন: সোহাগ রানা" class="w-full px-4 py-2 rounded-xl bg-white border border-slate-300 text-slate-900 text-xs focus:border-cyan-600 focus:outline-none">
+            </div>
+            <div>
+              <label class="block text-xs text-slate-600 mb-1">পিকআপ রাইডার ফোন</label>
+              <input type="tel" id="edit-pickup-phone" placeholder="০১৯XX-XXXXXX" class="w-full px-4 py-2 rounded-xl bg-white border border-slate-300 text-slate-900 text-xs focus:border-cyan-600 focus:outline-none">
+            </div>
+          </div>
+        </div>
+
+        <!-- 4. Payment & Technician Notes -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-medium text-slate-600 mb-1">পেমেন্ট স্ট্যাটাস</label>
+            <select id="edit-payment-status" class="w-full px-4 py-2.5 rounded-xl bg-white border border-slate-300 text-slate-900 text-xs focus:border-cyan-600 focus:outline-none">
+              <option value="UNPAID">UNPAID (পরিশোধ বাকি)</option>
+              <option value="PAID">PAID (পরিশোধিত)</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-600 mb-1">টেকনিশিয়ান ইন্টারনাল নোট</label>
+            <input type="text" id="edit-tech-notes" placeholder="অভ্যন্তরীণ নোট..." class="w-full px-4 py-2.5 rounded-xl bg-white border border-slate-300 text-slate-900 text-xs focus:border-cyan-600 focus:outline-none">
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="pt-4 border-t border-slate-200 flex items-center justify-end gap-3">
+          <button type="button" onclick="closeEditModal()" class="px-5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-xs font-semibold text-slate-700 transition">
+            বাতিল
+          </button>
+          <button type="submit" class="px-6 py-2.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold transition shadow-md shadow-cyan-600/20">
+            সংরক্ষণ করুন (Save Changes)
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="/js/i18n.js"></script>
+  <script src="/js/admin.js"></script>
+</body>
+</html>

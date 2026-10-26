@@ -1,0 +1,1779 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Repair Seba (রিপেয়ার সেবা) - Doorstep Phone & Tablet Repair Platform</title>
+  <meta name="description" content="বাংলাদেশের বিশ্বস্ত ডোরস্টেপ ফোন ও ট্যাব মেরামত সার্ভিস। ফ্রি পিকআপ, ল্যাব ডায়াগনোসিস, আগে খরচের হিসাব, আপনার সম্মতিতে মেরামত ও ফ্রি ডেলিভারি!">
+  
+  <!-- Tailwind CSS via CDN with full Tailwind styling -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#f0f9ff',
+              100: '#e0f2fe',
+              500: '#0ea5e9',
+              600: '#0284c7',
+              700: '#0369a1',
+              800: '#075985',
+              900: '#0c4a6e',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased selection:bg-cyan-500 selection:text-white">
+
+  <!-- Printable Job Sheet Container (Visible only when printing) -->
+  <div id="printable-receipt" class="hidden"></div>
+
+
+  <!-- Main Navigation Bar -->
+  <header class="sticky top-0 z-50 glass-nav border-b border-slate-200/80 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+      
+      <!-- Logo -->
+      <a href="/" class="flex items-center gap-3 group">
+        <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-cyan-600 to-sky-500 text-white flex items-center justify-center font-black text-2xl shadow-md group-hover:scale-105 transition">
+          🛠️
+        </div>
+        <div>
+          <span class="text-2xl font-black tracking-tight text-slate-900 group-hover:text-cyan-600 transition flex items-center gap-1">
+            Repair <span class="text-cyan-600">Seba</span>
+          </span>
+          <span class="block text-[11px] font-semibold text-slate-500 tracking-wider" data-i18n="brand_tagline">ডোরস্টেপ ফোন ও ট্যাব মেরামত</span>
+        </div>
+      </a>
+
+      <!-- Desktop Nav Links -->
+      <nav class="hidden md:flex items-center gap-8 text-sm font-semibold text-slate-600">
+        <a href="#how-it-works" class="hover:text-cyan-600 transition" data-i18n="nav_how_it_works">কাজের ধাপ</a>
+        <a href="#services-section" class="hover:text-cyan-600 transition" data-i18n="nav_services">সার্ভিসসমূহ</a>
+        <a href="#track-section" class="hover:text-cyan-600 transition" data-i18n="nav_track">অর্ডার ট্র্যাক</a>
+        <a href="#why-section" class="hover:text-cyan-600 transition" data-i18n="why_title">সুবিধাসমূহ</a>
+        <a href="#contact-section" class="hover:text-cyan-600 transition" data-i18n="nav_contact">যোগাযোগ</a>
+      </nav>
+
+      <!-- Language Switcher & Action CTA -->
+      <div class="flex items-center gap-4">
+        
+        <!-- Language Switcher Toggle -->
+        <div class="bg-slate-100 p-1 rounded-xl flex items-center border border-slate-200">
+          <button class="lang-toggle-btn px-3 py-1 rounded-lg text-xs font-bold transition flex items-center gap-1" data-lang="bn">
+            <span>🇧🇩</span> <span>বাংলা</span>
+          </button>
+          <button class="lang-toggle-btn px-3 py-1 rounded-lg text-xs font-bold transition flex items-center gap-1" data-lang="en">
+            <span>🇬🇧</span> <span>English</span>
+          </button>
+        </div>
+
+        <!-- User Authentication & Profile Menu (Replaces Pickup Button) -->
+        <div id="nav-user-container" class="relative">
+          <!-- Logged Out State: Phone Login Button -->
+          <button id="nav-btn-login" onclick="openUserLoginModal()" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-cyan-600 to-sky-600 hover:from-cyan-500 hover:to-sky-500 text-white font-bold text-xs sm:text-sm shadow-md shadow-cyan-600/20 hover:scale-105 transition">
+            <span>👤</span> <span>লগইন / প্রোফাইল</span>
+          </button>
+
+          <!-- Logged In State: User Avatar & Dropdown -->
+          <div id="nav-user-dropdown" class="hidden relative">
+            <button onclick="toggleUserDropdown()" class="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-800 font-bold text-xs sm:text-sm shadow-xs transition">
+              <span class="w-7 h-7 rounded-full bg-cyan-600 text-white flex items-center justify-center text-xs font-black shadow-xs">👤</span>
+              <span id="nav-user-display-name" class="truncate max-w-[100px] sm:max-w-[130px] text-slate-900">ব্যবহারকারী</span>
+              <span class="text-xs text-slate-400">▾</span>
+            </button>
+
+            <!-- Dropdown Menu -->
+            <div id="user-dropdown-menu" class="hidden absolute right-0 mt-2 w-56 bg-white border border-slate-200 rounded-2xl shadow-xl py-2 z-50 text-slate-700 animate-fade-in text-xs">
+              <div class="px-4 py-2.5 border-b border-slate-100">
+                <div id="dropdown-user-name" class="font-bold text-slate-900 truncate">গ্রাহক</div>
+                <div id="dropdown-user-phone" class="text-[11px] text-cyan-600 font-mono mt-0.5 truncate">০১৭১১-XXXXXX</div>
+              </div>
+
+              <div class="py-1">
+                <button onclick="openUserProfileModal('profile'); closeUserDropdown();" class="w-full text-left px-4 py-2.5 hover:bg-slate-50 flex items-center gap-2.5 font-medium text-slate-700 hover:text-cyan-600 transition">
+                  <span class="text-base">👤</span> <span>আমার প্রোফাইল ও এডিট</span>
+                </button>
+                <button onclick="openUserProfileModal('orders'); closeUserDropdown();" class="w-full text-left px-4 py-2.5 hover:bg-slate-50 flex items-center gap-2.5 font-medium text-slate-700 hover:text-cyan-600 transition">
+                  <span class="text-base">📦</span> <span>আমার অর্ডারসমূহ</span>
+                </button>
+                <a href="#booking-section" onclick="closeUserDropdown();" class="w-full text-left px-4 py-2.5 hover:bg-slate-50 flex items-center gap-2.5 font-medium text-slate-700 hover:text-cyan-600 transition">
+                  <span class="text-base">⚡</span> <span>নতুন পিকআপ বুক করুন</span>
+                </a>
+              </div>
+
+              <div class="border-t border-slate-100 pt-1">
+                <button onclick="handleUserLogout(); closeUserDropdown();" class="w-full text-left px-4 py-2.5 hover:bg-rose-50 text-rose-600 flex items-center gap-2.5 font-bold transition">
+                  <span class="text-base">🚪</span> <span>লগআউট (Logout)</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- Hero Section (Full Animated City Background with Delivery Cyclist) -->
+  <section id="hero-section" class="relative pt-6 pb-24 lg:pb-32 overflow-hidden min-h-[660px] lg:min-h-[730px] flex flex-col justify-between bg-gradient-to-b from-sky-100/70 via-sky-50/50 to-slate-100">
+    
+    <!-- 1. FULL BACKGROUND SVG CANVAS (City Skyline, Metro Rail, Road & Cyclist) -->
+    <div class="hero-full-bg">
+      <svg viewBox="0 0 1440 680" preserveAspectRatio="xMidYMax slice" class="w-full h-full block" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <!-- Sky Gradient -->
+          <linearGradient id="skyGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#bae6fd" stop-opacity="0.65"/>
+            <stop offset="55%" stop-color="#f0fdf4" stop-opacity="0.75"/>
+            <stop offset="100%" stop-color="#fefce8" stop-opacity="0.85"/>
+          </linearGradient>
+
+          <!-- Sun Radial Gradients -->
+          <radialGradient id="sunCore" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#fef08a"/>
+            <stop offset="60%" stop-color="#fbbf24"/>
+            <stop offset="100%" stop-color="#f59e0b"/>
+          </radialGradient>
+          <radialGradient id="sunAura" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#fde047" stop-opacity="0.45"/>
+            <stop offset="60%" stop-color="#fef08a" stop-opacity="0.15"/>
+            <stop offset="100%" stop-color="#fef08a" stop-opacity="0"/>
+          </radialGradient>
+
+          <!-- City Architecture Gradients -->
+          <linearGradient id="towerGrad1" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#bae6fd"/>
+            <stop offset="100%" stop-color="#7dd3fc"/>
+          </linearGradient>
+          <linearGradient id="towerGrad2" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#cbd5e1"/>
+            <stop offset="100%" stop-color="#94a3b8"/>
+          </linearGradient>
+          <linearGradient id="towerGrad3" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stop-color="#e2e8f0"/>
+            <stop offset="100%" stop-color="#cbd5e1"/>
+          </linearGradient>
+
+          <!-- Parliament Building Gradient (Jatiya Sangsad) -->
+          <linearGradient id="sangsadGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#f1f5f9"/>
+            <stop offset="50%" stop-color="#e2e8f0"/>
+            <stop offset="100%" stop-color="#cbd5e1"/>
+          </linearGradient>
+
+          <!-- Dhaka Metro Rail Gradients -->
+          <linearGradient id="metroPillar" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#e2e8f0"/>
+            <stop offset="100%" stop-color="#94a3b8"/>
+          </linearGradient>
+          <linearGradient id="metroViaduct" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#64748b"/>
+            <stop offset="100%" stop-color="#475569"/>
+          </linearGradient>
+          <linearGradient id="metroTrainGreen" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stop-color="#047857"/>
+            <stop offset="100%" stop-color="#10b981"/>
+          </linearGradient>
+
+          <!-- Flyover Gradient -->
+          <linearGradient id="flyoverSlab" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#94a3b8"/>
+            <stop offset="100%" stop-color="#64748b"/>
+          </linearGradient>
+
+          <!-- City Road Gradient -->
+          <linearGradient id="asphaltRoad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#475569"/>
+            <stop offset="12%" stop-color="#334155"/>
+            <stop offset="65%" stop-color="#1e293b"/>
+            <stop offset="100%" stop-color="#0f172a"/>
+          </linearGradient>
+
+          <!-- Bicycle Headlight Beam Gradient -->
+          <linearGradient id="headlightBeam" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stop-color="#fef08a" stop-opacity="0.6"/>
+            <stop offset="35%" stop-color="#fef08a" stop-opacity="0.25"/>
+            <stop offset="100%" stop-color="#fef08a" stop-opacity="0"/>
+          </linearGradient>
+
+          <!-- Parachute Gradients -->
+          <linearGradient id="chuteCyan" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#38bdf8"/>
+            <stop offset="100%" stop-color="#0284c7"/>
+          </linearGradient>
+          <linearGradient id="chuteAmber" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#fef08a"/>
+            <stop offset="50%" stop-color="#f59e0b"/>
+            <stop offset="100%" stop-color="#d97706"/>
+          </linearGradient>
+          <linearGradient id="chuteEmerald" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#6ee7b7"/>
+            <stop offset="100%" stop-color="#059669"/>
+          </linearGradient>
+          <linearGradient id="chuteBoxGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#ffffff"/>
+            <stop offset="100%" stop-color="#f8fafc"/>
+          </linearGradient>
+
+          <!-- Airplane Contrail Vapor Gradient -->
+          <linearGradient id="planeContrail" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stop-color="#ffffff" stop-opacity="0"/>
+            <stop offset="70%" stop-color="#e0f2fe" stop-opacity="0.5"/>
+            <stop offset="100%" stop-color="#bae6fd" stop-opacity="0.85"/>
+          </linearGradient>
+          <linearGradient id="planeFuselage" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#ffffff"/>
+            <stop offset="60%" stop-color="#f8fafc"/>
+            <stop offset="100%" stop-color="#e2e8f0"/>
+          </linearGradient>
+          <linearGradient id="planeTail" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#0284c7"/>
+            <stop offset="100%" stop-color="#0369a1"/>
+          </linearGradient>
+
+          <!-- Soft Drop Shadows -->
+          <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
+            <feDropShadow dx="0" dy="4" stdDeviation="4" flood-opacity="0.12"/>
+          </filter>
+        </defs>
+
+        <!-- 1. Sky Canvas -->
+        <rect x="0" y="0" width="1440" height="520" fill="url(#skyGrad)"/>
+
+        <!-- 2. Sun & Glow (Right side sky) -->
+        <g>
+          <circle cx="1200" cy="90" r="62" fill="url(#sunAura)" class="anim-sun-pulse"/>
+          <g class="anim-sun-rays" stroke="#fbbf24" stroke-width="2" stroke-linecap="round" opacity="0.65">
+            <line x1="1200" y1="50" x2="1200" y2="40"/>
+            <line x1="1200" y1="130" x2="1200" y2="140"/>
+            <line x1="1160" y1="90" x2="1150" y2="90"/>
+            <line x1="1240" y1="90" x2="1250" y2="90"/>
+            <line x1="1172" y1="62" x2="1165" y2="55"/>
+            <line x1="1228" y1="118" x2="1235" y2="125"/>
+            <line x1="1172" y1="118" x2="1165" y2="125"/>
+            <line x1="1228" y1="62" x2="1235" y2="55"/>
+          </g>
+          <circle cx="1200" cy="90" r="28" fill="url(#sunCore)"/>
+        </g>
+
+        <!-- 3. Soft Floating Clouds -->
+        <g class="anim-cloud-slow" fill="#ffffff" opacity="0.82">
+          <path d="M120 70 Q135 52 155 55 Q175 42 200 52 Q220 50 230 65 Q240 78 225 85 Q180 86 120 85 Q105 78 120 70 Z"/>
+          <path d="M720 60 Q735 45 755 48 Q775 38 795 48 Q810 46 820 60 Q830 72 815 78 Q775 80 720 78 Q708 70 720 60 Z"/>
+          <path d="M1560 70 Q1575 52 1595 55 Q1615 42 1640 52 Q1660 50 1670 65 Q1680 78 1665 85 Q1620 86 1560 85 Q1545 78 1560 70 Z"/>
+        </g>
+        <g class="anim-cloud-mid" fill="#ffffff" opacity="0.7">
+          <path d="M420 90 Q432 75 450 78 Q468 68 485 78 Q500 76 510 88 Q518 100 502 105 Q465 106 420 105 Q410 98 420 90 Z"/>
+          <path d="M1060 75 Q1072 65 1088 68 Q1102 60 1118 68 Q1130 66 1138 78 Q1145 88 1130 92 Q1098 94 1060 92 Q1050 85 1060 75 Z"/>
+          <path d="M1860 90 Q1872 75 1890 78 Q1908 68 1925 78 Q1940 76 1950 88 Q1958 100 1942 105 Q1905 106 1860 105 Q1850 98 1860 90 Z"/>
+        </g>
+
+        <!-- 4. Traditional Colorful Kite (বাঙালি ঘুড়ি) -->
+        <g class="anim-kite">
+          <path d="M1000 102 Q1015 130 995 170 Q985 200 1010 240" fill="none" stroke="#cbd5e1" stroke-width="1.2" stroke-dasharray="2 2"/>
+          <g id="kite-body">
+            <polygon points="1000,60 1022,82 1000,104 978,82" fill="#ef4444"/>
+            <polygon points="1000,60 1022,82 1000,82" fill="#f59e0b"/>
+            <polygon points="978,82 1000,104 1000,82" fill="#06b6d4"/>
+            <line x1="1000" y1="60" x2="1000" y2="104" stroke="#78350f" stroke-width="1.2"/>
+            <path d="M978 82 Q1000 75 1022 82" fill="none" stroke="#78350f" stroke-width="1.2"/>
+          </g>
+          <g class="anim-kite-tail">
+            <path d="M1000 104 Q995 125 1005 145 Q998 165 1004 180" fill="none" stroke="#f59e0b" stroke-width="1.5"/>
+            <polygon points="995,122 1002,125 995,128" fill="#10b981"/>
+            <polygon points="1008,122 1001,125 1008,128" fill="#ec4899"/>
+            <polygon points="997,142 1004,145 997,148" fill="#3b82f6"/>
+            <polygon points="1010,142 1003,145 1010,148" fill="#f59e0b"/>
+            <polygon points="996,162 1003,165 996,168" fill="#8b5cf6"/>
+          </g>
+        </g>
+
+        <!-- 5. Birds Soaring in Sky -->
+        <g class="anim-birds" stroke="#64748b" stroke-width="1.5" fill="none" stroke-linecap="round">
+          <path d="M0 0 Q6 -4 12 0 Q18 -4 24 0"/>
+          <path d="M35 -8 Q40 -12 45 -8 Q50 -12 55 -8"/>
+          <path d="M18 12 Q23 8 28 12 Q33 8 38 12"/>
+        </g>
+
+        <!-- 5.5. High Sky Commercial / Express Jet Airplane (আকাশে জেট বিমান উড্ডয়ন) -->
+        <g id="hero-sky-airplane" class="anim-airplane">
+          <!-- Jet Engine Vapor Contrail (ধোঁয়ার ট্রেইল) -->
+          <line x1="-150" y1="4.5" x2="-8" y2="4.5" stroke="url(#planeContrail)" stroke-width="2.5" stroke-linecap="round"/>
+          <line x1="-110" y1="2.5" x2="-6" y2="2.5" stroke="url(#planeContrail)" stroke-width="1.8" stroke-linecap="round"/>
+
+          <!-- Far-Side Wing (দূরের ডানা) -->
+          <polygon points="8,-2 -6,-13 2,-14 18,-2" fill="#cbd5e1"/>
+
+          <!-- Horizontal Stabilizer (পেছনের অনুভূমিক পাখা) -->
+          <polygon points="-24,-1 -35,-5 -30,-6 -18,-2" fill="#94a3b8"/>
+
+          <!-- Main Fuselage (বিমানের মূল বডি) -->
+          <path d="M -26 0 C -26 -4, 40 -4, 52 0 C 40 4, -26 4, -26 0 Z" fill="url(#planeFuselage)" stroke="#cbd5e1" stroke-width="0.6"/>
+
+          <!-- Sleek Aerodynamic Nose Cone -->
+          <path d="M 45 -2 Q 53 0 45 2 Z" fill="#0284c7"/>
+
+          <!-- Brand Cyan Speed Stripe along Body -->
+          <path d="M -20 0 L 46 0" stroke="#0284c7" stroke-width="1.2"/>
+          <path d="M -15 1.4 L 38 1.4" stroke="#38bdf8" stroke-width="0.6"/>
+
+          <!-- Cockpit Windshield (পাইলট উইন্ডশীল্ড) -->
+          <path d="M 43 -2.2 L 48 -0.8 L 46 0 L 41 -0.8 Z" fill="#0f172a"/>
+
+          <!-- Passenger Cabin Windows (কেবিন উইন্ডোজ) -->
+          <g fill="#0284c7" opacity="0.85">
+            <circle cx="34" cy="-0.8" r="0.8"/>
+            <circle cx="30" cy="-0.8" r="0.8"/>
+            <circle cx="26" cy="-0.8" r="0.8"/>
+            <circle cx="22" cy="-0.8" r="0.8"/>
+            <circle cx="18" cy="-0.8" r="0.8"/>
+            <circle cx="14" cy="-0.8" r="0.8"/>
+            <circle cx="10" cy="-0.8" r="0.8"/>
+            <circle cx="6" cy="-0.8" r="0.8"/>
+            <circle cx="2" cy="-0.8" r="0.8"/>
+            <circle cx="-2" cy="-0.8" r="0.8"/>
+            <circle cx="-6" cy="-0.8" r="0.8"/>
+            <circle cx="-10" cy="-0.8" r="0.8"/>
+            <circle cx="-14" cy="-0.8" r="0.8"/>
+          </g>
+
+          <!-- Vertical Tail Fin (উল্লম্ব লেজ) -->
+          <polygon points="-18,-3 -32,-16 -24,-16 -12,-3" fill="url(#planeTail)"/>
+          <!-- Tail Fin Amber Brand Accent Stripe -->
+          <polygon points="-28,-14 -31,-16 -27,-16 -24,-14" fill="#f59e0b"/>
+
+          <!-- Near-Side Main Wing (সামনের প্রধান ডানা) -->
+          <polygon points="12,0 -4,14 4,14 24,0" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="0.5"/>
+          <!-- Winglet Tip (উইংলেট) -->
+          <polygon points="-4,14 -2,17 1,17 4,14" fill="#0284c7"/>
+
+          <!-- Jet Turbofan Engine Pod (টার্বোফ্যান ইঞ্জিন) -->
+          <g transform="translate(6, 2.5)">
+            <rect x="0" y="0" width="13" height="5" rx="2" fill="#475569" stroke="#334155" stroke-width="0.5"/>
+            <ellipse cx="13" cy="2.5" rx="1.2" ry="2.2" fill="#0284c7"/>
+            <ellipse cx="0" cy="2.5" rx="1" ry="2" fill="#0f172a"/>
+          </g>
+
+          <!-- Anti-Collision Strobe / Navigation Beacon Light (ব্লিঙ্কিং সিগন্যাল লাইট) -->
+          <circle cx="-1" cy="17" r="1.5" fill="#ef4444" class="anim-antenna-beacon"/>
+          <circle cx="-30" cy="-16" r="1.2" fill="#ffffff" class="anim-antenna-beacon"/>
+        </g>
+
+
+        <!-- 6. Distant & Mid City Skyline (Dhaka Urban Architecture) -->
+        <g fill="#93c5fd" opacity="0.45">
+          <rect x="70" y="320" width="45" height="195"/>
+          <rect x="170" y="340" width="40" height="175"/>
+          <rect x="310" y="330" width="55" height="185"/>
+          <polygon points="337,295 337,330" stroke="#93c5fd" stroke-width="2"/>
+          <rect x="580" y="345" width="45" height="170"/>
+          <rect x="710" y="315" width="55" height="200"/>
+          <rect x="850" y="335" width="50" height="180"/>
+          <rect x="1000" y="325" width="45" height="190"/>
+          <rect x="1170" y="330" width="60" height="185"/>
+        </g>
+
+        <!-- Corporate Glass Tower 1 (Left) -->
+        <g>
+          <rect x="130" y="335" width="50" height="180" rx="3" fill="url(#towerGrad1)" stroke="#38bdf8" stroke-width="1"/>
+          <line x1="145" y1="335" x2="145" y2="515" stroke="#ffffff" stroke-width="1" opacity="0.6"/>
+          <line x1="162" y1="335" x2="162" y2="515" stroke="#ffffff" stroke-width="1" opacity="0.6"/>
+          <line x1="130" y1="365" x2="180" y2="365" stroke="#bae6fd" stroke-width="1" opacity="0.7"/>
+          <line x1="130" y1="395" x2="180" y2="395" stroke="#bae6fd" stroke-width="1" opacity="0.7"/>
+          <line x1="130" y1="425" x2="180" y2="425" stroke="#bae6fd" stroke-width="1" opacity="0.7"/>
+          <line x1="130" y1="455" x2="180" y2="455" stroke="#bae6fd" stroke-width="1" opacity="0.7"/>
+          <line x1="155" y1="305" x2="155" y2="335" stroke="#0284c7" stroke-width="2"/>
+          <circle cx="155" cy="305" r="2.5" fill="#ef4444"/>
+        </g>
+
+        <!-- Stepped Modern High-Rise Tower -->
+        <g>
+          <rect x="235" y="350" width="55" height="165" rx="2" fill="url(#towerGrad2)"/>
+          <rect x="245" y="325" width="35" height="25" rx="2" fill="url(#towerGrad3)"/>
+          <rect x="255" y="310" width="15" height="15" fill="#64748b"/>
+          <g fill="#fef08a" opacity="0.7">
+            <rect x="242" y="360" width="7" height="9" rx="1"/>
+            <rect x="255" y="360" width="7" height="9" rx="1"/>
+            <rect x="268" y="360" width="7" height="9" rx="1"/>
+            <rect x="242" y="380" width="7" height="9" rx="1"/>
+            <rect x="268" y="380" width="7" height="9" rx="1"/>
+            <rect x="255" y="400" width="7" height="9" rx="1"/>
+            <rect x="268" y="420" width="7" height="9" rx="1"/>
+          </g>
+        </g>
+
+        <!-- Iconic Jatiya Sangsad Bhaban (জাতীয় সংসদ ভবন) -->
+        <g id="jatiya-sangsad-bhaban" filter="url(#softShadow)">
+          <rect x="360" y="370" width="180" height="145" rx="6" fill="url(#sangsadGrad)" stroke="#cbd5e1" stroke-width="1.5"/>
+          <rect x="420" y="345" width="60" height="35" rx="4" fill="#e2e8f0" stroke="#cbd5e1" stroke-width="1"/>
+          <circle cx="450" cy="415" r="20" fill="#334155"/>
+          <circle cx="450" cy="415" r="16" fill="#0284c7" opacity="0.4"/>
+          <polygon points="385,445 408,400 408,445" fill="#334155"/>
+          <polygon points="515,445 492,400 492,445" fill="#334155"/>
+          <rect x="385" y="385" width="22" height="4" rx="1" fill="#475569"/>
+          <rect x="492" y="385" width="22" height="4" rx="1" fill="#475569"/>
+          <rect x="428" y="354" width="44" height="3.5" rx="1" fill="#475569"/>
+          <line x1="450" y1="318" x2="450" y2="345" stroke="#475569" stroke-width="2"/>
+          <rect x="450" y="318" width="24" height="14" fill="#047857"/>
+          <circle cx="461" cy="325" r="4.5" fill="#dc2626"/>
+        </g>
+
+        <!-- Modern City Apartment Complex with Rooftop Garden -->
+        <g>
+          <rect x="585" y="365" width="60" height="150" rx="3" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="1"/>
+          <rect x="590" y="385" width="22" height="14" fill="#e2e8f0" rx="1"/>
+          <circle cx="596" cy="383" r="3" fill="#10b981"/>
+          <circle cx="605" cy="383" r="2.5" fill="#059669"/>
+          <rect x="618" y="385" width="22" height="14" fill="#e2e8f0" rx="1"/>
+          <rect x="590" y="410" width="22" height="14" fill="#e2e8f0" rx="1"/>
+          <rect x="618" y="410" width="22" height="14" fill="#e2e8f0" rx="1"/>
+          <rect x="592" y="354" width="14" height="11" rx="2" fill="#64748b"/>
+          <polygon points="612,364 635,360 632,355 609,359" fill="#0284c7"/>
+        </g>
+
+        <!-- Mobile Telecommunications Tower (মোবাইল নেটওয়ার্ক টাওয়ার) -->
+        <g id="telecom-tower">
+          <line x1="680" y1="285" x2="670" y2="515" stroke="#64748b" stroke-width="2"/>
+          <line x1="680" y1="285" x2="690" y2="515" stroke="#64748b" stroke-width="2"/>
+          <line x1="673" y1="335" x2="687" y2="335" stroke="#94a3b8" stroke-width="1.2"/>
+          <line x1="672" y1="385" x2="688" y2="385" stroke="#94a3b8" stroke-width="1.2"/>
+          <line x1="671" y1="435" x2="689" y2="435" stroke="#94a3b8" stroke-width="1.2"/>
+          <line x1="673" y1="335" x2="688" y2="385" stroke="#94a3b8" stroke-width="1"/>
+          <line x1="687" y1="335" x2="672" y2="385" stroke="#94a3b8" stroke-width="1"/>
+          <line x1="672" y1="385" x2="689" y2="435" stroke="#94a3b8" stroke-width="1"/>
+          <line x1="688" y1="385" x2="671" y2="435" stroke="#94a3b8" stroke-width="1"/>
+          <line x1="680" y1="260" x2="680" y2="285" stroke="#475569" stroke-width="2.5"/>
+          <circle cx="680" cy="260" r="4" fill="#ef4444" class="anim-antenna-beacon"/>
+          <circle cx="680" cy="260" r="8" fill="none" stroke="#38bdf8" class="anim-signal-ring"/>
+          <circle cx="680" cy="260" r="16" fill="none" stroke="#38bdf8" class="anim-signal-ring" style="animation-delay: 0.8s;"/>
+        </g>
+
+        <!-- Glass Corporate Skyscraper 2 -->
+        <g>
+          <rect x="745" y="325" width="70" height="190" rx="4" fill="url(#towerGrad1)" stroke="#38bdf8" stroke-width="1"/>
+          <line x1="768" y1="325" x2="768" y2="515" stroke="#ffffff" stroke-width="1" opacity="0.6"/>
+          <line x1="792" y1="325" x2="792" y2="515" stroke="#ffffff" stroke-width="1" opacity="0.6"/>
+          <polygon points="745,430 780,325 795,325 745,470" fill="#ffffff" opacity="0.25"/>
+        </g>
+
+        <!-- Commercial Bank & Office Complex -->
+        <g>
+          <rect x="840" y="355" width="65" height="160" rx="3" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1"/>
+          <rect x="850" y="338" width="45" height="17" rx="2" fill="#0284c7"/>
+          <text x="872" y="350" font-size="7" font-weight="bold" fill="#ffffff" text-anchor="middle">CITY TOWER</text>
+          <g fill="#94a3b8">
+            <rect x="848" y="368" width="8" height="12" rx="1"/>
+            <rect x="862" y="368" width="8" height="12" rx="1"/>
+            <rect x="876" y="368" width="8" height="12" rx="1"/>
+            <rect x="890" y="368" width="8" height="12" rx="1"/>
+            <rect x="848" y="392" width="8" height="12" rx="1"/>
+            <rect x="862" y="392" width="8" height="12" rx="1"/>
+            <rect x="876" y="392" width="8" height="12" rx="1"/>
+            <rect x="890" y="392" width="8" height="12" rx="1"/>
+          </g>
+        </g>
+
+        <!-- Residential High-Rise with Balconies (Right) -->
+        <g>
+          <rect x="1030" y="340" width="60" height="175" rx="3" fill="#e2e8f0" stroke="#cbd5e1" stroke-width="1"/>
+          <g fill="#0ea5e9" opacity="0.65">
+            <rect x="1040" y="360" width="10" height="14" rx="1"/>
+            <rect x="1065" y="360" width="10" height="14" rx="1"/>
+            <rect x="1040" y="390" width="10" height="14" rx="1"/>
+            <rect x="1065" y="390" width="10" height="14" rx="1"/>
+            <rect x="1040" y="420" width="10" height="14" rx="1"/>
+            <rect x="1065" y="420" width="10" height="14" rx="1"/>
+          </g>
+        </g>
+
+        <!-- 7. Elevated Flyover / Expressway -->
+        <g id="city-flyover">
+          <path d="M680 475 Q850 440 1080 455" fill="none" stroke="url(#flyoverSlab)" stroke-width="9" stroke-linecap="round"/>
+          <path d="M680 470 Q850 435 1080 450" fill="none" stroke="#e2e8f0" stroke-width="1.5"/>
+          <rect x="740" y="465" width="10" height="40" fill="#94a3b8" rx="2"/>
+          <rect x="880" y="445" width="10" height="60" fill="#94a3b8" rx="2"/>
+          <rect x="1010" y="452" width="10" height="53" fill="#94a3b8" rx="2"/>
+          <g class="anim-flyover-car">
+            <rect x="0" y="435" width="20" height="8" rx="2" fill="#eab308"/>
+            <polygon points="5,435 8,431 14,431 17,435" fill="#0f172a"/>
+            <rect x="45" y="434" width="15" height="9" rx="2" fill="#15803d"/>
+            <rect x="47" y="432" width="8" height="4" rx="1" fill="#facc15"/>
+          </g>
+        </g>
+
+        <!-- 8. Dhaka Metro Rail (ঢাকা মেট্রোরেল - Elevated MRT Line-6) -->
+        <g id="dhaka-metro-rail">
+          <rect x="0" y="492" width="1440" height="11" fill="url(#metroViaduct)"/>
+          <line x1="0" y1="488" x2="1440" y2="488" stroke="#cbd5e1" stroke-width="1.5"/>
+          <g fill="url(#metroPillar)">
+            <rect x="90" y="497" width="30" height="5" rx="1"/>
+            <rect x="98" y="502" width="14" height="45" rx="2"/>
+            <rect x="270" y="497" width="30" height="5" rx="1"/>
+            <rect x="278" y="502" width="14" height="45" rx="2"/>
+            <rect x="470" y="497" width="30" height="5" rx="1"/>
+            <rect x="478" y="502" width="14" height="45" rx="2"/>
+            <rect x="660" y="497" width="30" height="5" rx="1"/>
+            <rect x="668" y="502" width="14" height="45" rx="2"/>
+            <rect x="840" y="497" width="30" height="5" rx="1"/>
+            <rect x="848" y="502" width="14" height="45" rx="2"/>
+            <rect x="1030" y="497" width="30" height="5" rx="1"/>
+            <rect x="1038" y="502" width="14" height="45" rx="2"/>
+            <rect x="1220" y="497" width="30" height="5" rx="1"/>
+            <rect x="1228" y="502" width="14" height="45" rx="2"/>
+          </g>
+
+          <line x1="0" y1="472" x2="1440" y2="472" stroke="#94a3b8" stroke-width="0.8" opacity="0.6"/>
+          <g stroke="#64748b" stroke-width="1.5">
+            <line x1="285" y1="470" x2="285" y2="492"/>
+            <line x1="675" y1="470" x2="675" y2="492"/>
+            <line x1="1045" y1="470" x2="1045" y2="492"/>
+          </g>
+
+          <!-- Animated Dhaka Metro Train (MRT-6) -->
+          <g class="anim-metro-train" filter="url(#softShadow)">
+            <g>
+              <path d="M160 476 L230 476 Q245 476 248 484 L248 492 L160 492 Z" fill="#ffffff" stroke="#cbd5e1" stroke-width="1"/>
+              <path d="M160 484 L235 484 Q243 484 246 489 L246 492 L160 492 Z" fill="url(#metroTrainGreen)"/>
+              <circle cx="215" cy="486" r="3.5" fill="#dc2626"/>
+              <path d="M232 478 L243 481 L241 484 L230 484 Z" fill="#0f172a"/>
+              <rect x="168" y="478" width="12" height="6" rx="1" fill="#38bdf8"/>
+              <rect x="185" y="478" width="12" height="6" rx="1" fill="#38bdf8"/>
+              <rect x="202" y="478" width="12" height="6" rx="1" fill="#38bdf8"/>
+              <path d="M175 476 L180 470 L185 473 L190 470" fill="none" stroke="#475569" stroke-width="1.2"/>
+            </g>
+
+            <rect x="156" y="478" width="4" height="12" fill="#334155"/>
+
+            <g>
+              <rect x="75" y="476" width="81" height="16" rx="2" fill="#ffffff" stroke="#cbd5e1" stroke-width="1"/>
+              <rect x="75" y="484" width="81" height="8" fill="url(#metroTrainGreen)"/>
+              <circle cx="115" cy="486" r="3.5" fill="#dc2626"/>
+              <rect x="82" y="478" width="12" height="6" rx="1" fill="#38bdf8"/>
+              <rect x="99" y="478" width="12" height="6" rx="1" fill="#38bdf8"/>
+              <rect x="116" y="478" width="12" height="6" rx="1" fill="#38bdf8"/>
+              <rect x="133" y="478" width="12" height="6" rx="1" fill="#38bdf8"/>
+            </g>
+
+            <rect x="71" y="478" width="4" height="12" fill="#334155"/>
+
+            <g>
+              <path d="M71 476 L2 476 Q-5 476 -8 484 L-8 492 L71 492 Z" fill="#ffffff" stroke="#cbd5e1" stroke-width="1"/>
+              <path d="M71 484 L0 484 Q-5 484 -7 489 L-7 492 L71 492 Z" fill="url(#metroTrainGreen)"/>
+              <circle cx="25" cy="486" r="3.5" fill="#dc2626"/>
+              <rect x="12" y="478" width="12" height="6" rx="1" fill="#38bdf8"/>
+              <rect x="29" y="478" width="12" height="6" rx="1" fill="#38bdf8"/>
+              <rect x="46" y="478" width="12" height="6" rx="1" fill="#38bdf8"/>
+              <path d="M50 476 L55 470 L60 473 L65 470" fill="none" stroke="#475569" stroke-width="1.2"/>
+            </g>
+          </g>
+        </g>
+
+        <!-- 9. Sidewalk, Green Verge, Krishnachura Trees & Milestones -->
+        <rect x="0" y="540" width="1440" height="82" fill="#86efac" opacity="0.65"/>
+        <path d="M0 608 Q360 602 720 608 Q1080 614 1440 608 L1440 622 L0 622 Z" fill="#22c55e" opacity="0.45"/>
+
+        <!-- Krishnachura Tree 1 -->
+        <g>
+          <path d="M300 595 Q303 540 308 515" fill="none" stroke="#78350f" stroke-width="4.5" stroke-linecap="round"/>
+          <circle cx="305" cy="495" r="24" fill="#15803d"/>
+          <circle cx="322" cy="490" r="20" fill="#16a34a"/>
+          <circle cx="290" cy="490" r="18" fill="#15803d"/>
+          <circle cx="300" cy="488" r="3.5" fill="#ef4444"/>
+          <circle cx="312" cy="482" r="3.5" fill="#f97316"/>
+          <circle cx="320" cy="492" r="3.5" fill="#ef4444"/>
+          <circle cx="292" cy="494" r="3" fill="#f97316"/>
+        </g>
+
+        <!-- Krishnachura Tree 2 -->
+        <g>
+          <path d="M940 595 Q943 540 948 515" fill="none" stroke="#78350f" stroke-width="4.5" stroke-linecap="round"/>
+          <circle cx="945" cy="495" r="25" fill="#15803d"/>
+          <circle cx="965" cy="490" r="20" fill="#16a34a"/>
+          <circle cx="930" cy="490" r="19" fill="#15803d"/>
+          <circle cx="940" cy="487" r="4" fill="#ef4444"/>
+          <circle cx="955" cy="482" r="3.5" fill="#f97316"/>
+          <circle cx="962" cy="492" r="4" fill="#ef4444"/>
+          <circle cx="932" cy="494" r="3" fill="#f97316"/>
+        </g>
+
+        <!-- Modern Street Lamps -->
+        <g>
+          <path d="M170 616 L170 500 Q170 488 182 488 L190 488" fill="none" stroke="#475569" stroke-width="2.5"/>
+          <circle cx="190" cy="492" r="4.5" fill="#fbbf24"/>
+          <polygon points="185,495 195,495 210,616 170,616" fill="#fef08a" opacity="0.12"/>
+        </g>
+        <g>
+          <path d="M510 616 L510 500 Q510 488 522 488 L530 488" fill="none" stroke="#475569" stroke-width="2.5"/>
+          <circle cx="530" cy="492" r="4.5" fill="#fbbf24"/>
+          <polygon points="525,495 535,495 550,616 510,616" fill="#fef08a" opacity="0.12"/>
+        </g>
+        <g>
+          <path d="M880 616 L880 500 Q880 488 892 488 L900 488" fill="none" stroke="#475569" stroke-width="2.5"/>
+          <circle cx="900" cy="492" r="4.5" fill="#fbbf24"/>
+          <polygon points="895,495 905,495 920,616 880,616" fill="#fef08a" opacity="0.12"/>
+        </g>
+        <g>
+          <path d="M1220 616 L1220 500 Q1220 488 1232 488 L1240 488" fill="none" stroke="#475569" stroke-width="2.5"/>
+          <circle cx="1240" cy="492" r="4.5" fill="#fbbf24"/>
+          <polygon points="1235,495 1245,495 1260,616 1220,616" fill="#fef08a" opacity="0.12"/>
+        </g>
+
+        <!-- ANIMATED SKY PARACHUTE EXPRESS DELIVERY (আকাশ থেকে প্যারাসুটে সার্ভিস ডেলিভারি নামার অ্যানিমেশন) -->
+        <g id="hero-parachute-delivery" class="anim-parachute-descend">
+          <g class="anim-parachute-sway">
+            <!-- Suspension Shroud Lines (প্যারাসুটের মজবুত সাসপেনশন দড়ি) -->
+            <g stroke="#64748b" stroke-width="1.2" opacity="0.8" stroke-linecap="round">
+              <line x1="-36" y1="0" x2="0" y2="34"/>
+              <line x1="-18" y1="0" x2="0" y2="34"/>
+              <line x1="0" y1="-2" x2="0" y2="34"/>
+              <line x1="18" y1="0" x2="0" y2="34"/>
+              <line x1="36" y1="0" x2="0" y2="34"/>
+            </g>
+
+            <!-- Parachute Canopy (প্যারাসুটের আধুনিক রঙিন ছাতা) -->
+            <g filter="url(#softShadow)">
+              <!-- Canopy Panel 1 (Left Outer: Cyan) -->
+              <path d="M -36 0 C -36 -28, -24 -36, -18 -36 C -18 -18, -24 -6, -18 0 Q -27 -5, -36 0 Z" fill="url(#chuteCyan)"/>
+              
+              <!-- Canopy Panel 2 (Left Mid: Emerald) -->
+              <path d="M -18 0 C -24 -6, -18 -18, -18 -36 C -12 -38, -6 -39, 0 -40 C -2 -20, -6 -8, 0 0 Q -9 -5, -18 0 Z" fill="url(#chuteEmerald)"/>
+
+              <!-- Canopy Panel 3 (Center: Vibrant Brand Amber) -->
+              <path d="M -7 -1 C -10 -15, -6 -28, 0 -40 C 6 -28, 10 -15, 7 -1 Q 0 -5, -7 -1 Z" fill="url(#chuteAmber)"/>
+
+              <!-- Canopy Panel 4 (Right Mid: Emerald) -->
+              <path d="M 0 0 C 6 -8, 2 -20, 0 -40 C 6 -39, 12 -38, 18 -36 C 18 -18, 24 -6, 18 0 Q 9 -5, 0 0 Z" fill="url(#chuteEmerald)"/>
+
+              <!-- Canopy Panel 5 (Right Outer: Cyan) -->
+              <path d="M 18 0 C 24 -6, 18 -18, 18 -36 C 24 -36, 36 -28, 36 0 Q 27 -5, 18 0 Z" fill="url(#chuteCyan)"/>
+
+              <!-- Outer Smooth Dome Arch Overlay -->
+              <path d="M -36 0 C -36 -38, 36 -38, 36 0 Q 27 -5, 18 0 Q 9 -5, 0 0 Q -9 -5, -18 0 Q -27 -5, -36 0 Z" fill="none" stroke="#0284c7" stroke-width="1.3" opacity="0.35"/>
+              
+              <!-- Top Vent / Apex Cap (প্যারাসুটের উপরের ঢাকনা ও ভেন্ট) -->
+              <path d="M -10 -36 Q 0 -44 10 -36" fill="none" stroke="#f59e0b" stroke-width="2.5" stroke-linecap="round"/>
+              <circle cx="0" cy="-40" r="3" fill="#f59e0b"/>
+            </g>
+
+            <!-- Carabiner Harness Ring -->
+            <circle cx="0" cy="34" r="2.8" fill="#f59e0b" stroke="#ffffff" stroke-width="1"/>
+
+            <!-- Payload: High-tech Parcel Box with Repaired Phone & Tools -->
+            <g id="parachute-payload" filter="url(#softShadow)">
+              <!-- Main Delivery Box -->
+              <rect x="-16" y="38" width="32" height="26" rx="4" fill="url(#chuteBoxGrad)" stroke="#0284c7" stroke-width="1.5"/>
+              
+              <!-- Delivery Ribbon Band -->
+              <rect x="-16" y="49" width="32" height="4" fill="#38bdf8" opacity="0.6"/>
+              <rect x="-2" y="38" width="4" height="26" fill="#38bdf8" opacity="0.6"/>
+
+              <!-- Mini Repaired Smartphone on Box -->
+              <rect x="-9" y="42" width="18" height="18" rx="3" fill="#0f172a" stroke="#cbd5e1" stroke-width="0.8"/>
+              <rect x="-7.5" y="44" width="15" height="14" rx="1.5" fill="#38bdf8"/>
+              
+              <!-- Screen Success Checkmark Graphic -->
+              <path d="M -3 51 L -0.5 53.5 L 4 48" fill="none" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              
+              <!-- Pulsing Live Order Status LED Beacon -->
+              <circle cx="12" cy="41" r="2.2" fill="#10b981" class="anim-antenna-beacon"/>
+
+              <!-- Express Delivery Pill Tag -->
+              <rect x="-21" y="66" width="42" height="13" rx="6.5" fill="#0284c7"/>
+              <text x="0" y="75.5" font-size="6.5" font-weight="900" fill="#ffffff" text-anchor="middle" letter-spacing="0.5">EXPRESS</text>
+            </g>
+          </g>
+        </g>
+
+        <!-- SECONDARY DISTANT PARACHUTE (ডান পাশের দূরবর্তী প্যারাসুট - চমৎকার 3D গভীরতা) -->
+        <g id="hero-parachute-distant" class="anim-parachute-descend-distant">
+          <g class="anim-parachute-sway-distant">
+            <!-- Shroud Lines -->
+            <g stroke="#94a3b8" stroke-width="1" opacity="0.75" stroke-linecap="round">
+              <line x1="-24" y1="0" x2="0" y2="24"/>
+              <line x1="-12" y1="0" x2="0" y2="24"/>
+              <line x1="0" y1="0" x2="0" y2="24"/>
+              <line x1="12" y1="0" x2="0" y2="24"/>
+              <line x1="24" y1="0" x2="0" y2="24"/>
+            </g>
+            <!-- Canopy -->
+            <path d="M -24 0 C -24 -26, 24 -26, 24 0 Q 18 -4, 12 0 Q 6 -4, 0 0 Q -6 -4, -12 0 Q -18 -4, -24 0 Z" fill="url(#chuteCyan)"/>
+            <path d="M -6 0 C -9 -10, -6 -18, 0 -24 C 6 -18, 9 -10, 6 0 Q 0 -3, -6 0 Z" fill="url(#chuteAmber)"/>
+            <!-- Small Box -->
+            <rect x="-8" y="24" width="16" height="14" rx="2" fill="#ffffff" stroke="#38bdf8" stroke-width="1"/>
+            <circle cx="0" cy="31" r="2.5" fill="#0284c7"/>
+          </g>
+        </g>
+
+
+        <g id="city-road">
+          <!-- Sidewalk Curbstone Border -->
+          <rect x="0" y="618" width="1440" height="4" fill="#cbd5e1"/>
+          <line x1="0" y1="622" x2="1440" y2="622" stroke="#94a3b8" stroke-width="1"/>
+          
+          <!-- Asphalt Pavement (58px Slim Height) -->
+          <rect x="0" y="622" width="1440" height="58" fill="url(#asphaltRoad)"/>
+
+          <!-- Yellow Safety Curb Line -->
+          <line x1="0" y1="624" x2="1440" y2="624" stroke="#facc15" stroke-width="2" opacity="0.9"/>
+
+          <!-- Center Lane Divider (Dashed White Line) -->
+          <line x1="0" y1="646" x2="1440" y2="646" stroke="#ffffff" stroke-width="2" stroke-dasharray="30 22" opacity="0.6"/>
+
+          <!-- ANIMATED DIGITAL ROAD NAVIGATION FLOW CHEVRONS (রাস্তায় গতিশীল অ্যারো) -->
+          <g class="anim-road-flow" stroke="#38bdf8" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none">
+            <path d="M 260 648 L 267 651 L 260 654"/>
+            <path d="M 271 648 L 278 651 L 271 654"/>
+            <path d="M 500 648 L 507 651 L 500 654"/>
+            <path d="M 511 648 L 518 651 L 511 654"/>
+            <path d="M 740 648 L 747 651 L 740 654"/>
+            <path d="M 751 648 L 758 651 L 751 654"/>
+            <path d="M 980 648 L 987 651 L 980 654"/>
+            <path d="M 991 648 L 998 651 L 991 654"/>
+          </g>
+
+          <!-- Dedicated Delivery Route Stencils Painted on Asphalt (ডেলিভারি লেন) -->
+          <g opacity="0.4" fill="none" stroke="#ffffff" stroke-linecap="round" stroke-linejoin="round">
+            <!-- Stencil 1 at x=440 -->
+            <g transform="translate(440, 650)">
+              <circle cx="0" cy="0" r="5.5" stroke-width="1.5"/>
+              <circle cx="20" cy="0" r="5.5" stroke-width="1.5"/>
+              <path d="M0 0 L7 -7 L14 0 L5 0 L10 -7 L20 0" stroke-width="1.3"/>
+              <circle cx="6" cy="-7" r="1.2" fill="#ffffff"/>
+            </g>
+            <!-- Stencil 2 at x=900 -->
+            <g transform="translate(900, 650)">
+              <circle cx="0" cy="0" r="5.5" stroke-width="1.5"/>
+              <circle cx="20" cy="0" r="5.5" stroke-width="1.5"/>
+              <path d="M0 0 L7 -7 L14 0 L5 0 L10 -7 L20 0" stroke-width="1.3"/>
+              <circle cx="6" cy="-7" r="1.2" fill="#ffffff"/>
+            </g>
+          </g>
+
+          <!-- Bottom Road Shoulder Guide Line -->
+          <line x1="0" y1="676" x2="1440" y2="676" stroke="#334155" stroke-width="1" opacity="0.5"/>
+        </g>
+
+
+        <!-- 11. THE HERO FEATURE: Animated Doorstep Delivery Bike Carrying Phone (স্মার্ট ডেলিভারি বাইক) -->
+        <g class="anim-cyclist-track" id="cyclist-clickable" filter="url(#softShadow)" style="pointer-events: auto;">
+          <!-- Compact scaled bike group (Proportionate, realistic scale on asphalt road) -->
+          <g id="hero-bike-scaler" transform="translate(24, 346) scale(0.48)">
+            <!-- Realistic Ground Contact Shadow on Asphalt -->
+            <ellipse cx="75" cy="656" rx="66" ry="4.5" fill="#020617" opacity="0.45"/>
+
+            <!-- Exhaust Smoke Particles -->
+            <g class="anim-exhaust-smoke" transform="translate(10, 642)">
+              <circle cx="0" cy="0" r="3.5" fill="#cbd5e1" opacity="0.6"/>
+              <circle cx="-8" cy="-3" r="5" fill="#e2e8f0" opacity="0.4"/>
+            </g>
+
+            <!-- Trail Speed Wind Dashes Behind Bike -->
+            <g class="anim-trail-puff" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" opacity="0.75">
+              <line x1="5" y1="626" x2="-25" y2="626"/>
+              <line x1="12" y1="614" x2="-18" y2="614"/>
+              <line x1="-2" y1="638" x2="-30" y2="638"/>
+            </g>
+
+            <!-- Smooth Motorbike Body & Rider (No vibration, glides smoothly) -->
+            <!-- Rear Wheel (x: 25, y: 636, r: 19) Alloy Mag Wheel -->
+            <g id="rear-wheel" transform="translate(25, 636)">
+              <circle cx="0" cy="0" r="19" fill="none" stroke="#0f172a" stroke-width="5"/>
+              <circle cx="0" cy="0" r="16.5" fill="none" stroke="#38bdf8" stroke-width="1.8"/>
+              <circle cx="0" cy="0" r="11" fill="none" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="3 2"/>
+              <!-- 5-Spoke Alloy Star Spinning -->
+              <g class="anim-wheel" stroke="#e2e8f0" stroke-width="2" stroke-linecap="round">
+                <line x1="0" y1="0" x2="0" y2="-15"/>
+                <line x1="0" y1="0" x2="14" y2="-5"/>
+                <line x1="0" y1="0" x2="9" y2="12"/>
+                <line x1="0" y1="0" x2="-9" y2="12"/>
+                <line x1="0" y1="0" x2="-14" y2="-5"/>
+              </g>
+              <rect x="5" y="-12" width="6" height="8" rx="1" fill="#ef4444"/>
+              <circle cx="0" cy="0" r="3.5" fill="#cbd5e1"/>
+            </g>
+
+            <!-- Front Wheel (x: 122, y: 636, r: 19) Alloy Mag Wheel -->
+            <g id="front-wheel" transform="translate(122, 636)">
+              <circle cx="0" cy="0" r="19" fill="none" stroke="#0f172a" stroke-width="5"/>
+              <circle cx="0" cy="0" r="16.5" fill="none" stroke="#38bdf8" stroke-width="1.8"/>
+              <circle cx="0" cy="0" r="11" fill="none" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="3 2"/>
+              <!-- 5-Spoke Alloy Star Spinning -->
+              <g class="anim-wheel" stroke="#e2e8f0" stroke-width="2" stroke-linecap="round">
+                <line x1="0" y1="0" x2="0" y2="-15"/>
+                <line x1="0" y1="0" x2="14" y2="-5"/>
+                <line x1="0" y1="0" x2="9" y2="12"/>
+                <line x1="0" y1="0" x2="-9" y2="12"/>
+                <line x1="0" y1="0" x2="-14" y2="-5"/>
+              </g>
+              <rect x="5" y="-12" width="6" height="8" rx="1" fill="#ef4444"/>
+              <circle cx="0" cy="0" r="3.5" fill="#cbd5e1"/>
+            </g>
+
+            <!-- Front Telescopic Suspension Forks -->
+            <line x1="122" y1="636" x2="108" y2="588" stroke="#64748b" stroke-width="4.5" stroke-linecap="round"/>
+            <line x1="124" y1="636" x2="110" y2="588" stroke="#cbd5e1" stroke-width="2"/>
+            
+            <!-- Front Fender / Mudguard -->
+            <path d="M102 628 Q122 612 138 625" fill="none" stroke="#0284c7" stroke-width="5" stroke-linecap="round"/>
+
+            <!-- Exhaust Pipe & Chrome Muffler -->
+            <path d="M60 634 Q45 644 15 642" fill="none" stroke="#475569" stroke-width="4.5" stroke-linecap="round"/>
+            <rect x="10" y="639" width="22" height="7" rx="3" fill="#334155" stroke="#64748b" stroke-width="1"/>
+            <rect x="14" y="640.5" width="14" height="2" rx="1" fill="#e2e8f0"/>
+
+            <!-- Motorbike Engine Casing & Floorboard -->
+            <rect x="35" y="628" width="36" height="15" rx="5" fill="#1e293b" stroke="#334155" stroke-width="1.5"/>
+            <circle cx="44" cy="635" r="4.5" fill="#475569"/>
+            <rect x="68" y="626" width="30" height="7" rx="2" fill="#0f172a"/>
+            <rect x="70" y="624" width="26" height="3" fill="#334155"/>
+
+            <!-- Scooter Body Fairing & Aerodynamic Apron (Repair Seba Cyan & Navy) -->
+            <path d="M68 628 L98 628 L114 584 Q116 578 112 576 L96 580 Q75 588 66 612 Z" fill="#0284c7" stroke="#0369a1" stroke-width="1.5"/>
+            <path d="M78 616 L108 586 L112 590 L82 620 Z" fill="#38bdf8" opacity="0.6"/>
+            <!-- Front Cowl & Headlight Housing -->
+            <path d="M112 576 L124 596 L120 608 L108 604 Z" fill="#0f172a"/>
+            <polygon points="120,594 125,602 121,605 117,597" fill="#fef08a"/>
+            <circle cx="122" cy="600" r="2.5" fill="#ffffff"/>
+
+            <!-- POWERFUL LED HEADLIGHT BEAM CASTING ONTO ROAD -->
+            <polygon points="124,600 290,595 290,660 124,606" fill="url(#headlightBeam)" opacity="0.55"/>
+
+            <!-- Aerodynamic Smoke Windscreen -->
+            <path d="M106 574 L114 554 Q116 550 112 550 L104 558 L100 574 Z" fill="#0f172a" opacity="0.75" stroke="#38bdf8" stroke-width="1"/>
+
+            <!-- Rear Body Panel & Padded Comfort Seat -->
+            <path d="M40 600 L68 596 L76 616 L45 624 Z" fill="#0284c7"/>
+            <path d="M38 592 Q58 588 78 595 L76 601 Q56 596 36 600 Z" fill="#0f172a" stroke="#1e293b" stroke-width="1.5"/>
+            <path d="M52 590 L52 597" stroke="#0284c7" stroke-width="1"/>
+
+            <!-- Handlebars & View Mirror -->
+            <line x1="104" y1="576" x2="98" y2="564" stroke="#0f172a" stroke-width="4" stroke-linecap="round"/>
+            <line x1="94" y1="564" x2="104" y2="564" stroke="#475569" stroke-width="3.5" stroke-linecap="round"/>
+            <circle cx="94" cy="564" r="2.5" fill="#0f172a"/>
+            <circle cx="104" cy="564" r="2.5" fill="#0f172a"/>
+            <line x1="97" y1="562" x2="93" y2="554" stroke="#334155" stroke-width="1.5"/>
+            <circle cx="93" cy="554" r="2" fill="#bae6fd"/>
+
+            <!-- MOUNTED GPS NAVIGATION SMARTPHONE ON HANDLEBAR (গুগল ম্যাপ রুট সহ ফোন) -->
+            <g transform="translate(100, 555)">
+              <rect x="0" y="0" width="13" height="20" rx="2" fill="#0f172a" stroke="#38bdf8" stroke-width="1" class="anim-phone-glow"/>
+              <rect x="1.5" y="2" width="10" height="16" rx="1" fill="#0284c7"/>
+              <!-- Mini GPS Route Trail on Phone Screen -->
+              <path d="M3 14 L6 9 L9 4" fill="none" stroke="#ffffff" stroke-width="1.2" stroke-linecap="round"/>
+              <circle cx="9" cy="4" r="1.5" fill="#22c55e"/>
+              <circle cx="3" cy="14" r="1.2" fill="#facc15"/>
+            </g>
+
+            <!-- Branded Heavy-Duty Rear Cargo Delivery Box (REPAIR SEBA) -->
+            <g id="delivery-cargo-box">
+              <line x1="38" y1="598" x2="8" y2="598" stroke="#64748b" stroke-width="2.5"/>
+              <line x1="26" y1="624" x2="14" y2="598" stroke="#64748b" stroke-width="2"/>
+              <rect x="5" y="572" width="36" height="30" rx="4" fill="#0284c7" stroke="#0369a1" stroke-width="1.5"/>
+              <rect x="4" y="570" width="38" height="5" rx="2" fill="#38bdf8"/>
+              <rect x="10" y="579" width="26" height="16" rx="2" fill="#ffffff" opacity="0.95"/>
+              <text x="23" y="587" font-size="6.5" font-weight="900" fill="#0284c7" text-anchor="middle">REPAIR</text>
+              <text x="23" y="593" font-size="5" font-weight="bold" fill="#0f172a" text-anchor="middle">SEBA 📱</text>
+              <!-- Rear Safety Blinker Red LED Light -->
+              <rect x="4" y="584" width="2.5" height="7" rx="1" fill="#ef4444" class="anim-antenna-beacon"/>
+            </g>
+
+            <!-- Delivery Rider Figure (Sitting on Bike) -->
+            <!-- Rider Legs & Boots resting on floorboard -->
+            <path d="M52 590 L72 602 L76 626" stroke="#0f172a" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+            <path d="M52 590 L72 602 L76 626" stroke="#1e293b" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+            <rect x="72" y="623" width="12" height="6" rx="2" fill="#0f172a"/>
+
+            <!-- Torso (Athletic Posture with Repair Seba Cyan Uniform & Safety Stripe) -->
+            <path d="M50 590 L68 558" stroke="#0284c7" stroke-width="14" stroke-linecap="round"/>
+            <path d="M62 558 L68 558" stroke="#0f172a" stroke-width="3" stroke-linecap="round"/>
+            <path d="M52 576 L66 570" stroke="#facc15" stroke-width="2" opacity="0.9"/>
+            <circle cx="65" cy="564" r="2" fill="#ffffff"/>
+
+            <!-- Arms Reaching to Handlebar Grips -->
+            <path d="M68 558 L85 566 L98 564" stroke="#0284c7" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+            <circle cx="98" cy="564" r="2.8" fill="#1e293b"/>
+
+            <!-- Rider Full-Face Helmet & Visor -->
+            <line x1="68" y1="558" x2="70" y2="550" stroke="#fed7aa" stroke-width="4"/>
+            <circle cx="73" cy="542" r="10" fill="#0f172a" stroke="#0284c7" stroke-width="1.8"/>
+            <path d="M73 538 Q82 538 84 544 Q82 548 74 548 Z" fill="#38bdf8" stroke="#bae6fd" stroke-width="1"/>
+            <path d="M68 548 Q74 554 80 548" fill="none" stroke="#0284c7" stroke-width="2"/>
+
+            <!-- INTERACTIVE HORN BEEP BUBBLE (Pops up when clicked) -->
+            <foreignObject x="75" y="475" width="130" height="34" class="overflow-visible pointer-events-none">
+              <div xmlns="http://www.w3.org/1999/xhtml">
+                <div id="cyclist-chime-bubble" class="hidden inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-black bg-amber-400 text-slate-900 border border-amber-500 shadow-lg">
+                  📢 পিপ পিপ!
+                </div>
+              </div>
+            </foreignObject>
+          </g>
+        </g>
+      </svg>
+
+      <!-- Atmospheric Center Radial Wash for 100% crisp text readability -->
+      <div class="bg-radial-gradient-hero absolute inset-0 pointer-events-none"></div>
+    </div>
+
+    <!-- 2. FOREGROUND HERO CONTENT (relative z-10) -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full pt-4">
+      
+      <!-- Top Announcement Badge -->
+      <div id="hero-badge-container" class="text-center mb-4 pointer-events-auto">
+        <span class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold bg-white/95 text-cyan-900 border border-cyan-200/90 shadow-sm backdrop-blur-md">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          <span id="hero-badge-text" data-i18n="hero_badge">✨ বাংলাদেশে প্রথম ডিজিটাল ডোরস্টেপ রিপেয়ার সেবা</span>
+        </span>
+      </div>
+
+      <!-- Main Headline, Subtitle & Interactive Booking -->
+      <div class="text-center max-w-3xl mx-auto mt-2 sm:mt-4 mb-4">
+        <h1 id="hero-main-title" class="text-4xl sm:text-5xl lg:text-6xl font-black text-slate-900 tracking-tight leading-tight mb-5" data-i18n="hero_title">
+          ঘরে বসেই নষ্ট ফোন ও ট্যাব মেরামত করুন
+        </h1>
+        <p id="hero-main-subtitle" class="text-base sm:text-lg text-slate-700 font-semibold leading-relaxed mb-7 max-w-2xl mx-auto" data-i18n="hero_subtitle">
+          আপনার ঠিকানায় গিয়ে নষ্ট ফোন বা ট্যাব সংগ্রহ করব, ল্যাবে পরীক্ষা করে খরচের হিসাব জানাব। আপনি রাজি হলে মেরামত করে আবার আপনার ঠিকানায় পৌঁছে দেব!
+        </p>
+
+        <!-- CTA Buttons -->
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-7">
+          <a href="#booking-section" class="w-full sm:w-auto px-8 py-3.5 rounded-2xl bg-cyan-600 hover:bg-cyan-700 text-white font-bold text-base shadow-lg shadow-cyan-600/30 transition hover:scale-105 flex items-center justify-center gap-2">
+            <span>🛵</span> <span data-i18n="hero_cta_book">এখনই পিকআপ বুক করুন</span>
+          </a>
+          <a href="#track-section" class="w-full sm:w-auto px-8 py-3.5 rounded-2xl bg-white hover:bg-slate-50 text-slate-800 font-bold text-base border border-slate-200/90 shadow-md transition flex items-center justify-center gap-2">
+            <span>🔍</span> <span data-i18n="hero_cta_track">অর্ডার ট্র্যাক করুন</span>
+          </a>
+        </div>
+
+        <!-- Quick Tracking Search Input -->
+        <div class="max-w-xl mx-auto bg-white p-2 rounded-2xl shadow-xl border border-slate-200/90 mb-7 backdrop-blur-md">
+          <form id="quick-track-form" class="flex items-center gap-2">
+            <input type="text" id="hero-track-input" placeholder="অর্ডার আইডি (যেমন: RS-841920) অথবা ফোন নম্বর দিন..." data-i18n-placeholder="track_input_placeholder" class="flex-1 px-4 py-3 text-sm rounded-xl focus:outline-none text-slate-800 placeholder-slate-400">
+            <button type="submit" class="px-6 py-3 rounded-xl bg-slate-900 hover:bg-cyan-600 text-white text-sm font-bold transition shadow whitespace-nowrap" data-i18n="track_btn_search">
+              ট্র্যাক করুন
+            </button>
+          </form>
+        </div>
+
+        <!-- Trust Stats Badges in Floating Frosted Glass Card -->
+        <div class="grid grid-cols-3 gap-2 sm:gap-4 p-4 sm:p-5 rounded-2xl bg-white/95 border border-white/95 shadow-lg shadow-cyan-950/5 backdrop-blur-md max-w-2xl mx-auto">
+          <div>
+            <div id="hero-stat-1-val" class="text-xl sm:text-2xl lg:text-3xl font-black text-cyan-600" data-i18n="hero_stat_1_num">১৫,০০০+</div>
+            <div id="hero-stat-1-lbl" class="text-[11px] sm:text-xs font-semibold text-slate-600 mt-1" data-i18n="hero_stat_1_lbl">মেরামতকৃত ডিভাইস</div>
+          </div>
+          <div class="border-x border-slate-200/80">
+            <div id="hero-stat-2-val" class="text-xl sm:text-2xl lg:text-3xl font-black text-slate-900" data-i18n="hero_stat_2_num">৯০-১৮০ দিন</div>
+            <div id="hero-stat-2-lbl" class="text-[11px] sm:text-xs font-semibold text-slate-600 mt-1" data-i18n="hero_stat_2_lbl">সার্ভিস ওয়ারেন্টি</div>
+          </div>
+          <div>
+            <div id="hero-stat-3-val" class="text-xl sm:text-2xl lg:text-3xl font-black text-emerald-600" data-i18n="hero_stat_3_num">ফ্রি পিকআপ</div>
+            <div id="hero-stat-3-lbl" class="text-[11px] sm:text-xs font-semibold text-slate-600 mt-1" data-i18n="hero_stat_3_lbl">ও ডোরস্টেপ ড্রপ</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- How It Works Section (The 4-Step Process) -->
+  <section id="how-it-works" class="py-20 bg-white border-y border-slate-200/60">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="text-center max-w-2xl mx-auto mb-16">
+        <h2 class="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight" data-i18n="how_title">
+          আমরা যেভাবে সেবা প্রদান করি
+        </h2>
+        <p class="mt-4 text-base text-slate-600" data-i18n="how_subtitle">
+          ঝামেলাহীন ও বিশ্বস্ত ৪টি সহজ ধাপে আপনার ফোন বা ট্যাব ঠিক করিয়ে নিন
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        
+        <!-- Step 1 -->
+        <div class="bg-slate-50 hover:bg-white rounded-3xl p-8 border border-slate-200/80 hover:border-cyan-300 hover:shadow-xl transition-all duration-300 relative group overflow-hidden">
+          <!-- Ambient Glow Accent on Hover -->
+          <div class="absolute -top-12 -right-12 w-28 h-28 bg-cyan-400/10 rounded-full blur-2xl group-hover:bg-cyan-400/20 transition-all duration-500 pointer-events-none"></div>
+
+          <!-- Animated Icon Badge with Ambient Aura -->
+          <div class="relative w-16 h-16 mb-6">
+            <div class="absolute inset-0 rounded-2xl bg-cyan-400/30 blur-md anim-step-aura-cyan group-hover:blur-lg transition-all duration-300"></div>
+            <div class="relative w-16 h-16 rounded-2xl bg-gradient-to-tr from-cyan-100 to-sky-50 border border-cyan-200/80 text-cyan-600 flex items-center justify-center text-3xl shadow-sm group-hover:shadow-cyan-500/20 group-hover:scale-105 transition-all duration-300 overflow-hidden">
+              <span class="anim-step-bike inline-block select-none">🛵</span>
+              <!-- Speed Wind Dashes -->
+              <span class="anim-step-wind absolute bottom-2 left-2 flex gap-0.5 opacity-60">
+                <span class="w-1.5 h-0.5 bg-cyan-500 rounded-full"></span>
+                <span class="w-2.5 h-0.5 bg-cyan-400 rounded-full"></span>
+              </span>
+            </div>
+          </div>
+          <span class="text-3xl font-black text-slate-200 group-hover:text-cyan-200 transition absolute top-6 right-6" data-i18n="step1_num">০১</span>
+          <h3 class="text-lg font-bold text-slate-900 mb-3" data-i18n="step1_title">অনলাইনে অর্ডার ও ফ্রি পিকআপ</h3>
+          <p class="text-sm text-slate-600 leading-relaxed" data-i18n="step1_desc">
+            ওয়েবসাইটে আপনার ফোন বা ট্যাবের সমস্যা লিখে বুক করুন। আমাদের প্রতিনিধি আপনার বাসায়/অফিসে গিয়ে ডিভাইসটি সংগ্রহ করে নিয়ে আসবে।
+          </p>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="bg-slate-50 hover:bg-white rounded-3xl p-8 border border-slate-200/80 hover:border-purple-300 hover:shadow-xl transition-all duration-300 relative group overflow-hidden">
+          <!-- Ambient Glow Accent on Hover -->
+          <div class="absolute -top-12 -right-12 w-28 h-28 bg-purple-400/10 rounded-full blur-2xl group-hover:bg-purple-400/20 transition-all duration-500 pointer-events-none"></div>
+
+          <!-- Animated Icon Badge with Ambient Aura -->
+          <div class="relative w-16 h-16 mb-6">
+            <div class="absolute inset-0 rounded-2xl bg-purple-400/30 blur-md anim-step-aura-purple group-hover:blur-lg transition-all duration-300"></div>
+            <div class="relative w-16 h-16 rounded-2xl bg-gradient-to-tr from-purple-100 to-fuchsia-50 border border-purple-200/80 text-purple-600 flex items-center justify-center text-3xl shadow-sm group-hover:shadow-purple-500/20 group-hover:scale-105 transition-all duration-300 overflow-hidden">
+              <span class="anim-step-microscope inline-block select-none">🔬</span>
+              <!-- Laser Scan Beam Line -->
+              <span class="anim-step-scan-line absolute inset-x-0 h-[2px] bg-gradient-to-r from-transparent via-cyan-400 to-transparent shadow-[0_0_8px_#38bdf8]"></span>
+            </div>
+          </div>
+          <span class="text-3xl font-black text-slate-200 group-hover:text-purple-200 transition absolute top-6 right-6" data-i18n="step2_num">০২</span>
+          <h3 class="text-lg font-bold text-slate-900 mb-3" data-i18n="step2_title">ল্যাব ডায়াগনোসিস ও খরচের হিসাব</h3>
+          <p class="text-sm text-slate-600 leading-relaxed" data-i18n="step2_desc">
+            আমাদের এক্সপার্ট ল্যাবে ফোনটি সম্পূর্ণ টেস্ট করা হবে। আমরা আপনাকে কল করে এবং অনলাইনে জানাব ঠিক করতে মোট কত টাকা লাগবে।
+          </p>
+        </div>
+
+        <!-- Step 3 (The Core Requirement Highlighted) -->
+        <div class="bg-gradient-to-br from-amber-50 to-orange-50 hover:from-amber-100/70 hover:to-orange-100/70 rounded-3xl p-8 border-2 border-amber-400 hover:border-amber-500 hover:shadow-2xl transition-all duration-300 relative group overflow-hidden shadow-lg shadow-amber-950/5">
+          <!-- Ambient Glow Accent on Hover -->
+          <div class="absolute -top-12 -right-12 w-32 h-32 bg-amber-400/20 rounded-full blur-2xl group-hover:bg-amber-400/30 transition-all duration-500 pointer-events-none"></div>
+
+          <!-- Animated Icon Badge with Ambient Aura -->
+          <div class="relative w-16 h-16 mb-6">
+            <div class="absolute inset-0 rounded-2xl bg-amber-400/40 blur-md anim-step-aura-amber group-hover:blur-lg transition-all duration-300"></div>
+            <div class="relative w-16 h-16 rounded-2xl bg-gradient-to-tr from-amber-500 to-amber-400 text-white border border-amber-300 flex items-center justify-center text-3xl shadow-md shadow-amber-500/30 group-hover:scale-105 transition-all duration-300">
+              <span class="anim-step-handshake inline-block select-none">🤝</span>
+              <!-- Golden Sparkle Twinkle Badge at Top Right -->
+              <span class="anim-sparkle absolute -top-1 -right-1 text-xs select-none">✨</span>
+            </div>
+          </div>
+          <span class="text-3xl font-black text-amber-200 group-hover:text-amber-300 transition absolute top-6 right-6" data-i18n="step3_num">০৩</span>
+          <h3 class="text-lg font-bold text-amber-950 mb-3" data-i18n="step3_title">গ্রাহকের সিদ্ধান্ত ও অনুমোদন</h3>
+          <p class="text-sm text-amber-900 leading-relaxed" data-i18n="step3_desc">
+            খরচে আপনি সম্মত (Agree) হলে আমরা অরিজিনাল পার্টস দিয়ে মেরামত শুরু করব। সম্মত না হলে ডিভাইসটি অক্ষত অবস্থায় বিনামূল্যে ফেরত পাঠানো হবে।
+          </p>
+        </div>
+
+        <!-- Step 4 -->
+        <div class="bg-slate-50 hover:bg-white rounded-3xl p-8 border border-slate-200/80 hover:border-emerald-300 hover:shadow-xl transition-all duration-300 relative group overflow-hidden">
+          <!-- Ambient Glow Accent on Hover -->
+          <div class="absolute -top-12 -right-12 w-28 h-28 bg-emerald-400/10 rounded-full blur-2xl group-hover:bg-emerald-400/20 transition-all duration-500 pointer-events-none"></div>
+
+          <!-- Animated Icon Badge with Ambient Aura -->
+          <div class="relative w-16 h-16 mb-6">
+            <div class="absolute inset-0 rounded-2xl bg-emerald-400/30 blur-md anim-step-aura-emerald group-hover:blur-lg transition-all duration-300"></div>
+            <div class="relative w-16 h-16 rounded-2xl bg-gradient-to-tr from-emerald-100 to-teal-50 border border-emerald-200/80 text-emerald-600 flex items-center justify-center text-3xl shadow-sm group-hover:shadow-emerald-500/20 group-hover:scale-105 transition-all duration-300 overflow-hidden">
+              <span class="anim-step-gift inline-block select-none">🎁</span>
+              <!-- Verified Shield / Check Sparkle -->
+              <span class="anim-step-check absolute -bottom-1 -right-1 text-[11px] bg-emerald-500 text-white rounded-full w-4 h-4 flex items-center justify-center font-bold shadow-sm">✓</span>
+            </div>
+          </div>
+          <span class="text-3xl font-black text-slate-200 group-hover:text-emerald-200 transition absolute top-6 right-6" data-i18n="step4_num">০৪</span>
+          <h3 class="text-lg font-bold text-slate-900 mb-3" data-i18n="step4_title">দ্রুত মেরামত ও ডোরস্টেপ ড্রপ</h3>
+          <p class="text-sm text-slate-600 leading-relaxed" data-i18n="step4_desc">
+            কোয়ালিটি টেস্টিং ও ওয়ারেন্টি স্লিপ সহ আমাদের রাইডার আপনার পূর্বের ঠিকানায় ফোনটি পৌঁছে দেবে। চেক করে ক্যাশ বা বিকাশে পেমেন্ট করবেন।
+          </p>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Services Section -->
+  <section id="services-section" class="py-24 bg-gradient-to-b from-slate-50 via-sky-50/20 to-slate-50 border-b border-slate-200/80">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="flex flex-col md:flex-row md:items-end justify-between mb-14 gap-6">
+        <div>
+          <span class="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-bold bg-cyan-100 text-cyan-800 border border-cyan-200/90 mb-3 shadow-xs">
+            <span>⚡</span> ১০০% অরিজিনাল ও এক্সপার্ট মেরামত সেবা
+          </span>
+          <h2 class="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 tracking-tight" data-i18n="services_title">
+            আমাদের রিপেয়ার সার্ভিসসমূহ
+          </h2>
+          <p class="mt-2 text-base text-slate-600 max-w-xl font-medium" data-i18n="services_subtitle">
+            যেকোনো ব্র্যান্ডের ফোন বা ট্যাবের নির্ভরযোগ্য সলিউশন ও ফ্রি ডোরস্টেপ পিকআপ
+          </p>
+        </div>
+
+        <!-- Filter Buttons with Glassy Look -->
+        <div class="inline-flex bg-white p-1.5 rounded-2xl self-start md:self-auto border border-slate-200/90 shadow-sm backdrop-blur-md">
+          <button class="service-filter-btn active px-4 py-2 rounded-xl text-xs font-bold bg-cyan-600 text-white transition shadow-sm" data-filter="all" data-i18n="filter_all">
+            সকল সার্ভিস
+          </button>
+          <button class="service-filter-btn px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:text-slate-900 transition" data-filter="phone" data-i18n="filter_phone">
+            স্মার্টফোন / মোবাইল
+          </button>
+          <button class="service-filter-btn px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:text-slate-900 transition" data-filter="tablet" data-i18n="filter_tablet">
+            ট্যাবলেট / ট্যাব
+          </button>
+        </div>
+      </div>
+
+      <!-- Services Grid (Populated dynamically) -->
+      <div id="services-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Rendered by app.js -->
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Interactive Doorstep Booking Section -->
+  <section id="booking-section" class="py-20 bg-white border-y border-slate-200">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="text-center mb-12">
+        <span class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-cyan-100 text-cyan-800 uppercase tracking-wider mb-2">
+          Doorstep Booking
+        </span>
+        <h2 class="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight" data-i18n="book_title">
+          ডোরস্টেপ রিপেয়ার বুকিং ফর্ম
+        </h2>
+        <p class="mt-2 text-base text-slate-600" data-i18n="book_subtitle">
+          নিচের তথ্যগুলো দিন, আমাদের রাইডার আপনার ঠিকানায় পৌঁছে যাবে
+        </p>
+      </div>
+
+      <div class="bg-slate-50 border border-slate-200 rounded-3xl p-6 sm:p-10 shadow-lg">
+        <form id="repair-booking-form" class="space-y-8">
+          
+          <!-- Device Type & Model Section -->
+          <div>
+            <h3 class="text-lg font-bold text-slate-900 mb-4 pb-2 border-b border-slate-200 flex items-center gap-2">
+              <span>📱</span> <span data-i18n="device_type_label">ডিভাইস ও সমস্যার তথ্য</span>
+            </h3>
+
+            <!-- Device Type Radio -->
+            <div class="grid grid-cols-2 gap-4 mb-6">
+              <label class="flex items-center gap-3 p-4 rounded-2xl border-2 border-slate-200 bg-white hover:border-cyan-500 cursor-pointer transition">
+                <input type="radio" name="device_type" value="phone" checked class="w-5 h-5 text-cyan-600 focus:ring-cyan-500">
+                <div>
+                  <div class="font-bold text-slate-900" data-i18n="type_phone">স্মার্টফোন (Phone)</div>
+                  <div class="text-xs text-slate-500">iPhone, Samsung, Xiaomi, etc.</div>
+                </div>
+              </label>
+
+              <label class="flex items-center gap-3 p-4 rounded-2xl border-2 border-slate-200 bg-white hover:border-cyan-500 cursor-pointer transition">
+                <input type="radio" name="device_type" value="tablet" class="w-5 h-5 text-cyan-600 focus:ring-cyan-500">
+                <div>
+                  <div class="font-bold text-slate-900" data-i18n="type_tablet">ট্যাবলেট (Tab / iPad)</div>
+                  <div class="text-xs text-slate-500">Apple iPad, Galaxy Tab, etc.</div>
+                </div>
+              </label>
+            </div>
+
+            <!-- Brand & Model Inputs -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+              <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1" data-i18n="brand_label">
+                  ব্র্যান্ড নির্বাচন করুন*
+                </label>
+                <select id="brand-select" required class="w-full px-4 py-3 rounded-xl border border-slate-300 bg-white text-sm focus:ring-2 focus:ring-cyan-500 focus:outline-none">
+                  <!-- Options populated by JS -->
+                </select>
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1" data-i18n="model_label">
+                  মডেলের নাম লিখুন*
+                </label>
+                <input type="text" id="model-input" required placeholder="যেমন: Galaxy S21 / iPhone 13 / iPad 9th Gen" data-i18n-placeholder="model_placeholder" class="w-full px-4 py-3 rounded-xl border border-slate-300 bg-white text-sm focus:ring-2 focus:ring-cyan-500 focus:outline-none">
+              </div>
+            </div>
+
+            <!-- Issues Checkbox List -->
+            <div class="mb-6">
+              <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-2" data-i18n="issues_label">
+                সমস্যাসমূহ টিক দিন (একাধিক নির্বাচন করা যাবে)*
+              </label>
+              <div id="issues-checkbox-list" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <!-- Checkboxes populated by JS -->
+              </div>
+            </div>
+
+            <!-- Problem Description Textarea -->
+            <div>
+              <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1" data-i18n="desc_label">
+                সমস্যার বিস্তারিত বিবরণ (ঐচ্ছিক)
+              </label>
+              <textarea id="desc-input" rows="2" placeholder="ফোনে কি সমস্যা হচ্ছে বা কিভাবে নষ্ট হয়েছে সংক্ষেপে লিখুন..." data-i18n-placeholder="desc_placeholder" class="w-full px-4 py-3 rounded-xl border border-slate-300 bg-white text-sm focus:ring-2 focus:ring-cyan-500 focus:outline-none"></textarea>
+            </div>
+          </div>
+
+          <!-- Customer Address & Contact Info -->
+          <div>
+            <h3 class="text-lg font-bold text-slate-900 mb-4 pb-2 border-b border-slate-200 flex items-center gap-2">
+              <span>📍</span> <span data-i18n="cust_info_heading">আপনার যোগাযোগের তথ্য ও ঠিকানা</span>
+            </h3>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+              <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1" data-i18n="name_label">
+                  আপনার সম্পূর্ণ নাম*
+                </label>
+                <input type="text" id="name-input" required placeholder="যেমন: মোঃ তানভীর আহমেদ" data-i18n-placeholder="name_placeholder" class="w-full px-4 py-3 rounded-xl border border-slate-300 bg-white text-sm focus:ring-2 focus:ring-cyan-500 focus:outline-none">
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1" data-i18n="phone_label">
+                  সচল মোবাইল নম্বর (১১ ডিজিট)*
+                </label>
+                <input type="tel" id="phone-input" required placeholder="০১৭১১-XXXXXX" data-i18n-placeholder="phone_placeholder" class="w-full px-4 py-3 rounded-xl border border-slate-300 bg-white text-sm focus:ring-2 focus:ring-cyan-500 focus:outline-none">
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+              <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1" data-i18n="alt_phone_label">
+                  বিকল্প মোবাইল নম্বর (ঐচ্ছিক)
+                </label>
+                <input type="tel" id="alt-phone-input" placeholder="০১৮XX-XXXXXX" data-i18n-placeholder="alt_phone_placeholder" class="w-full px-4 py-3 rounded-xl border border-slate-300 bg-white text-sm focus:ring-2 focus:ring-cyan-500 focus:outline-none">
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1" data-i18n="area_label">
+                  এলাকা নির্বাচন করুন*
+                </label>
+                <select id="area-select" required class="w-full px-4 py-3 rounded-xl border border-slate-300 bg-white text-sm focus:ring-2 focus:ring-cyan-500 focus:outline-none">
+                  <!-- Populated by JS -->
+                </select>
+              </div>
+            </div>
+
+            <div class="mb-4">
+              <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1" data-i18n="address_label">
+                সম্পূর্ণ ঠিকানা (বাসা নং, রোড, ফ্ল্যাট/ল্যান্ডমার্ক)*
+              </label>
+              <input type="text" id="address-input" required placeholder="যেমন: বাসা নং ১২, রোড ৪, ব্লক সি, বনানী, ঢাকা" data-i18n-placeholder="address_placeholder" class="w-full px-4 py-3 rounded-xl border border-slate-300 bg-white text-sm focus:ring-2 focus:ring-cyan-500 focus:outline-none">
+            </div>
+
+            <!-- Date & Time Slot -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1" data-i18n="date_label">
+                  পছন্দের পিকআপ তারিখ
+                </label>
+                <input type="date" id="pickup-date" class="w-full px-4 py-3 rounded-xl border border-slate-300 bg-white text-sm focus:ring-2 focus:ring-cyan-500 focus:outline-none">
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1" data-i18n="time_slot_label">
+                  পছন্দের সময়
+                </label>
+                <select id="time-slot-select" class="w-full px-4 py-3 rounded-xl border border-slate-300 bg-white text-sm focus:ring-2 focus:ring-cyan-500 focus:outline-none">
+                  <option value="10:00 AM - 1:00 PM">সকাল ১০:০০ - দুপুর ১:০০</option>
+                  <option value="2:00 PM - 5:00 PM" selected>দুপুর ২:০০ - বিকাল ৫:০০</option>
+                  <option value="6:00 PM - 9:00 PM">সন্ধ্যা ৬:০০ - রাত ৯:০০</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Submit Button & Privacy Note -->
+          <div class="pt-4 border-t border-slate-200">
+            <button type="submit" class="w-full py-4 rounded-2xl bg-gradient-to-r from-cyan-600 to-sky-600 hover:from-cyan-700 hover:to-sky-700 text-white font-bold text-base shadow-xl hover:shadow-cyan-500/25 transition">
+              <span data-i18n="btn_submit_order">রিপেয়ার পিকআপ নিশ্চিত করুন</span>
+            </button>
+            <p class="text-center text-xs text-slate-500 mt-3" data-i18n="booking_terms">
+              🔒 আপনার ডিভাইসের ডাটা এবং যন্ত্রাংশের পূর্ণ নিরাপত্তা আমাদের প্রতিশ্রুতি। নো ফিক্স, নো ফি নীতি।
+            </p>
+          </div>
+
+        </form>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Live Order Tracking & Decision Portal -->
+  <section id="track-section" class="py-20 bg-slate-100/70">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="text-center mb-10">
+        <span class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-cyan-100 text-cyan-800 uppercase tracking-wider mb-2">
+          Live Tracking & Quote Portal
+        </span>
+        <h2 class="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight" data-i18n="track_section_title">
+          লাইভ অর্ডার ট্র্যাকিং ও সিদ্ধান্ত পোর্টাল
+        </h2>
+        <p class="mt-2 text-base text-slate-600" data-i18n="track_section_subtitle">
+          আপনার ডিভাইসের বর্তমান অগ্রগতি দেখুন এবং প্রয়োজনে খরচের অনুমোদন দিন
+        </p>
+      </div>
+
+      <!-- Search Box -->
+      <div class="bg-white p-3 rounded-2xl shadow-md border border-slate-200 mb-8">
+        <form id="main-track-form" class="flex items-center gap-2">
+          <input type="text" id="track-input" required placeholder="অর্ডার আইডি (যেমন: RS-841920) অথবা ফোন নম্বর দিন..." data-i18n-placeholder="track_input_placeholder" class="flex-1 px-4 py-3 text-sm rounded-xl focus:outline-none text-slate-800 placeholder-slate-400">
+          <button type="submit" class="px-6 py-3 rounded-xl bg-cyan-600 hover:bg-cyan-700 text-white text-sm font-bold transition shadow" data-i18n="track_search_btn">
+            তথ্য খুঁজুন
+          </button>
+        </form>
+      </div>
+
+      <!-- Quick Demo Badges to easily test sample orders -->
+      <div class="flex items-center justify-center gap-2 text-xs text-slate-500 mb-8 flex-wrap">
+        <span>দ্রুত পরীক্ষা করতে ক্লিক করুন:</span>
+        <button onclick="document.getElementById('track-input').value='RS-841920'; trackOrder('RS-841920');" class="px-2.5 py-1 rounded-lg bg-white border border-slate-200 hover:border-cyan-500 font-medium text-cyan-700 shadow-2xs">
+          RS-841920 (মূল্য অনুমোদনের অপেক্ষায়)
+        </button>
+        <button onclick="document.getElementById('track-input').value='RS-712394'; trackOrder('RS-712394');" class="px-2.5 py-1 rounded-lg bg-white border border-slate-200 hover:border-cyan-500 font-medium text-cyan-700 shadow-2xs">
+          RS-712394 (মেরামত চলছে)
+        </button>
+      </div>
+
+      <!-- Tracking Results Container (Populated by app.js) -->
+      <div id="track-results">
+        <!-- Rendered dynamically -->
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Why Choose Us -->
+  <section id="why-section" class="py-20 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="text-center max-w-2xl mx-auto mb-16">
+        <h2 class="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight" data-i18n="why_title">
+          কেন রিপেয়ার সেবা সেরা?
+        </h2>
+        <p class="mt-4 text-base text-slate-600" data-i18n="why_subtitle">
+          আমরা শুধু মেরামত করি না, দিই পূর্ণ মানসিক শান্তি
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        
+        <div class="p-6 rounded-3xl bg-slate-50 border border-slate-200 hover:border-cyan-300 transition">
+          <div class="text-3xl mb-4">🚚</div>
+          <h3 class="text-lg font-bold text-slate-900 mb-2" data-i18n="why_1_title">ফ্রি ডোরস্টেপ পিকআপ ও ড্রপ</h3>
+          <p class="text-sm text-slate-600 leading-relaxed" data-i18n="why_1_desc">
+            আপনাকে জ্যামে নষ্ট করে কোনো দোকানে যেতে হবে না। আমাদের নিজস্ব রাইডার আপনার বাসায় আসবে।
+          </p>
+        </div>
+
+        <div class="p-6 rounded-3xl bg-slate-50 border border-slate-200 hover:border-cyan-300 transition">
+          <div class="text-3xl mb-4">💎</div>
+          <h3 class="text-lg font-bold text-slate-900 mb-2" data-i18n="why_2_title">শতভাগ অরিজিনাল পার্টস</h3>
+          <p class="text-sm text-slate-600 leading-relaxed" data-i18n="why_2_desc">
+            ডিসপ্লে, ব্যাটারি ও আইসিতে সরাসরি অরিজিনাল ও গ্রেড-এ সার্টিফাইড যন্ত্রাংশ ব্যবহার করা হয়।
+          </p>
+        </div>
+
+        <div class="p-6 rounded-3xl bg-slate-50 border border-slate-200 hover:border-cyan-300 transition">
+          <div class="text-3xl mb-4">🎯</div>
+          <h3 class="text-lg font-bold text-slate-900 mb-2" data-i18n="why_3_title">স্বচ্ছ মূল্য ও আগে জানানোর নিয়ম</h3>
+          <p class="text-sm text-slate-600 leading-relaxed" data-i18n="why_3_desc">
+            আপনার ফোন খোলার পর আগে জানানো হবে খরচ কত হবে। আপনি রাজি হলেই কেবল কাজ করা হবে।
+          </p>
+        </div>
+
+        <div class="p-6 rounded-3xl bg-slate-50 border border-slate-200 hover:border-cyan-300 transition">
+          <div class="text-3xl mb-4">🛡️</div>
+          <h3 class="text-lg font-bold text-slate-900 mb-2" data-i18n="why_4_title">৯০ থেকে ১৮০ দিন পর্যন্ত ওয়ারেন্টি</h3>
+          <p class="text-sm text-slate-600 leading-relaxed" data-i18n="why_4_desc">
+            সার্ভিসিং এর পর কোনো ত্রুটি দেখা দিলে নির্ধারিত মেয়াদের মধ্যে সম্পূর্ণ বিনামূল্যে সমাধান।
+          </p>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Contact Form -->
+  <section id="contact-section" class="py-20 bg-slate-50 border-t border-slate-200">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="text-center mb-10">
+        <h2 class="text-3xl font-black text-slate-900 tracking-tight" data-i18n="contact_title">
+          আমাদের সাথে যোগাযোগ
+        </h2>
+        <p class="mt-2 text-sm text-slate-600" data-i18n="contact_subtitle">
+          যেকোনো তথ্য বা সরাসরি প্রশ্নের জন্য মেসেজ দিন
+        </p>
+      </div>
+
+      <div class="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm">
+        <form id="contact-form" class="space-y-4">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-bold uppercase text-slate-600 mb-1" data-i18n="contact_name">নাম</label>
+              <input type="text" id="contact-name" required class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-cyan-500 focus:outline-none">
+            </div>
+            <div>
+              <label class="block text-xs font-bold uppercase text-slate-600 mb-1" data-i18n="contact_phone">ফোন নম্বর</label>
+              <input type="tel" id="contact-phone" required class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-cyan-500 focus:outline-none">
+            </div>
+          </div>
+          <div>
+            <label class="block text-xs font-bold uppercase text-slate-600 mb-1" data-i18n="contact_message">আপনার বার্তা</label>
+            <textarea id="contact-message" rows="3" required class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-cyan-500 focus:outline-none"></textarea>
+          </div>
+          <button type="submit" class="w-full py-3 rounded-xl bg-slate-900 hover:bg-cyan-600 text-white font-bold text-sm transition" data-i18n="contact_submit">
+            বার্তা পাঠান
+          </button>
+        </form>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Modern Multi-Column Footer with Office Address, Contacts & Social Media -->
+  <footer class="bg-slate-950 text-slate-400 pt-16 pb-12 border-t border-slate-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <!-- Top Grid: 4 Pillars -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 pb-12 border-b border-slate-800/80">
+        
+        <!-- Column 1: Brand & About -->
+        <div class="space-y-4">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-600 to-sky-500 text-white flex items-center justify-center font-black text-xl shadow">
+              🛠️
+            </div>
+            <div>
+              <span class="text-2xl font-black text-white tracking-tight">
+                Repair <span class="text-cyan-400">Seba</span>
+              </span>
+              <span class="block text-[11px] font-semibold text-slate-400" data-i18n="brand_tagline">ডোরস্টেপ ফোন ও ট্যাব মেরামত</span>
+            </div>
+          </div>
+          <p id="footer-brand-desc" class="text-xs text-slate-400 leading-relaxed">
+            বাংলাদেশের প্রথম ডিজিটাল ডোরস্টেপ গ্যাজেট রিপেয়ার প্ল্যাটফর্ম। আপনার বাসা বা অফিস থেকে ডিভাইস সংগ্রহ করে ল্যাব টেস্ট ও দ্রুততম সময়ে ওয়ারেন্টিসহ মেরামত ডেলিভারি দেওয়া হয়।
+          </p>
+          <div class="flex items-center gap-2 text-xs font-bold text-emerald-400 pt-1">
+            <span class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span>লাইভ সার্ভিস ও পিকআপ চালু আছে</span>
+          </div>
+        </div>
+
+        <!-- Column 2: Office Address (আমাদের অফিস ও সার্ভিস সেন্টার) -->
+        <div class="space-y-4">
+          <h4 class="text-sm font-black text-white uppercase tracking-wider flex items-center gap-2">
+            <span>📍</span> আমাদের অফিস ঠিকানা
+          </h4>
+          <ul class="space-y-3 text-xs text-slate-300">
+            <li class="flex items-start gap-2.5">
+              <span class="text-cyan-400 text-base leading-none">🏢</span>
+              <div>
+                <span class="font-bold text-white block" id="footer-office-name">হেড অফিস ও সেন্ট্রাল ল্যাব:</span>
+                <span id="footer-office-address" class="text-slate-400">লেভেল ৪, প্লট ১২, রোড ৭, ধানমন্ডি, ঢাকা - ১২০৫, বাংলাদেশ।</span>
+              </div>
+            </li>
+            <li class="flex items-start gap-2.5">
+              <span class="text-cyan-400 text-base leading-none">⏰</span>
+              <div>
+                <span class="font-bold text-white block">সার্ভিস ও কল সেন্টারের সময়:</span>
+                <span id="footer-office-hours" class="text-slate-400">প্রতিদিন সকাল ৯:০০ - রাত ৯:০০ (শুক্রবারসহ সার্বক্ষণিক সহায়তা)</span>
+              </div>
+            </li>
+            <li class="flex items-start gap-2.5">
+              <span class="text-cyan-400 text-base leading-none">🚚</span>
+              <div>
+                <span class="font-bold text-white block">পিকআপ কাভারেজ:</span>
+                <span id="footer-office-coverage" class="text-slate-400">ঢাকা মহানগরের সকল থানা ও এরিয়া সরাসরি আওতাভুক্ত।</span>
+              </div>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Column 3: Contact Info (সরাসরি যোগাযোগ) -->
+        <div class="space-y-4">
+          <h4 class="text-sm font-black text-white uppercase tracking-wider flex items-center gap-2">
+            <span>📞</span> সরাসরি যোগাযোগ
+          </h4>
+          <ul class="space-y-3 text-xs">
+            <li>
+              <span class="text-slate-400 block text-[11px] uppercase font-bold">২৪/৭ কাস্টমার হটলাইন:</span>
+              <a id="footer-phone-link" href="tel:01711002233" class="text-sm font-black text-cyan-400 hover:text-cyan-300 transition flex items-center gap-2 mt-0.5">
+                <span>📱</span> <span id="footer-phone">০১৭১১-০০২২৩৩</span>
+              </a>
+            </li>
+            <li>
+              <span class="text-slate-400 block text-[11px] uppercase font-bold">বিকল্প হেল্পলাইন:</span>
+              <a id="footer-phone2-link" href="tel:01822334455" class="text-xs font-bold text-slate-300 hover:text-cyan-400 transition flex items-center gap-2 mt-0.5">
+                <span>📞</span> <span id="footer-phone2">০১৮২২-৩৩৪৪৫৫</span>
+              </a>
+            </li>
+            <li>
+              <span class="text-slate-400 block text-[11px] uppercase font-bold">সরাসরি হোয়াটসঅ্যাপ (WhatsApp):</span>
+              <a id="footer-whatsapp-link" href="https://wa.me/8801711002233" target="_blank" class="text-xs font-bold text-emerald-400 hover:text-emerald-300 transition flex items-center gap-1.5 mt-0.5">
+                <span>💬</span> <span id="footer-whatsapp">০১৭১১-০০২২৩৩ (Live Chat)</span>
+              </a>
+            </li>
+            <li>
+              <span class="text-slate-400 block text-[11px] uppercase font-bold">ইমেইল সাপোর্ট:</span>
+              <a id="footer-email-link" href="mailto:support@repairseba.com" class="text-xs font-medium text-slate-300 hover:text-white transition flex items-center gap-2 mt-0.5">
+                <span>✉️</span> <span id="footer-email">support@repairseba.com</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Column 4: Social Media & Quick Connect -->
+        <div class="space-y-4">
+          <h4 class="text-sm font-black text-white uppercase tracking-wider flex items-center gap-2">
+            <span>🌐</span> সোশ্যাল মিডিয়া
+          </h4>
+          <p class="text-xs text-slate-400">
+            আমাদের অফার, টেক টিপস ও নতুন আপডেট পেতে সোশ্যাল হ্যান্ডেলে যুক্ত থাকুন:
+          </p>
+
+          <!-- Social Buttons Grid -->
+          <div id="footer-social-container" class="flex flex-wrap gap-2.5 pt-1">
+            <!-- Facebook -->
+            <a id="footer-fb-link" href="https://facebook.com/repairseba" target="_blank" rel="noopener noreferrer" class="group flex items-center gap-2 px-3 py-2 rounded-xl bg-slate-900 border border-slate-800 hover:border-cyan-500 hover:bg-cyan-950/40 text-slate-300 hover:text-white text-xs font-bold transition shadow-sm" title="Facebook Page">
+              <span class="w-6 h-6 rounded-lg bg-blue-600 text-white flex items-center justify-center text-xs font-black shadow-inner">f</span>
+              <span>Facebook</span>
+            </a>
+
+            <!-- WhatsApp -->
+            <a id="footer-wa-social-link" href="https://wa.me/8801711002233" target="_blank" rel="noopener noreferrer" class="group flex items-center gap-2 px-3 py-2 rounded-xl bg-slate-900 border border-slate-800 hover:border-emerald-500 hover:bg-emerald-950/40 text-slate-300 hover:text-white text-xs font-bold transition shadow-sm" title="WhatsApp Chat">
+              <span class="w-6 h-6 rounded-lg bg-emerald-600 text-white flex items-center justify-center text-xs font-black shadow-inner">💬</span>
+              <span>WhatsApp</span>
+            </a>
+
+            <!-- YouTube -->
+            <a id="footer-yt-link" href="https://youtube.com/@repairseba" target="_blank" rel="noopener noreferrer" class="group flex items-center gap-2 px-3 py-2 rounded-xl bg-slate-900 border border-slate-800 hover:border-rose-500 hover:bg-rose-950/40 text-slate-300 hover:text-white text-xs font-bold transition shadow-sm" title="YouTube Channel">
+              <span class="w-6 h-6 rounded-lg bg-rose-600 text-white flex items-center justify-center text-xs font-black shadow-inner">▶</span>
+              <span>YouTube</span>
+            </a>
+
+            <!-- Instagram -->
+            <a id="footer-ig-link" href="https://instagram.com/repairseba" target="_blank" rel="noopener noreferrer" class="group flex items-center gap-2 px-3 py-2 rounded-xl bg-slate-900 border border-slate-800 hover:border-pink-500 hover:bg-pink-950/40 text-slate-300 hover:text-white text-xs font-bold transition shadow-sm" title="Instagram">
+              <span class="w-6 h-6 rounded-lg bg-gradient-to-tr from-amber-500 via-rose-500 to-purple-600 text-white flex items-center justify-center text-xs font-black shadow-inner">📷</span>
+              <span>Instagram</span>
+            </a>
+
+            <!-- LinkedIn -->
+            <a id="footer-li-link" href="https://linkedin.com/company/repairseba" target="_blank" rel="noopener noreferrer" class="group flex items-center gap-2 px-3 py-2 rounded-xl bg-slate-900 border border-slate-800 hover:border-sky-500 hover:bg-sky-950/40 text-slate-300 hover:text-white text-xs font-bold transition shadow-sm" title="LinkedIn">
+              <span class="w-6 h-6 rounded-lg bg-sky-700 text-white flex items-center justify-center text-xs font-black shadow-inner">in</span>
+              <span>LinkedIn</span>
+            </a>
+          </div>
+
+          <!-- Trust Badge -->
+          <div id="footer-trust-badge" class="mt-3 p-2.5 rounded-xl bg-slate-900/80 border border-slate-800 flex items-center gap-2 text-[11px] text-slate-400">
+            <span class="text-base">🛡️</span>
+            <span>১০০% নিরাপদ ডেটা ও আসল পার্টস গ্যারান্টি</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Bottom Bar: Copyright & Service Links -->
+      <div class="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
+        <div id="footer-copyright-text">
+          © ২০২৬ রিপেয়ার সেবা (Repair Seba). সর্বস্বত্ব সংরক্ষিত। একটি বিশ্বস্ত ডিজিটাল ডোরস্টেপ সার্ভিস।
+        </div>
+        <div class="flex items-center gap-6 text-slate-400">
+          <a href="#how-it-works" class="hover:text-cyan-400 transition">কাজের ধাপ</a>
+          <a href="#services-section" class="hover:text-cyan-400 transition">সার্ভিসসমূহ</a>
+          <a href="#track-section" class="hover:text-cyan-400 transition">অর্ডার ট্র্যাকিং</a>
+          <a href="#contact-section" class="hover:text-cyan-400 transition">যোগাযোগ</a>
+        </div>
+      </div>
+
+    </div>
+  </footer>
+
+  <!-- 1. USER PHONE LOGIN MODAL -->
+  <div id="user-login-modal" class="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs hidden flex items-center justify-center p-4">
+    <div class="bg-white border border-slate-200 rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl relative animate-fade-in text-slate-800">
+      <button onclick="closeUserLoginModal()" class="absolute top-5 right-5 w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-800 flex items-center justify-center text-sm transition">
+        ✕
+      </button>
+
+      <div class="text-center mb-6">
+        <div class="w-14 h-14 rounded-2xl bg-cyan-50 text-cyan-600 border border-cyan-200 flex items-center justify-center text-2xl mx-auto mb-3 shadow-xs">
+          📱
+        </div>
+        <h3 class="text-xl font-black text-slate-900">ফোন নম্বর দিয়ে লগইন করুন</h3>
+        <p class="text-xs text-slate-500 mt-1">লগইন করে আপনার ডিভাইস রিপেয়ার অর্ডার ও প্রোফাইল পরিচালনা করুন</p>
+      </div>
+
+      <form id="user-login-form" onsubmit="handleUserPhoneLogin(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
+            মোবাইল নম্বর (Phone Number)*
+          </label>
+          <div class="relative">
+            <span class="absolute left-3.5 top-3 text-slate-400 font-bold text-sm">🇧🇩 +88</span>
+            <input type="tel" id="user-login-phone" placeholder="017XXXXXXXX" required maxlength="15" class="w-full pl-20 pr-4 py-2.5 rounded-xl bg-slate-50 border border-slate-300 text-slate-900 font-bold text-sm focus:bg-white focus:border-cyan-600 focus:outline-none focus:ring-1 focus:ring-cyan-500 transition">
+          </div>
+          <p class="text-[11px] text-slate-400 mt-1">১১ ডিজিটের যেকোনো সচল মোবাইল নম্বর দিন</p>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
+            আপনার নাম (Name - নতুন হলে দিন)
+          </label>
+          <input type="text" id="user-login-name" placeholder="যেমন: সাকিব হাসান" class="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-300 text-slate-900 text-sm focus:bg-white focus:border-cyan-600 focus:outline-none focus:ring-1 focus:ring-cyan-500 transition">
+        </div>
+
+        <button type="submit" id="btn-user-login-submit" class="w-full py-3 rounded-xl bg-gradient-to-r from-cyan-600 to-sky-600 hover:from-cyan-500 hover:to-sky-500 text-white font-bold text-sm shadow-md shadow-cyan-600/20 transition flex items-center justify-center gap-2">
+          <span>⚡</span> <span>লগইন / প্রবেশ করুন</span>
+        </button>
+
+        <div class="text-center pt-1 text-[11px] text-slate-400">
+          🔒 নিরাপদ ও পাসওয়ার্ডবিহীন তাৎক্ষণিক ফোন লগইন
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 2. USER PROFILE & ORDERS MODAL -->
+  <div id="user-profile-modal" class="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs hidden flex items-center justify-center p-4">
+    <div class="bg-white border border-slate-200 rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl relative animate-fade-in text-slate-800 max-h-[90vh] overflow-y-auto">
+      <button onclick="closeUserProfileModal()" class="absolute top-5 right-5 w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-800 flex items-center justify-center text-sm transition">
+        ✕
+      </button>
+
+      <!-- Modal Header -->
+      <div class="flex items-center gap-3 border-b border-slate-200 pb-4 mb-5">
+        <div class="w-12 h-12 rounded-2xl bg-cyan-50 text-cyan-700 border border-cyan-200 flex items-center justify-center text-xl font-bold shrink-0">
+          👤
+        </div>
+        <div class="flex-1 min-w-0">
+          <h3 id="profile-modal-title" class="text-xl font-black text-slate-900 truncate">গ্রাহক প্রোফাইল</h3>
+          <p id="profile-modal-subtitle" class="text-xs text-slate-500">আপনার ব্যক্তিগত তথ্য, ঠিকানা ও অর্ডারসমূহ পরিচালনা করুন</p>
+        </div>
+      </div>
+
+      <!-- Navigation Tabs inside Profile Modal -->
+      <div class="flex items-center gap-2 mb-6 border-b border-slate-100 pb-2">
+        <button onclick="switchProfileModalTab('profile')" id="modal-tab-btn-profile" class="px-4 py-2 rounded-xl text-xs font-bold bg-cyan-600 text-white shadow-xs transition">
+          👤 প্রোফাইল এডিট (Profile)
+        </button>
+        <button onclick="switchProfileModalTab('orders')" id="modal-tab-btn-orders" class="px-4 py-2 rounded-xl text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200 transition">
+          📦 আমার অর্ডারসমূহ (<span id="user-orders-count">0</span>)
+        </button>
+      </div>
+
+      <!-- TAB A: EDIT PROFILE FORM -->
+      <div id="profile-tab-content" class="space-y-5">
+        <form id="user-profile-edit-form" onsubmit="handleUserProfileSave(event)" class="space-y-4">
+          
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
+                মোবাইল নম্বর (Phone)
+              </label>
+              <input type="text" id="profile-edit-phone" readonly class="w-full px-4 py-2.5 rounded-xl bg-slate-100 border border-slate-200 text-slate-600 font-bold text-sm cursor-not-allowed">
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
+                আপনার নাম (Full Name)*
+              </label>
+              <input type="text" id="profile-edit-name" required placeholder="আপনার পূর্ণ নাম" class="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-300 text-slate-900 font-bold text-sm focus:bg-white focus:border-cyan-600 focus:outline-none focus:ring-1 focus:ring-cyan-500 transition">
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
+              ইমেইল অ্যাড্রেস (Email Address)
+            </label>
+            <input type="email" id="profile-edit-email" placeholder="user@example.com" class="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-300 text-slate-900 text-sm focus:bg-white focus:border-cyan-600 focus:outline-none focus:ring-1 focus:ring-cyan-500 transition">
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
+              ডিফল্ট পিকআপ ঠিকানা (Default Pickup Address)
+            </label>
+            <textarea id="profile-edit-address" rows="2" placeholder="যেমন: বাসা ১২, রোড ৭, ব্লক ডি..." class="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-300 text-slate-900 text-sm focus:bg-white focus:border-cyan-600 focus:outline-none focus:ring-1 focus:ring-cyan-500 transition leading-relaxed"></textarea>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
+                এলাকা (Area)
+              </label>
+              <input type="text" id="profile-edit-area" placeholder="যেমন: ধানমন্ডি, মিরপুর..." class="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-300 text-slate-900 text-sm focus:bg-white focus:border-cyan-600 focus:outline-none focus:ring-1 focus:ring-cyan-500 transition">
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
+                শহর (City)
+              </label>
+              <input type="text" id="profile-edit-city" value="Dhaka" class="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-300 text-slate-900 text-sm focus:bg-white focus:border-cyan-600 focus:outline-none focus:ring-1 focus:ring-cyan-500 transition">
+            </div>
+          </div>
+
+          <div class="pt-3 border-t border-slate-100 flex items-center justify-between">
+            <div id="profile-save-message" class="text-xs font-bold text-emerald-600 hidden"></div>
+            <button type="submit" id="btn-save-user-profile" class="ml-auto px-6 py-2.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-xs shadow-md shadow-cyan-600/20 transition flex items-center gap-2">
+              <span>💾</span> <span>প্রোফাইল সংরক্ষণ করুন</span>
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- TAB B: USER ORDERS LIST -->
+      <div id="orders-tab-content" class="hidden space-y-4">
+        <div id="user-orders-list-container" class="space-y-3">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Order Success Modal -->
+  <div id="order-success-modal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl border border-slate-100 text-center animate-fade-in">
+      <div class="w-16 h-16 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-3xl mx-auto mb-4">
+        ✅
+      </div>
+      <h3 class="text-2xl font-black text-slate-900 mb-2">অর্ডার সফলভাবে গৃহীত হয়েছে!</h3>
+      <p class="text-sm text-slate-600 mb-6">আমাদের প্রতিনিধি শীঘ্রই ফোন করে পিকআপ সময় নিশ্চিত করবেন।</p>
+
+      <div class="bg-slate-50 rounded-2xl p-4 border border-slate-200 text-left space-y-2 mb-6">
+        <div class="flex justify-between text-xs">
+          <span class="text-slate-500">অর্ডার নম্বর:</span>
+          <span id="modal-order-number" class="font-black text-cyan-600 text-sm"></span>
+        </div>
+        <div class="flex justify-between text-xs">
+          <span class="text-slate-500">গ্রাহকের নাম:</span>
+          <span id="modal-customer-name" class="font-bold text-slate-800"></span>
+        </div>
+        <div class="flex justify-between text-xs">
+          <span class="text-slate-500">ডিভাইস:</span>
+          <span id="modal-device-name" class="font-medium text-slate-800"></span>
+        </div>
+        <div class="flex justify-between text-xs">
+          <span class="text-slate-500">ঠিকানা:</span>
+          <span id="modal-address" class="font-medium text-slate-800 text-right"></span>
+        </div>
+      </div>
+
+      <div class="flex flex-col gap-2">
+        <button id="modal-track-btn" class="w-full py-3 rounded-xl bg-cyan-600 hover:bg-cyan-700 text-white font-bold text-sm transition">
+          অর্ডার লাইভ ট্র্যাক করুন
+        </button>
+        <button onclick="closeSuccessModal()" class="w-full py-2.5 rounded-xl text-slate-600 hover:bg-slate-100 text-xs font-semibold transition">
+          বন্ধ করুন
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="/js/i18n.js"></script>
+  <script src="/js/app.js"></script>
+</body>
+</html>

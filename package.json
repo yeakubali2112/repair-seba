@@ -1,0 +1,21 @@
+{
+  "name": "repair-seba",
+  "version": "1.0.0",
+  "description": "Repair Seba - Doorstep Phone & Tablet Repair Service Platform",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "seed": "node seed.js"
+  },
+  "keywords": [
+    "repair",
+    "phone-repair",
+    "tablet-repair",
+    "doorstep-service",
+    "bangladesh",
+    "bilingual"
+  ],
+  "author": "Repair Seba Team",
+  "license": "ISC"
+}

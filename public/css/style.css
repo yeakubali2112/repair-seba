@@ -1,0 +1,874 @@
+/* Repair Seba Custom Styles & Typography */
+@import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+:root {
+  --primary-blue: #0284c7;
+  --primary-cyan: #06b6d4;
+  --dark-slate: #0f172a;
+}
+
+body {
+  font-family: 'Hind Siliguri', 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Custom scrollbars */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Glassmorphism */
+.glass-nav {
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out forwards;
+}
+
+/* Stepper styles */
+.step-line {
+  position: absolute;
+  top: 20px;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background-color: #e2e8f0;
+  z-index: 1;
+}
+
+.step-line-progress {
+  position: absolute;
+  top: 20px;
+  left: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #0284c7, #06b6d4);
+  transition: width 0.5s ease;
+  z-index: 2;
+}
+
+/* Print Styles for Job Sheets and Invoices */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #printable-receipt, #printable-receipt * {
+    visibility: visible;
+  }
+  #printable-receipt {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    margin: 0;
+    padding: 24px;
+    background: white;
+    color: black;
+  }
+  .no-print {
+    display: none !important;
+  }
+}
+
+/* ============================================================
+   HERO CITY FULL-BACKGROUND ANIMATIONS & STYLES (শহরের দৃশ্য ও সাইকেল চালক)
+   ============================================================ */
+
+.hero-full-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  user-select: none;
+  overflow: hidden;
+  z-index: 0;
+}
+
+/* Atmospheric Center Radial Wash for 100% crisp text readability */
+.bg-radial-gradient-hero {
+  background: radial-gradient(ellipse 75% 68% at 50% 40%, rgba(255, 255, 255, 0.92) 0%, rgba(255, 255, 255, 0.72) 48%, rgba(255, 255, 255, 0.25) 80%, rgba(255, 255, 255, 0) 100%);
+}
+
+#cyclist-clickable {
+  pointer-events: auto !important;
+  cursor: pointer;
+}
+
+/* Clouds Animation */
+@keyframes cloudFloatLeft {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-1440px); }
+}
+
+.anim-cloud-slow {
+  animation: cloudFloatLeft 65s linear infinite;
+}
+
+.anim-cloud-mid {
+  animation: cloudFloatLeft 42s linear infinite;
+}
+
+/* Sun Rays & Pulse */
+@keyframes sunGlowPulse {
+  0%, 100% { transform: scale(1); opacity: 0.95; }
+  50% { transform: scale(1.08); opacity: 1; filter: drop-shadow(0 0 16px rgba(251, 191, 36, 0.6)); }
+}
+
+@keyframes sunRayRotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.anim-sun-pulse {
+  animation: sunGlowPulse 4s ease-in-out infinite;
+  transform-origin: 1200px 90px;
+}
+
+.anim-sun-rays {
+  animation: sunRayRotate 35s linear infinite;
+  transform-origin: 1200px 90px;
+}
+
+/* Kite Floating & Tail */
+@keyframes kiteSway {
+  0%, 100% { transform: translate(0, 0) rotate(-4deg); }
+  35% { transform: translate(-8px, -12px) rotate(6deg); }
+  70% { transform: translate(6px, -6px) rotate(-2deg); }
+}
+
+@keyframes kiteTailWave {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(10deg); }
+}
+
+.anim-kite {
+  animation: kiteSway 5s ease-in-out infinite;
+  transform-origin: 1000px 80px;
+}
+
+.anim-kite-tail {
+  animation: kiteTailWave 2.2s ease-in-out infinite;
+  transform-origin: 1000px 104px;
+}
+
+/* Birds soaring */
+@keyframes birdsFly {
+  0% { transform: translate(1480px, 40px); }
+  100% { transform: translate(-150px, 15px); }
+}
+
+.anim-birds {
+  animation: birdsFly 28s linear infinite;
+}
+
+/* Modern Jet Airplane Flight in High Sky (আকাশে জেট বিমান উড্ডয়ন) */
+@keyframes planeFlight {
+  0% {
+    transform: translate(-180px, 92px) rotate(-2deg);
+  }
+  25% {
+    transform: translate(260px, 80px) rotate(-2deg);
+  }
+  50% {
+    transform: translate(700px, 70px) rotate(-1.5deg);
+  }
+  75% {
+    transform: translate(1140px, 58px) rotate(-2deg);
+  }
+  100% {
+    transform: translate(1580px, 46px) rotate(-2deg);
+  }
+}
+
+.anim-airplane {
+  animation: planeFlight 24s linear infinite;
+  transform-origin: center;
+  pointer-events: none;
+}
+
+
+/* Antenna Beacon Blinking */
+@keyframes antennaBeacon {
+  0%, 100% { opacity: 0.25; }
+  50% { opacity: 1; filter: drop-shadow(0 0 6px #ef4444); }
+}
+
+.anim-antenna-beacon {
+  animation: antennaBeacon 1.1s ease-in-out infinite;
+}
+
+@keyframes signalPulse {
+  0% { r: 4; opacity: 0.9; stroke-width: 1.5; }
+  100% { r: 24; opacity: 0; stroke-width: 0.5; }
+}
+
+.anim-signal-ring {
+  animation: signalPulse 2s cubic-bezier(0.2, 0.8, 0.2, 1) infinite;
+}
+
+/* Dhaka Metro Rail Train (ঢাকা মেট্রোরেল MRT-6) */
+@keyframes metroTrainGlide {
+  0% { transform: translateX(-400px); }
+  100% { transform: translateX(1580px); }
+}
+
+.anim-metro-train {
+  animation: metroTrainGlide 20s linear infinite;
+}
+
+/* Flyover Traffic */
+@keyframes flyoverCarMove {
+  0% { transform: translateX(1480px); }
+  100% { transform: translateX(-250px); }
+}
+
+.anim-flyover-car {
+  animation: flyoverCarMove 16s linear infinite;
+}
+
+/* Delivery Cyclist Animations (স্মার্ট সাইকেল রাইডার) */
+@keyframes cyclistRideAcross {
+  0% { transform: translateX(-180px); }
+  100% { transform: translateX(1520px); }
+}
+
+@keyframes wheelRotation {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes pedalRotation {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes cyclistCadence {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  25% { transform: translateY(-2px) rotate(-0.8deg); }
+  50% { transform: translateY(0.5px) rotate(0deg); }
+  75% { transform: translateY(-2px) rotate(0.8deg); }
+}
+
+@keyframes shadowPulse {
+  0%, 100% { transform: scaleX(1); opacity: 0.5; }
+  50% { transform: scaleX(0.93); opacity: 0.42; }
+}
+
+.anim-cyclist-track {
+  animation: cyclistRideAcross 15s linear infinite;
+  cursor: pointer;
+}
+
+/* Bike Speed Control Classes */
+.anim-cyclist-track.speed-slow {
+  animation-duration: 22s !important;
+}
+.anim-cyclist-track.speed-normal {
+  animation-duration: 15s !important;
+}
+.anim-cyclist-track.speed-fast {
+  animation-duration: 9s !important;
+}
+
+/* Disable City Background Animations if toggled in Admin Panel */
+.hero-animations-disabled .anim-cloud-slow,
+.hero-animations-disabled .anim-cloud-mid,
+.hero-animations-disabled .anim-sun-pulse,
+.hero-animations-disabled .anim-sun-rays,
+.hero-animations-disabled .anim-kite,
+.hero-animations-disabled .anim-kite-tail,
+.hero-animations-disabled .anim-birds,
+.hero-animations-disabled .anim-airplane,
+.hero-animations-disabled .anim-flyover-car,
+.hero-animations-disabled .anim-metro-train,
+.hero-animations-disabled .anim-parachute-descend,
+.hero-animations-disabled .anim-parachute-descend-distant,
+.hero-animations-disabled .anim-parachute-sway,
+.hero-animations-disabled .anim-parachute-sway-distant {
+  animation: none !important;
+  display: none !important;
+}
+
+#hero-section:hover .anim-cyclist-track:not(.speed-slow):not(.speed-fast) {
+  animation-duration: 8s; /* Smooth speed boost on hover */
+}
+
+.anim-wheel {
+  animation: wheelRotation 0.45s linear infinite;
+  transform-origin: center;
+}
+
+#hero-section:hover .anim-wheel {
+  animation-duration: 0.25s;
+}
+
+/* Exhaust Smoke Puff Particles */
+@keyframes exhaustSmoke {
+  0% { transform: translate(0, 0) scale(0.6); opacity: 0.7; }
+  100% { transform: translate(-24px, -5px) scale(1.5); opacity: 0; }
+}
+
+.anim-exhaust-smoke {
+  animation: exhaustSmoke 0.8s ease-out infinite;
+}
+
+/* Road Floating Landmark Tags (রাস্তার অ্যানিমেটেড ল্যান্ডমার্ক ট্যাগ) */
+@keyframes tagFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+.anim-float-tag {
+  animation: tagFloat 3.2s ease-in-out infinite;
+  pointer-events: auto;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.anim-float-tag:hover {
+  transform: translateY(-8px) scale(1.06);
+}
+
+/* Road Digital Navigation Route Flow (ডিজিটাল রুট ফ্লো অ্যারো) */
+@keyframes roadFlowPulse {
+  0%, 100% { opacity: 0.35; transform: translateX(0); }
+  50% { opacity: 0.9; transform: translateX(10px); filter: drop-shadow(0 0 6px #38bdf8); }
+}
+
+.anim-road-flow {
+  animation: roadFlowPulse 1.8s ease-in-out infinite;
+}
+
+/* Phone Glow & Sparkles */
+@keyframes phoneScreenGlow {
+  0%, 100% { filter: drop-shadow(0 0 4px rgba(14, 165, 233, 0.7)); }
+  50% { filter: drop-shadow(0 0 12px rgba(56, 189, 248, 1)); }
+}
+
+@keyframes sparkleTwinkle {
+  0%, 100% { transform: scale(0.8) rotate(0deg); opacity: 0.7; }
+  50% { transform: scale(1.25) rotate(45deg); opacity: 1; }
+}
+
+.anim-phone-glow {
+  animation: phoneScreenGlow 2s ease-in-out infinite;
+}
+
+.anim-sparkle {
+  animation: sparkleTwinkle 1.4s ease-in-out infinite;
+  transform-origin: center;
+}
+
+/* Dynamic Live Status Bubble */
+@keyframes statusBubbleFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+.anim-status-bubble {
+  animation: statusBubbleFloat 2.5s ease-in-out infinite;
+}
+
+/* Bell Sound Comic Pop Bubble */
+@keyframes bellPop {
+  0% { transform: scale(0.5) translateY(6px); opacity: 0; }
+  50% { transform: scale(1.15) translateY(-4px); opacity: 1; }
+  100% { transform: scale(1) translateY(0); opacity: 1; }
+}
+
+.bell-ring-active {
+  animation: bellPop 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+/* Trail Wind Dashes */
+@keyframes trailPuff {
+  0% { opacity: 0.8; transform: translateX(0); }
+  100% { opacity: 0; transform: translateX(-16px); }
+}
+
+.anim-trail-puff {
+  animation: trailPuff 0.6s ease-out infinite;
+}
+
+/* ============================================================
+   AIR-DROP PARACHUTE SKY DESCENT ANIMATIONS (আকাশ থেকে প্যারাসুট নামার অ্যানিমেশন)
+   ============================================================ */
+
+/* 1. Main Foreground Parachute Descent (Left Sky) */
+@keyframes parachuteFallMain {
+  0% {
+    transform: translate(180px, -120px);
+    opacity: 0;
+  }
+  3% {
+    opacity: 0.98;
+  }
+  15% {
+    transform: translate(215px, 25px);
+  }
+  30% {
+    transform: translate(165px, 145px);
+  }
+  45% {
+    transform: translate(220px, 260px);
+  }
+  60% {
+    transform: translate(175px, 365px);
+  }
+  75% {
+    transform: translate(210px, 455px);
+    opacity: 0.98;
+  }
+  90% {
+    transform: translate(185px, 515px);
+    opacity: 0.85;
+  }
+  100% {
+    transform: translate(190px, 545px);
+    opacity: 0;
+  }
+}
+
+/* Parachute Side-to-Side Swaying (প্যারাশুটের দোল খাওয়া) */
+@keyframes parachuteSway {
+  0%, 100% {
+    transform: rotate(-6deg);
+  }
+  50% {
+    transform: rotate(6deg);
+  }
+}
+
+.anim-parachute-descend {
+  animation: parachuteFallMain 14s cubic-bezier(0.35, 0, 0.65, 1) infinite;
+  transform-origin: center;
+  pointer-events: none;
+}
+
+.anim-parachute-sway {
+  animation: parachuteSway 3s ease-in-out infinite;
+  transform-origin: 0px 34px;
+}
+
+/* 2. Distant Background Parachute Descent (Right Sky - 3D গভীরতা) */
+@keyframes parachuteFallDistant {
+  0% {
+    transform: translate(1160px, -100px) scale(0.55);
+    opacity: 0;
+  }
+  5% {
+    opacity: 0.75;
+  }
+  20% {
+    transform: translate(1130px, 40px) scale(0.55);
+  }
+  40% {
+    transform: translate(1180px, 160px) scale(0.55);
+  }
+  60% {
+    transform: translate(1140px, 270px) scale(0.55);
+  }
+  80% {
+    transform: translate(1170px, 370px) scale(0.55);
+    opacity: 0.75;
+  }
+  92% {
+    transform: translate(1150px, 420px) scale(0.55);
+    opacity: 0.5;
+  }
+  100% {
+    transform: translate(1155px, 450px) scale(0.55);
+    opacity: 0;
+  }
+}
+
+@keyframes parachuteSwayDistant {
+  0%, 100% {
+    transform: rotate(5deg);
+  }
+  50% {
+    transform: rotate(-5deg);
+  }
+}
+
+.anim-parachute-descend-distant {
+  animation: parachuteFallDistant 18s cubic-bezier(0.35, 0, 0.65, 1) infinite;
+  animation-delay: 6s;
+  transform-origin: center;
+  pointer-events: none;
+}
+
+.anim-parachute-sway-distant {
+  animation: parachuteSwayDistant 3.6s ease-in-out infinite;
+  transform-origin: 0px 24px;
+}
+
+
+/* ============================================================
+   HOW IT WORKS (আমরা যেভাবে সেবা প্রদান করি) STEP ICON ANIMATIONS
+   ============================================================ */
+
+/* Aura Glow Breathing */
+@keyframes stepAuraBreath {
+  0%, 100% { transform: scale(0.92); opacity: 0.45; }
+  50% { transform: scale(1.14); opacity: 0.85; }
+}
+
+.anim-step-aura-cyan {
+  animation: stepAuraBreath 3.2s ease-in-out infinite;
+}
+.anim-step-aura-purple {
+  animation: stepAuraBreath 3.4s ease-in-out infinite 0.5s;
+}
+.anim-step-aura-amber {
+  animation: stepAuraBreath 2.8s ease-in-out infinite 0.2s;
+}
+.anim-step-aura-emerald {
+  animation: stepAuraBreath 3.1s ease-in-out infinite 0.7s;
+}
+
+/* Step 1: Scooter Cruising & Vibration */
+@keyframes stepScooterRide {
+  0%, 100% { transform: translateX(0) translateY(0) rotate(0deg); }
+  25% { transform: translateX(3px) translateY(-3px) rotate(-3deg); }
+  50% { transform: translateX(5px) translateY(1px) rotate(1deg); }
+  75% { transform: translateX(2px) translateY(-2px) rotate(-2deg); }
+}
+
+.anim-step-bike {
+  animation: stepScooterRide 2.4s ease-in-out infinite;
+  display: inline-block;
+  transform-origin: bottom center;
+  transition: transform 0.3s ease;
+}
+
+.group:hover .anim-step-bike {
+  animation-duration: 1.2s;
+  transform: translateX(6px) translateY(-4px) scale(1.15) rotate(-4deg);
+}
+
+/* Step 1 Wind Dashes */
+@keyframes stepWindPuff {
+  0% { transform: translateX(0); opacity: 0.8; }
+  50% { transform: translateX(-6px); opacity: 0.25; }
+  100% { transform: translateX(0); opacity: 0.8; }
+}
+
+.anim-step-wind {
+  animation: stepWindPuff 1s ease-in-out infinite;
+}
+
+/* Step 2: Microscope Lab Inspection Tilt */
+@keyframes stepMicroscopeScan {
+  0%, 100% { transform: rotate(0deg) scale(1); }
+  25% { transform: rotate(-10deg) scale(1.08); }
+  50% { transform: rotate(0deg) scale(1.04); }
+  75% { transform: rotate(8deg) scale(1.08); }
+}
+
+.anim-step-microscope {
+  animation: stepMicroscopeScan 3.6s ease-in-out infinite;
+  display: inline-block;
+  transform-origin: bottom center;
+  transition: transform 0.3s ease;
+}
+
+.group:hover .anim-step-microscope {
+  animation-duration: 1.8s;
+  transform: scale(1.18) rotate(-8deg);
+}
+
+/* Step 2 Laser Diagnostic Scan Line */
+@keyframes laserScanSweep {
+  0% { transform: translateY(-12px); opacity: 0; }
+  15% { opacity: 0.95; }
+  85% { opacity: 0.95; }
+  100% { transform: translateY(68px); opacity: 0; }
+}
+
+.anim-step-scan-line {
+  animation: laserScanSweep 2.2s linear infinite;
+  pointer-events: none;
+}
+
+/* Step 3: Agreement Handshake Heartbeat */
+@keyframes stepHandshakeClasp {
+  0%, 100% { transform: scale(1) rotate(0deg); }
+  20% { transform: scale(1.16) rotate(-5deg); }
+  40% { transform: scale(1.08) rotate(3deg); }
+  60% { transform: scale(1.14) rotate(-3deg); }
+  80% { transform: scale(1.04) rotate(0deg); }
+}
+
+.anim-step-handshake {
+  animation: stepHandshakeClasp 2.8s ease-in-out infinite;
+  display: inline-block;
+  transform-origin: center;
+  transition: transform 0.3s ease;
+}
+
+.group:hover .anim-step-handshake {
+  animation-duration: 1.4s;
+  transform: scale(1.22) rotate(-6deg);
+}
+
+/* Step 4: Fast Delivery Gift Bounce */
+@keyframes stepGiftFloat {
+  0%, 100% { transform: translateY(0) rotate(0deg) scale(1); }
+  25% { transform: translateY(-6px) rotate(-6deg) scale(1.08); }
+  50% { transform: translateY(0) rotate(0deg) scale(1.02); }
+  75% { transform: translateY(-4px) rotate(6deg) scale(1.06); }
+}
+
+.anim-step-gift {
+  animation: stepGiftFloat 2.6s ease-in-out infinite;
+  display: inline-block;
+  transform-origin: center;
+  transition: transform 0.3s ease;
+}
+
+.group:hover .anim-step-gift {
+  animation-duration: 1.3s;
+  transform: translateY(-8px) scale(1.18) rotate(8deg);
+}
+
+/* Step 4 Verified Checkmark Pulse */
+@keyframes stepCheckPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.22); filter: drop-shadow(0 0 5px #10b981); }
+}
+
+.anim-step-check {
+  animation: stepCheckPulse 2s ease-in-out infinite;
+}
+
+/* ============================================================
+   SERVICES SECTION (আমাদের রিপেয়ার সার্ভিসসমূহ) ICON ANIMATIONS
+   ============================================================ */
+
+/* Service Aura Breathing */
+@keyframes serviceAuraPulse {
+  0%, 100% { transform: scale(0.92); opacity: 0.45; }
+  50% { transform: scale(1.15); opacity: 0.85; }
+}
+
+.anim-service-aura {
+  animation: serviceAuraPulse 3s ease-in-out infinite;
+}
+
+/* 1. Screen & Display Replacement Pulse */
+@keyframes screenPulse {
+  0%, 100% { transform: translateY(0) scale(1); filter: drop-shadow(0 0 2px rgba(255,255,255,0.4)); }
+  50% { transform: translateY(-3px) scale(1.06); filter: drop-shadow(0 0 10px rgba(56, 189, 248, 0.85)); }
+}
+
+.anim-srv-screen {
+  animation: screenPulse 2.8s ease-in-out infinite;
+  display: inline-block;
+  transform-origin: center;
+  transition: transform 0.3s ease;
+}
+
+.group:hover .anim-srv-screen {
+  animation-duration: 1.4s;
+  transform: translateY(-4px) scale(1.12);
+}
+
+/* 2. Battery Energy Surge & Vibration */
+@keyframes batteryEnergy {
+  0%, 100% { transform: scale(1) rotate(0deg); }
+  25% { transform: scale(1.08) rotate(-3deg); filter: drop-shadow(0 0 8px #34d399); }
+  50% { transform: scale(0.98) rotate(1deg); }
+  75% { transform: scale(1.06) rotate(-2deg); filter: drop-shadow(0 0 10px #10b981); }
+}
+
+.anim-srv-battery {
+  animation: batteryEnergy 2.4s ease-in-out infinite;
+  display: inline-block;
+  transform-origin: center;
+  transition: transform 0.3s ease;
+}
+
+.group:hover .anim-srv-battery {
+  animation-duration: 1.2s;
+  transform: scale(1.15) rotate(-4deg);
+}
+
+/* 3. Fast Charging Lightning Surge */
+@keyframes zapSurge {
+  0%, 100% { transform: scale(1) rotate(0deg); filter: drop-shadow(0 0 3px #f59e0b); }
+  20% { transform: scale(1.14) rotate(-6deg); filter: drop-shadow(0 0 12px #fbbf24); }
+  40% { transform: scale(0.95) rotate(4deg); }
+  60% { transform: scale(1.12) rotate(-4deg); filter: drop-shadow(0 0 10px #f59e0b); }
+  80% { transform: scale(1.04) rotate(0deg); }
+}
+
+.anim-srv-zap {
+  animation: zapSurge 1.9s ease-in-out infinite;
+  display: inline-block;
+  transform-origin: center;
+  transition: transform 0.3s ease;
+}
+
+.group:hover .anim-srv-zap {
+  animation-duration: 1s;
+  transform: scale(1.2) rotate(-6deg);
+}
+
+/* 4. CPU Microprocessor Core Pulse */
+@keyframes cpuClockPulse {
+  0%, 100% { transform: scale(1); filter: drop-shadow(0 0 3px #a855f7); }
+  50% { transform: scale(1.1); filter: drop-shadow(0 0 12px #c084fc); }
+}
+
+.anim-srv-cpu {
+  animation: cpuClockPulse 2.5s ease-in-out infinite;
+  display: inline-block;
+  transform-origin: center;
+  transition: transform 0.3s ease;
+}
+
+.group:hover .anim-srv-cpu {
+  animation-duration: 1.2s;
+  transform: scale(1.16);
+}
+
+/* 5. Water Damage Liquid Float & Splash */
+@keyframes waterDropFloat {
+  0%, 100% { transform: translateY(0) scale(1); }
+  45% { transform: translateY(-5px) scale(1.1, 0.94); filter: drop-shadow(0 0 10px #38bdf8); }
+  70% { transform: translateY(1px) scale(0.96, 1.04); }
+}
+
+.anim-srv-drop {
+  animation: waterDropFloat 2.6s ease-in-out infinite;
+  display: inline-block;
+  transform-origin: bottom center;
+  transition: transform 0.3s ease;
+}
+
+.group:hover .anim-srv-drop {
+  animation-duration: 1.3s;
+  transform: translateY(-6px) scale(1.15);
+}
+
+/* 6. Camera Lens Aperture Focus */
+@keyframes cameraFocus {
+  0%, 100% { transform: rotate(0deg) scale(1); }
+  25% { transform: rotate(-8deg) scale(1.08); }
+  50% { transform: rotate(6deg) scale(1.03); filter: drop-shadow(0 0 10px #fb7185); }
+  75% { transform: rotate(-3deg) scale(1.06); }
+}
+
+.anim-srv-camera {
+  animation: cameraFocus 3.2s ease-in-out infinite;
+  display: inline-block;
+  transform-origin: center;
+  transition: transform 0.3s ease;
+}
+
+.group:hover .anim-srv-camera {
+  animation-duration: 1.6s;
+  transform: scale(1.18) rotate(-10deg);
+}
+
+/* 7. Soundwave Speaker Vibration */
+@keyframes speakerVibrate {
+  0%, 100% { transform: scale(1); }
+  20% { transform: scale(1.12) rotate(-4deg); filter: drop-shadow(0 0 8px #818cf8); }
+  40% { transform: scale(0.96) rotate(3deg); }
+  60% { transform: scale(1.1) rotate(-2deg); filter: drop-shadow(0 0 10px #a5b4fc); }
+  80% { transform: scale(1.02) rotate(0deg); }
+}
+
+.anim-srv-speaker {
+  animation: speakerVibrate 2.2s ease-in-out infinite;
+  display: inline-block;
+  transform-origin: center;
+  transition: transform 0.3s ease;
+}
+
+.group:hover .anim-srv-speaker {
+  animation-duration: 1.1s;
+  transform: scale(1.18) rotate(-5deg);
+}
+
+/* 8. Tablet Digitizer Screen Float */
+@keyframes tabletFloat {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-4px) rotate(-4deg) scale(1.06); filter: drop-shadow(0 0 10px #2dd4bf); }
+}
+
+.anim-srv-tablet {
+  animation: tabletFloat 3s ease-in-out infinite;
+  display: inline-block;
+  transform-origin: center;
+  transition: transform 0.3s ease;
+}
+
+.group:hover .anim-srv-tablet {
+  animation-duration: 1.5s;
+  transform: translateY(-6px) scale(1.14) rotate(-6deg);
+}
+
+/* 9. Software OS Terminal Scan */
+@keyframes softwareCodeBlink {
+  0%, 100% { transform: scale(1); opacity: 0.95; }
+  50% { transform: scale(1.08); opacity: 1; filter: drop-shadow(0 0 10px #38bdf8); }
+}
+
+.anim-srv-software {
+  animation: softwareCodeBlink 2.4s ease-in-out infinite;
+  display: inline-block;
+  transform-origin: center;
+  transition: transform 0.3s ease;
+}
+
+.group:hover .anim-srv-software {
+  animation-duration: 1.2s;
+  transform: scale(1.16);
+}
+
+/* 10. Precision Wrench / Toolkit Turn */
+@keyframes wrenchTurn {
+  0%, 100% { transform: rotate(0deg); }
+  30% { transform: rotate(-14deg) scale(1.1); filter: drop-shadow(0 0 8px #38bdf8); }
+  70% { transform: rotate(8deg) scale(1.05); }
+}
+
+.anim-srv-wrench {
+  animation: wrenchTurn 2.8s ease-in-out infinite;
+  display: inline-block;
+  transform-origin: center;
+  transition: transform 0.3s ease;
+}
+
+.group:hover .anim-srv-wrench {
+  animation-duration: 1.4s;
+  transform: rotate(-16deg) scale(1.2);
+}
+
