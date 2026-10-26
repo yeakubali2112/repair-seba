@@ -36,6 +36,64 @@ document.addEventListener('DOMContentLoaded', () => {
 let allServices = [];
 
 // -------------------------------------------------------------
+// CENTERED MODAL / POPUP ALERT (Replaces browser top alert)
+// -------------------------------------------------------------
+let customMessageCallback = null;
+
+function showCenterPopup(title, message, icon = '🎉', btnText = 'ঠিক আছে (OK)', callback = null) {
+  const modal = document.getElementById('custom-message-modal');
+  if (!modal) {
+    if (window._nativeAlert) window._nativeAlert(message);
+    if (callback) callback();
+    return;
+  }
+  const titleEl = document.getElementById('custom-modal-title');
+  const msgEl = document.getElementById('custom-modal-message');
+  const iconEl = document.getElementById('custom-modal-icon');
+  const btnEl = document.getElementById('custom-modal-action-btn');
+
+  if (titleEl) titleEl.textContent = title;
+  if (msgEl) msgEl.textContent = message;
+  if (iconEl) iconEl.textContent = icon;
+  if (btnEl) btnEl.textContent = btnText;
+
+  customMessageCallback = callback;
+  modal.classList.remove('hidden');
+}
+
+function closeCustomMessageModal() {
+  const modal = document.getElementById('custom-message-modal');
+  if (modal) modal.classList.add('hidden');
+  if (customMessageCallback) {
+    const cb = customMessageCallback;
+    customMessageCallback = null;
+    cb();
+  }
+}
+
+// Override window.alert so all popups display centered in page
+if (typeof window !== 'undefined') {
+  window._nativeAlert = window.alert;
+  window.alert = function(msg) {
+    let icon = '📢';
+    let title = 'বিজ্ঞপ্তি';
+    if (typeof msg === 'string') {
+      if (msg.includes('স্বাগতম') || msg.includes('সফল') || msg.includes('গৃহীত')) {
+        icon = '🎉';
+        title = 'সফলতা';
+      } else if (msg.includes('ভুল') || msg.includes('ব্যর্থ') || msg.includes('এরর') || msg.includes('সঠিক')) {
+        icon = '⚠️';
+        title = 'সতর্কতা';
+      }
+    }
+    showCenterPopup(title, msg, icon, 'ঠিক আছে');
+  };
+}
+
+window.showCenterPopup = showCenterPopup;
+window.closeCustomMessageModal = closeCustomMessageModal;
+
+// -------------------------------------------------------------
 // LOAD & RENDER SERVICES
 // -------------------------------------------------------------
 async function loadServices(filter = 'all') {
@@ -1456,7 +1514,12 @@ async function handleUserPhoneLogin(e) {
       updateNavUserUI(true);
       autofillBookingFormWithCustomer(data.user);
 
-      alert(`স্বাগতম, ${data.user.name || 'গ্রাহক'}! আপনার অ্যাকাউন্ট সফলভাবে লগইন হয়েছে। আপনি যেকোনো সময় আপনার প্রোফাইল ও অর্ডার পরিচালনা করতে পারবেন।`);
+      showCenterPopup(
+        `স্বাগতম, ${data.user.name || 'গ্রাহক'}!`,
+        'আপনার অ্যাকাউন্ট সফলভাবে লগইন হয়েছে। আপনি যেকোনো সময় আপনার প্রোফাইল ও অর্ডার পরিচালনা করতে পারবেন।',
+        '🎉',
+        'ঠিক আছে (OK)'
+      );
     } else {
       alert(data.error || 'লগইন ব্যর্থ হয়েছে। অনুগ্রহ করে আবার চেষ্টা করুন।');
     }

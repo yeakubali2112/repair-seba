@@ -1,5 +1,63 @@
 // Repair Seba - Admin Dashboard Logic
 
+// -------------------------------------------------------------
+// CENTERED MODAL / POPUP ALERT (Replaces browser top alert)
+// -------------------------------------------------------------
+let customAdminMessageCallback = null;
+
+function showCenterPopup(title, message, icon = '🎉', btnText = 'ঠিক আছে (OK)', callback = null) {
+  const modal = document.getElementById('custom-message-modal');
+  if (!modal) {
+    if (window._nativeAlert) window._nativeAlert(message);
+    if (callback) callback();
+    return;
+  }
+  const titleEl = document.getElementById('custom-modal-title');
+  const msgEl = document.getElementById('custom-modal-message');
+  const iconEl = document.getElementById('custom-modal-icon');
+  const btnEl = document.getElementById('custom-modal-action-btn');
+
+  if (titleEl) titleEl.textContent = title;
+  if (msgEl) msgEl.textContent = message;
+  if (iconEl) iconEl.textContent = icon;
+  if (btnEl) btnEl.textContent = btnText;
+
+  customAdminMessageCallback = callback;
+  modal.classList.remove('hidden');
+}
+
+function closeCustomMessageModal() {
+  const modal = document.getElementById('custom-message-modal');
+  if (modal) modal.classList.add('hidden');
+  if (customAdminMessageCallback) {
+    const cb = customAdminMessageCallback;
+    customAdminMessageCallback = null;
+    cb();
+  }
+}
+
+// Override window.alert so all popups display centered in page
+if (typeof window !== 'undefined') {
+  window._nativeAlert = window.alert;
+  window.alert = function(msg) {
+    let icon = '📢';
+    let title = 'বিজ্ঞপ্তি';
+    if (typeof msg === 'string') {
+      if (msg.includes('সফল') || msg.includes('সংরক্ষণ') || msg.includes('আপডেট')) {
+        icon = '✅';
+        title = 'সফলতা';
+      } else if (msg.includes('ভুল') || msg.includes('ব্যর্থ') || msg.includes('এরর') || msg.includes('অনুমতি নেই')) {
+        icon = '⚠️';
+        title = 'সতর্কতা';
+      }
+    }
+    showCenterPopup(title, msg, icon, 'ঠিক আছে');
+  };
+}
+
+window.showCenterPopup = showCenterPopup;
+window.closeCustomMessageModal = closeCustomMessageModal;
+
 const ADMIN_STATUS_BADGES = {
   'PENDING_PICKUP': { bn: 'পিকআপ বাকি', en: 'Pending Pickup', color: 'bg-amber-50 text-amber-800 border-amber-300' },
   'PICKUP_ASSIGNED': { bn: 'পিকআপ রাইডার নির্ধারিত', en: 'Rider Assigned', color: 'bg-blue-50 text-blue-800 border-blue-300' },
