@@ -10,6 +10,35 @@
   <link rel="alternate icon" href="/favicon.svg">
   <link rel="apple-touch-icon" href="/favicon.svg">
   
+  <!-- Instant Auth State Hydration (Completely prevents login page flash/flicker on reload) -->
+  <script>
+    (function() {
+      try {
+        var token = localStorage.getItem('repair_seba_admin_token');
+        if (token) {
+          document.documentElement.classList.add('admin-logged-in');
+        } else {
+          document.documentElement.classList.add('admin-logged-out');
+        }
+      } catch (_) {}
+    })();
+  </script>
+  <style>
+    /* Instant CSS state enforcement before paint */
+    html.admin-logged-in #admin-login-screen {
+      display: none !important;
+    }
+    html.admin-logged-in #admin-dashboard-screen {
+      display: flex !important;
+    }
+    html.admin-logged-out #admin-login-screen {
+      display: flex !important;
+    }
+    html.admin-logged-out #admin-dashboard-screen {
+      display: none !important;
+    }
+  </style>
+
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Custom CSS -->
@@ -96,6 +125,31 @@
             </div>
             <span class="text-xs text-slate-400 ml-0.5">▾</span>
           </button>
+          <script>
+            (function() {
+              try {
+                var prof = localStorage.getItem('repair_seba_admin_profile');
+                if (prof) {
+                  var a = JSON.parse(prof);
+                  var nameEl = document.getElementById('header-admin-name');
+                  var roleEl = document.getElementById('header-admin-role');
+                  var subEl = document.getElementById('header-admin-sub');
+                  var avatarEl = document.getElementById('header-admin-avatar');
+                  var initialEl = document.getElementById('header-admin-initial');
+                  if (nameEl) nameEl.textContent = a.name || 'সুপার অ্যাডমিন';
+                  if (roleEl) roleEl.textContent = a.role === 'superadmin' ? 'সুপার' : (a.role === 'admin' ? 'অ্যাডমিন' : 'স্টাফ');
+                  if (subEl) subEl.textContent = (a.role === 'superadmin' ? 'সুপার অ্যাডমিন' : 'অ্যাডমিন') + ' • @' + (a.username || 'admin');
+                  if (a.avatar && a.avatar.trim()) {
+                    if (avatarEl) { avatarEl.src = a.avatar; avatarEl.classList.remove('hidden'); }
+                    if (initialEl) initialEl.classList.add('hidden');
+                  } else if (initialEl) {
+                    initialEl.textContent = ((a.name || 'আ').trim().charAt(0) || 'আ').toUpperCase();
+                    initialEl.classList.remove('hidden');
+                  }
+                }
+              } catch (_) {}
+            })();
+          </script>
 
           <!-- Mobile Toggle Menu Button -->
           <button onclick="toggleMobileSidebar()" class="lg:hidden p-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 border border-slate-200">

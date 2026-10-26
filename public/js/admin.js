@@ -108,6 +108,18 @@ let currentAdminTab = 'overview';
 let currentStatusFilter = 'ALL';
 let adminOrdersCache = [];
 
+let currentAdminProfile = null;
+let currentAdminPermissions = ["orders","services","inquiries","hero","footer","users"];
+try {
+  const cachedProf = localStorage.getItem('repair_seba_admin_profile');
+  if (cachedProf && adminToken) {
+    currentAdminProfile = JSON.parse(cachedProf);
+    if (Array.isArray(currentAdminProfile.permissions)) {
+      currentAdminPermissions = currentAdminProfile.permissions;
+    }
+  }
+} catch (_) {}
+
 // Initialize immediately if DOM is already ready, or listen to DOMContentLoaded
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', () => {
@@ -119,12 +131,12 @@ if (document.readyState === 'loading') {
   setupAdminListeners();
 }
 
-let currentAdminProfile = null;
-let currentAdminPermissions = ["orders","services","inquiries","hero","footer","users"];
-
 function updateHeaderProfileUI(admin) {
   if (!admin) return;
   currentAdminProfile = admin;
+  try {
+    localStorage.setItem('repair_seba_admin_profile', JSON.stringify(admin));
+  } catch (_) {}
   currentAdminPermissions = Array.isArray(admin.permissions) ? admin.permissions : ["orders","services","inquiries","hero","footer","users"];
 
   const nameEl = document.getElementById('header-admin-name');
@@ -234,25 +246,37 @@ async function initAdminAuth() {
     return;
   }
 
+  // INSTANTLY display dashboard with zero delay and zero login page flicker
+  showDashboardScreen();
+  if (currentAdminProfile) {
+    updateHeaderProfileUI(currentAdminProfile);
+  }
+
+  // Start loading dashboard orders, stats & polling immediately
+  loadAdminDashboardData();
+
+  // Validate session in background
   try {
     const res = await fetch('/api/admin/me', {
       headers: { 'Authorization': `Bearer ${adminToken}` }
     });
-    const data = await res.json();
-    if (data.success) {
-      showDashboardScreen();
-      updateHeaderProfileUI(data.admin);
-      loadAdminDashboardData();
-    } else {
+    if (res.status === 401) {
       adminLogout();
+      return;
+    }
+    const data = await res.json();
+    if (data.success && data.admin) {
+      currentAdminProfile = data.admin;
+      updateHeaderProfileUI(data.admin);
     }
   } catch (err) {
-    console.error('Session verify error:', err);
-    showLoginScreen();
+    console.warn('Session background verify network notice:', err);
   }
 }
 
 function showLoginScreen() {
+  document.documentElement.classList.remove('admin-logged-in');
+  document.documentElement.classList.add('admin-logged-out');
   const login = document.getElementById('admin-login-screen');
   const dash = document.getElementById('admin-dashboard-screen');
   if (login) {
@@ -266,6 +290,8 @@ function showLoginScreen() {
 }
 
 function showDashboardScreen() {
+  document.documentElement.classList.remove('admin-logged-out');
+  document.documentElement.classList.add('admin-logged-in');
   const login = document.getElementById('admin-login-screen');
   const dash = document.getElementById('admin-dashboard-screen');
   if (login) {
@@ -286,7 +312,9 @@ function adminLogout() {
     }).catch(() => {});
   }
   localStorage.removeItem('repair_seba_admin_token');
+  localStorage.removeItem('repair_seba_admin_profile');
   adminToken = null;
+  currentAdminProfile = null;
   showLoginScreen();
 }
 
@@ -318,6 +346,10 @@ async function handleAdminLoginSubmit(e) {
     if (data.success) {
       adminToken = data.token;
       localStorage.setItem('repair_seba_admin_token', adminToken);
+      if (data.admin) {
+        currentAdminProfile = data.admin;
+        localStorage.setItem('repair_seba_admin_profile', JSON.stringify(data.admin));
+      }
       showDashboardScreen();
       updateHeaderProfileUI(data.admin);
       loadAdminDashboardData();
@@ -333,9 +365,11 @@ async function handleAdminLoginSubmit(e) {
       submitBtn.textContent = 'লগইন করুন (Sign In)';
     }
   }
-  return false;
 }
 window.handleAdminLoginSubmit = handleAdminLoginSubmit;
+window.adminLogout = adminLogout;
+window.showLoginScreen = showLoginScreen;
+window.showDashboardScreen = showDashboardScreen;
 
 function setupAdminListeners() {
   // Login Form
