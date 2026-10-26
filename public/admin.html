@@ -478,18 +478,27 @@
                 </div>
               </div>
 
-              <!-- Customers Table -->
-              <div class="w-full overflow-x-auto">
-                <table class="w-full text-left text-xs table-auto">
+              <!-- Customers Table (Fixed 100% width, No Horizontal Scrollbar) -->
+              <div class="w-full overflow-hidden">
+                <table class="w-full text-left text-xs table-fixed">
+                  <colgroup>
+                    <col style="width: 21%;">
+                    <col style="width: 13%;">
+                    <col style="width: 15%;">
+                    <col style="width: 18%;">
+                    <col style="width: 10%;">
+                    <col style="width: 10%;">
+                    <col style="width: 13%;">
+                  </colgroup>
                   <thead class="bg-slate-50 text-slate-600 font-bold uppercase tracking-wider border-b border-slate-200">
                     <tr>
-                      <th class="py-3.5 px-4">গ্রাহকের প্রোফাইল ও নাম</th>
-                      <th class="py-3.5 px-4 whitespace-nowrap">মোবাইল নম্বর</th>
-                      <th class="py-3.5 px-4">ইমেইল</th>
-                      <th class="py-3.5 px-4">ঠিকানা ও এরিয়া</th>
-                      <th class="py-3.5 px-4 text-center whitespace-nowrap">সর্বমোট অর্ডার</th>
-                      <th class="py-3.5 px-4 whitespace-nowrap">রেজিস্ট্রেশন সময়</th>
-                      <th class="py-3.5 px-4 text-center whitespace-nowrap">অ্যাকশন</th>
+                      <th class="py-2.5 px-2.5 sm:px-3">গ্রাহকের প্রোফাইল ও নাম</th>
+                      <th class="py-2.5 px-2.5 sm:px-3">মোবাইল নম্বর</th>
+                      <th class="py-2.5 px-2.5 sm:px-3">ইমেইল</th>
+                      <th class="py-2.5 px-2.5 sm:px-3">ঠিকানা ও এরিয়া</th>
+                      <th class="py-2.5 px-2.5 sm:px-3 text-center">সর্বমোট অর্ডার</th>
+                      <th class="py-2.5 px-2.5 sm:px-3">রেজিস্ট্রেশন</th>
+                      <th class="py-2.5 px-2.5 sm:px-3 text-right">অ্যাকশন</th>
                     </tr>
                   </thead>
                   <tbody id="admin-customers-table-body" class="divide-y divide-slate-100 text-slate-800">

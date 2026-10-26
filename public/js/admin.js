@@ -1965,69 +1965,96 @@ function renderAdminCustomersTable(customers) {
     const initial = (c.name || 'গ').charAt(0).toUpperCase();
     const avatarHtml = c.avatar && c.avatar.trim() 
       ? `<img src="${c.avatar}" alt="${c.name || 'গ্রাহক'}" class="w-full h-full object-cover">`
-      : `<span class="font-bold">${initial}</span>`;
+      : `<span class="font-bold text-xs">${initial}</span>`;
     
-    const regDate = c.created_at ? new Date(c.created_at).toLocaleDateString('bn-BD', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'অজানা';
+    let dateStr = 'অজানা';
+    let timeStr = '';
+    if (c.created_at) {
+      const d = new Date(c.created_at);
+      dateStr = d.toLocaleDateString('bn-BD', { year: 'numeric', month: 'short', day: 'numeric' });
+      timeStr = d.toLocaleTimeString('bn-BD', { hour: '2-digit', minute: '2-digit' });
+    }
     const totalOrders = c.total_orders || 0;
+
+    const displayArea = c.area || c.address || 'ঠিকানা নেই';
+    const displayDetails = c.area && c.address && c.area !== c.address ? c.address : (c.city || '');
+    const fullAddressTooltip = [c.address, c.area, c.city].filter(Boolean).join(', ') || 'ঠিকানা দেওয়া হয়নি';
 
     return `
       <tr class="hover:bg-slate-50/90 transition text-slate-800 text-xs">
-        <td class="py-3.5 px-4">
-          <div class="flex items-center gap-3">
-            <div class="relative w-10 h-10 rounded-full overflow-hidden bg-[#0f766e] text-white flex items-center justify-center font-bold text-sm shrink-0 border-2 border-teal-300 shadow-xs cursor-pointer group" onclick="openCustomerDetailsModal(${c.id})" title="প্রোফাইল দেখতে ক্লিক করুন">
+        
+        <!-- 1. Avatar & Name -->
+        <td class="py-2.5 px-2.5 sm:px-3">
+          <div class="flex items-center gap-2.5 min-w-0">
+            <div class="relative w-8 h-8 rounded-full overflow-hidden bg-[#0f766e] text-white flex items-center justify-center font-bold text-xs shrink-0 border border-teal-300 shadow-2xs cursor-pointer group" onclick="openCustomerDetailsModal(${c.id})" title="প্রোফাইল দেখতে ক্লিক করুন">
               ${avatarHtml}
             </div>
-            <div>
-              <div class="font-bold text-slate-900 hover:text-teal-700 cursor-pointer flex items-center gap-1.5" onclick="openCustomerDetailsModal(${c.id})">
-                <span>${c.name || 'সম্মানিত গ্রাহক'}</span>
+            <div class="min-w-0 flex-1">
+              <div class="font-bold text-slate-900 hover:text-teal-700 cursor-pointer truncate" onclick="openCustomerDetailsModal(${c.id})" title="${c.name || 'সম্মানিত গ্রাহক'}">
+                ${c.name || 'সম্মানিত গ্রাহক'}
               </div>
-              <div class="text-[10px] text-teal-800 font-medium">আইডি: #RS-C${c.id}</div>
+              <div class="text-[10px] text-teal-800 font-medium font-mono">#RS-C${c.id}</div>
             </div>
           </div>
         </td>
 
-        <td class="py-3.5 px-4 whitespace-nowrap">
-          <div class="flex items-center gap-2">
-            <a href="tel:${c.phone}" class="font-mono font-bold text-slate-900 hover:text-teal-700 hover:underline" title="কল করুন">
+        <!-- 2. Phone Number -->
+        <td class="py-2.5 px-2.5 sm:px-3">
+          <div class="flex items-center gap-1.5 font-mono font-bold text-slate-900">
+            <a href="tel:${c.phone}" class="hover:text-teal-700 hover:underline truncate" title="কল করুন">
               ${c.phone}
             </a>
-            <button onclick="navigator.clipboard.writeText('${c.phone}'); alert('ফোন নম্বর কপি করা হয়েছে: ${c.phone}');" class="text-slate-400 hover:text-slate-700 transition cursor-pointer" title="নম্বর কপি করুন">
+            <button onclick="navigator.clipboard.writeText('${c.phone}'); alert('ফোন নম্বর কপি করা হয়েছে: ${c.phone}');" class="text-slate-400 hover:text-slate-600 transition shrink-0 cursor-pointer text-[11px]" title="নম্বর কপি করুন">
               📋
             </button>
           </div>
         </td>
 
-        <td class="py-3.5 px-4 text-slate-600">
-          ${c.email ? `<span class="font-sans font-medium text-slate-800">${c.email}</span>` : `<span class="text-slate-400 italic">দেওয়া হয়নি</span>`}
-        </td>
-
-        <td class="py-3.5 px-4 text-slate-700">
-          <div class="max-w-[220px]" title="${c.address || ''}">
-            ${c.address || c.area ? `<span class="font-medium text-slate-800">📍 ${[c.address, c.area, c.city].filter(Boolean).join(', ')}</span>` : '<span class="text-slate-400 italic">ঠিকানা যুক্ত হয়নি</span>'}
+        <!-- 3. Email -->
+        <td class="py-2.5 px-2.5 sm:px-3">
+          <div class="truncate text-slate-600 font-sans" title="${c.email || ''}">
+            ${c.email ? `<span class="font-medium text-slate-800">${c.email}</span>` : `<span class="text-slate-400 italic text-[11px]">দেওয়া হয়নি</span>`}
           </div>
         </td>
 
-        <td class="py-3.5 px-4 text-center whitespace-nowrap">
-          <button onclick="openCustomerDetailsModal(${c.id})" class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold transition cursor-pointer ${totalOrders > 0 ? 'bg-emerald-100 hover:bg-emerald-200 text-emerald-800 border border-emerald-300' : 'bg-slate-100 text-slate-600 border border-slate-200'}" title="অর্ডার দেখতে ক্লিক করুন">
-            📦 ${totalOrders}টি অর্ডার
+        <!-- 4. Address & Area -->
+        <td class="py-2.5 px-2.5 sm:px-3">
+          <div class="text-xs min-w-0" title="${fullAddressTooltip}">
+            <div class="font-medium text-slate-800 truncate">
+              📍 ${displayArea}
+            </div>
+            ${displayDetails ? `<div class="text-[10px] text-slate-400 truncate">${displayDetails}</div>` : ''}
+          </div>
+        </td>
+
+        <!-- 5. Total Orders -->
+        <td class="py-2.5 px-2.5 sm:px-3 text-center">
+          <button onclick="openCustomerDetailsModal(${c.id})" class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-bold transition cursor-pointer ${totalOrders > 0 ? 'bg-emerald-100 hover:bg-emerald-200 text-emerald-800 border border-emerald-300' : 'bg-slate-100 text-slate-600 border border-slate-200'}" title="অর্ডার দেখতে ক্লিক করুন">
+            ${totalOrders}টি অর্ডার
           </button>
         </td>
 
-        <td class="py-3.5 px-4 text-slate-500 whitespace-nowrap font-sans text-[11px]">
-          ${regDate}
+        <!-- 6. Registration Date & Time -->
+        <td class="py-2.5 px-2.5 sm:px-3">
+          <div class="text-[11px] font-medium text-slate-800 whitespace-nowrap">${dateStr}</div>
+          <div class="text-[10px] text-slate-400 whitespace-nowrap">${timeStr}</div>
         </td>
 
-        <td class="py-3.5 px-4 text-center whitespace-nowrap space-x-1.5">
-          <button onclick="openCustomerDetailsModal(${c.id})" class="px-2.5 py-1.5 rounded-lg bg-teal-50 hover:bg-teal-100 text-[#0f766e] border border-teal-200 font-bold text-xs transition inline-flex items-center gap-1 shadow-2xs cursor-pointer" title="বিস্তারিত প্রোফাইল">
-            <span>👁️</span> <span>বিস্তারিত</span>
-          </button>
-          <a href="https://wa.me/88${c.phone}?text=${encodeURIComponent(`Assalamu Alaikum ${c.name || ''}, Repair Seba থেকে আপনার সাথে যোগাযোগ করছি।`)}" target="_blank" class="px-2 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs transition inline-flex items-center gap-1 shadow-2xs" title="WhatsApp Message">
-            <span>💬</span>
-          </a>
-          <button onclick="deleteAdminCustomer(${c.id}, '${(c.name || c.phone).replace(/'/g, "\\'")}')" class="px-2 py-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-bold text-xs transition inline-flex items-center cursor-pointer" title="গ্রাহক মুছে ফেলুন">
-            🗑️
-          </button>
+        <!-- 7. Actions -->
+        <td class="py-2.5 px-2.5 sm:px-3 text-right">
+          <div class="flex items-center justify-end gap-1 whitespace-nowrap">
+            <button onclick="openCustomerDetailsModal(${c.id})" class="px-2 py-1 rounded-lg bg-teal-50 hover:bg-teal-100 text-[#0f766e] border border-teal-200 font-bold text-[11px] transition inline-flex items-center gap-1 shadow-2xs cursor-pointer" title="বিস্তারিত প্রোফাইল">
+              <span>👁️</span> <span>বিস্তারিত</span>
+            </button>
+            <a href="https://wa.me/88${c.phone}?text=${encodeURIComponent(`Assalamu Alaikum ${c.name || ''}, Repair Seba থেকে আপনার সাথে যোগাযোগ করছি।`)}" target="_blank" class="w-6 h-6 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white flex items-center justify-center text-[10px] transition shadow-2xs" title="WhatsApp Message">
+              💬
+            </a>
+            <button onclick="deleteAdminCustomer(${c.id}, '${(c.name || c.phone).replace(/'/g, "\\'")}')" class="w-6 h-6 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 flex items-center justify-center text-[10px] transition cursor-pointer" title="গ্রাহক মুছে ফেলুন">
+              🗑️
+            </button>
+          </div>
         </td>
+
       </tr>
     `;
   }).join('');
