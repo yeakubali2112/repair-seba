@@ -17,11 +17,11 @@ const ADMIN_STATUS_BADGES = {
 
 const TAB_TITLES = {
   'orders': 'ড্যাশবোর্ড ওভারভিউ',
-  'services': '<span>⚙️</span> রিপেয়ার সার্ভিস ও মূল্য তালিকা কনফিগ',
+  'services': '<span>🛠️</span> রিপেয়ার সার্ভিস ও মূল্য তালিকা পরিচালনা',
   'inquiries': '<span>💬</span> গ্রাহকদের মেসেজ ও যোগাযোগ তালিকা',
   'hero': '<span>🎨</span> হিরো ব্যানার ও বাইক অ্যানিমেশন কন্ট্রোল',
   'footer': '<span>🏢</span> অফিস ঠিকানা ও ফুটার সেটিংস',
-  'users': '<span>🛡️</span> অ্যাডমিন ও ইউজার রোল কন্ট্রোল'
+  'users': '<span>👤</span> প্রোফাইল তৈরি, টিম ও এক্সেস কন্ট্রোল'
 };
 
 function toggleAdminSidebar(open) {
@@ -78,13 +78,13 @@ function updateHeaderProfileUI(admin) {
   if (nameEl) nameEl.textContent = admin.name || 'Yeakub Ali';
   
   const roleMap = {
-    'superadmin': { label: 'সুপার', color: 'bg-emerald-100 text-emerald-800 border-emerald-200' },
-    'manager': { label: 'ম্যানেজার', color: 'bg-blue-100 text-blue-800 border-blue-200' },
-    'technician': { label: 'টেকনিশিয়ান', color: 'bg-amber-100 text-amber-800 border-amber-200' },
-    'support': { label: 'সাপোর্ট', color: 'bg-purple-100 text-purple-800 border-purple-200' },
-    'admin': { label: 'অ্যাডমিন', color: 'bg-teal-100 text-teal-800 border-teal-200' }
+    'superadmin': { label: 'সুপার', fullLabel: 'সুপার অ্যাডমিন', color: 'bg-emerald-100 text-emerald-800 border-emerald-200' },
+    'manager': { label: 'ম্যানেজার', fullLabel: 'অপারেশন ম্যানেজার', color: 'bg-blue-100 text-blue-800 border-blue-200' },
+    'technician': { label: 'টেকনিশিয়ান', fullLabel: 'ল্যাব টেকনিশিয়ান', color: 'bg-amber-100 text-amber-800 border-amber-200' },
+    'support': { label: 'সাপোর্ট', fullLabel: 'কাস্টমার সাপোর্ট ও রাইডার', color: 'bg-purple-100 text-purple-800 border-purple-200' },
+    'admin': { label: 'অ্যাডমিন', fullLabel: 'অ্যাডমিন', color: 'bg-teal-100 text-teal-800 border-teal-200' }
   };
-  const roleInfo = roleMap[admin.role] || { label: admin.role, color: 'bg-slate-100 text-slate-800 border-slate-200' };
+  const roleInfo = roleMap[admin.role] || { label: admin.role, fullLabel: admin.role, color: 'bg-slate-100 text-slate-800 border-slate-200' };
 
   if (roleEl) {
     roleEl.textContent = roleInfo.label;
@@ -106,28 +106,61 @@ function updateHeaderProfileUI(admin) {
     }
   }
 
+  // Update My Profile Card in Tab-Users
+  const myName = document.getElementById('my-card-name');
+  const myUser = document.getElementById('my-card-username');
+  const myRole = document.getElementById('my-card-role-badge');
+  const myPhone = document.getElementById('my-card-phone');
+  const myEmail = document.getElementById('my-card-email');
+  const myAvatar = document.getElementById('my-card-avatar');
+  const myInit = document.getElementById('my-card-initial');
+
+  if (myName) myName.textContent = admin.name || 'Yeakub Ali';
+  if (myUser) myUser.textContent = `@${admin.username || 'admin'}`;
+  if (myRole) myRole.textContent = roleInfo.fullLabel || roleInfo.label;
+  if (myPhone) myPhone.textContent = admin.phone || 'ফোন নম্বর নেই';
+  if (myEmail) myEmail.textContent = admin.email || 'support@repairseba.com';
+  if (myAvatar && admin.avatar && admin.avatar.trim() !== '') {
+    myAvatar.src = admin.avatar;
+    myAvatar.classList.remove('hidden');
+    if (myInit) myInit.classList.add('hidden');
+  } else {
+    if (myAvatar) myAvatar.classList.add('hidden');
+    if (myInit) {
+      myInit.textContent = (admin.name || admin.username || 'প্র')[0].toUpperCase();
+      myInit.classList.remove('hidden');
+    }
+  }
+
   // Apply RBAC to sidebar tabs
   applyRolePermissions(currentAdminPermissions, admin.role === 'superadmin');
 }
 
 function applyRolePermissions(perms, isSuper) {
-  const tabMap = {
-    'orders': document.getElementById('tab-btn-orders'),
-    'services': document.getElementById('tab-btn-services'),
-    'inquiries': document.getElementById('tab-btn-inquiries'),
-    'hero': document.getElementById('tab-btn-hero'),
-    'footer': document.getElementById('tab-btn-footer'),
-    'users': document.getElementById('tab-btn-users')
+  const tabElements = {
+    'orders': [document.getElementById('tab-btn-orders'), document.getElementById('tab-btn-orders-list')],
+    'services': [document.getElementById('tab-btn-services')],
+    'inquiries': [document.getElementById('tab-btn-inquiries')],
+    'hero': [document.getElementById('tab-btn-hero')],
+    'footer': [document.getElementById('tab-btn-footer')],
+    'users': [document.getElementById('tab-btn-users')]
   };
 
-  Object.entries(tabMap).forEach(([key, btn]) => {
-    if (!btn) return;
-    if (isSuper || perms.includes(key) || perms.includes('*')) {
-      btn.style.display = 'flex';
-    } else {
-      btn.style.display = 'none';
-    }
+  Object.entries(tabElements).forEach(([key, btnList]) => {
+    const hasPerm = isSuper || perms.includes(key) || perms.includes('*');
+    btnList.forEach(btn => {
+      if (!btn) return;
+      btn.style.display = hasPerm ? 'flex' : 'none';
+    });
   });
+
+  // If non-superadmin does not have orders permission and is on orders tab, redirect to first permitted tab
+  if (!isSuper && !perms.includes('orders') && !perms.includes('*') && currentAdminTab === 'orders') {
+    const allowed = ['services', 'inquiries', 'hero', 'footer', 'users'].find(p => perms.includes(p));
+    if (allowed) {
+      switchTab(allowed);
+    }
+  }
 }
 
 // -------------------------------------------------------------
@@ -509,8 +542,8 @@ function renderAdminOrdersTable(orders) {
         </td>
 
         <td class="py-3 px-4 text-right space-x-1.5 whitespace-nowrap">
-          <button onclick="openEditModal(${o.id})" class="px-2.5 py-1 rounded-md bg-[#2563eb] hover:bg-[#1d4ed8] text-white font-bold text-[11px] shadow-2xs transition">
-            প্রোফাইল তৈরি
+          <button onclick="openEditModal(${o.id})" class="px-2.5 py-1 rounded-md bg-[#0f766e] hover:bg-[#115e59] text-white font-bold text-[11px] shadow-2xs transition">
+            📝 কোটেশন ও আপডেট
           </button>
           <button onclick="openEditModal(${o.id})" class="px-2.5 py-1 rounded-md bg-teal-50 hover:bg-teal-100 text-teal-800 border border-teal-200 font-bold text-[11px] transition">
             বিস্তারিত
@@ -1151,13 +1184,17 @@ function resetAdminFooterSettings() {
 function openAdminProfileModal() {
   if (!currentAdminProfile) return;
   const nameInp = document.getElementById('my-profile-name');
+  const userInp = document.getElementById('my-profile-username');
   const avatarInp = document.getElementById('my-profile-avatar-url');
   const phoneInp = document.getElementById('my-profile-phone');
+  const emailInp = document.getElementById('my-profile-email');
   const pwdInp = document.getElementById('my-profile-new-password');
 
   if (nameInp) nameInp.value = currentAdminProfile.name || '';
+  if (userInp) userInp.value = `@${currentAdminProfile.username || 'admin'}`;
   if (avatarInp) avatarInp.value = currentAdminProfile.avatar || '';
   if (phoneInp) phoneInp.value = currentAdminProfile.phone || '';
+  if (emailInp) emailInp.value = currentAdminProfile.email || '';
   if (pwdInp) pwdInp.value = '';
 
   previewMyProfileAvatar(currentAdminProfile.avatar || '');
@@ -1197,6 +1234,7 @@ async function handleSaveOwnProfile(e) {
   const name = document.getElementById('my-profile-name')?.value.trim();
   const avatar = document.getElementById('my-profile-avatar-url')?.value.trim();
   const phone = document.getElementById('my-profile-phone')?.value.trim();
+  const email = document.getElementById('my-profile-email')?.value.trim();
   const password = document.getElementById('my-profile-new-password')?.value.trim();
   const btn = document.getElementById('btn-save-my-profile');
 
@@ -1221,13 +1259,14 @@ async function handleSaveOwnProfile(e) {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${adminToken}`
       },
-      body: JSON.stringify({ name, avatar, phone, password })
+      body: JSON.stringify({ name, avatar, phone, email, password })
     });
     const data = await res.json();
     if (data.success) {
       alert('আপনার প্রোফাইল সফলভাবে আপডেট হয়েছে!');
       updateHeaderProfileUI(data.admin);
       closeAdminProfileModal();
+      loadAdminUsers();
     } else {
       alert(data.error || 'প্রোফাইল আপডেট ব্যর্থ হয়েছে।');
     }
@@ -1273,6 +1312,22 @@ async function loadAdminUsers() {
   }
 }
 
+function handleSearchAdminUsers(term) {
+  const q = (term || '').toLowerCase().trim();
+  if (!q) {
+    renderAdminUsersTable(cachedAdminUsers);
+    return;
+  }
+  const filtered = cachedAdminUsers.filter(u => 
+    (u.name && u.name.toLowerCase().includes(q)) ||
+    (u.username && u.username.toLowerCase().includes(q)) ||
+    (u.phone && u.phone.includes(q)) ||
+    (u.email && u.email.toLowerCase().includes(q)) ||
+    (u.role && u.role.toLowerCase().includes(q))
+  );
+  renderAdminUsersTable(filtered);
+}
+
 function renderAdminUsersTable(users) {
   const tbody = document.getElementById('admin-users-table-body');
   if (!tbody) return;
@@ -1287,27 +1342,28 @@ function renderAdminUsersTable(users) {
     'manager': { label: 'অপারেশন ম্যানেজার', color: 'bg-blue-100 text-blue-800 border-blue-300' },
     'technician': { label: 'ল্যাব টেকনিশিয়ান', color: 'bg-amber-100 text-amber-800 border-amber-300' },
     'support': { label: 'সাপোর্ট ও রাইডার', color: 'bg-purple-100 text-purple-800 border-purple-300' },
-    'admin': { label: 'অ্যাডমিন', color: 'bg-teal-100 text-teal-800 border-teal-300' }
+    'admin': { label: 'অ্যাডমিন', color: 'bg-teal-100 text-teal-800 border-teal-300' },
+    'custom': { label: 'কাস্টম স্টাফ', color: 'bg-slate-100 text-slate-800 border-slate-300' }
   };
 
   const permBadges = {
-    'orders': { label: '📦 অর্ডার', color: 'bg-teal-50 text-teal-700 border-teal-200' },
-    'services': { label: '🛠️ সার্ভিস', color: 'bg-cyan-50 text-cyan-700 border-cyan-200' },
-    'inquiries': { label: '💬 মেসেজ', color: 'bg-rose-50 text-rose-700 border-rose-200' },
-    'hero': { label: '🎨 হিরো', color: 'bg-indigo-50 text-indigo-700 border-indigo-200' },
-    'footer': { label: '🏢 ফুটার', color: 'bg-slate-100 text-slate-700 border-slate-300' },
-    'users': { label: '🛡️ রোল', color: 'bg-emerald-50 text-emerald-800 border-emerald-200' }
+    'orders': { label: '📦 অর্ডার ও কোটেশন', color: 'bg-teal-50 text-teal-700 border-teal-200' },
+    'services': { label: '🛠️ সার্ভিস প্রাইসিং', color: 'bg-cyan-50 text-cyan-700 border-cyan-200' },
+    'inquiries': { label: '💬 কাস্টমার মেসেজ', color: 'bg-rose-50 text-rose-700 border-rose-200' },
+    'hero': { label: '🎨 হিরো ব্যানার', color: 'bg-indigo-50 text-indigo-700 border-indigo-200' },
+    'footer': { label: '🏢 ফুটার সেটিংস', color: 'bg-slate-100 text-slate-700 border-slate-300' },
+    'users': { label: '👤 প্রোফাইল কন্ট্রোল', color: 'bg-emerald-50 text-emerald-800 border-emerald-200' }
   };
 
   tbody.innerHTML = users.map(u => {
     const rInfo = roleLabels[u.role] || { label: u.role, color: 'bg-slate-100 text-slate-700 border-slate-300' };
     const avatarHtml = u.avatar && u.avatar.trim() !== ''
-      ? `<img src="${u.avatar}" alt="${u.name}" class="w-8 h-8 rounded-full object-cover border border-slate-200 shrink-0">`
-      : `<div class="w-8 h-8 rounded-full bg-[#0f766e] text-white flex items-center justify-center font-bold text-xs shrink-0">${(u.name || u.username)[0].toUpperCase()}</div>`;
+      ? `<img src="${u.avatar}" alt="${u.name}" class="w-9 h-9 rounded-full object-cover border border-slate-200 shrink-0">`
+      : `<div class="w-9 h-9 rounded-full bg-[#0f766e] text-white flex items-center justify-center font-bold text-xs shrink-0">${(u.name || u.username)[0].toUpperCase()}</div>`;
 
     const permsList = Array.isArray(u.permissions) ? u.permissions : [];
     const permsPills = u.role === 'superadmin' || permsList.includes('*')
-      ? `<span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">⭐ সর্বময় অ্যাক্সেস (All Access)</span>`
+      ? `<span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">⭐ সর্বময় অ্যাক্সেস (All Options)</span>`
       : permsList.map(p => {
           const pb = permBadges[p] || { label: p, color: 'bg-slate-100 text-slate-700 border-slate-200' };
           return `<span class="px-2 py-0.5 rounded-md text-[10px] font-semibold ${pb.color} border">${pb.label}</span>`;
@@ -1322,7 +1378,7 @@ function renderAdminUsersTable(users) {
             ${avatarHtml}
             <div>
               <div class="font-bold text-slate-900">${u.name}</div>
-              <div class="text-[10px] text-slate-500">${u.phone || 'ফোন নেই'}</div>
+              <div class="text-[10px] text-slate-500">${u.phone || 'ফোন নেই'}${u.email ? ` • ${u.email}` : ''}</div>
             </div>
           </div>
         </td>
@@ -1335,20 +1391,20 @@ function renderAdminUsersTable(users) {
           </span>
         </td>
         <td class="py-3 px-4">
-          <div class="flex flex-wrap gap-1 max-w-[280px]">
+          <div class="flex flex-wrap gap-1 max-w-[320px]">
             ${permsPills || '<span class="text-slate-400 text-[10px]">কোনো পারমিশন নেই</span>'}
           </div>
         </td>
         <td class="py-3 px-4 text-right space-x-1.5 whitespace-nowrap">
           <button onclick="openEditUserModal(${u.id})" class="px-2.5 py-1 rounded-md bg-teal-50 hover:bg-teal-100 text-teal-800 border border-teal-200 font-bold text-[11px] transition">
-            ✏️ এডিট
+            ✏️ এডিট ও পারমিশন
           </button>
           ${canDelete ? `
             <button onclick="deleteAdminUser(${u.id}, '${u.username}')" class="px-2.5 py-1 rounded-md bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-bold text-[11px] transition">
               🗑️ ডিলিট
             </button>
           ` : `
-            <span class="px-2 py-1 text-[10px] text-slate-400 font-medium">সুরক্ষিত</span>
+            <span class="px-2 py-1 text-[10px] text-slate-400 font-medium">প্রধান অ্যাডমিন</span>
           `}
         </td>
       </tr>
@@ -1356,9 +1412,36 @@ function renderAdminUsersTable(users) {
   }).join('');
 }
 
+function applyPresetPermissions(preset) {
+  const permMap = {
+    'all': ['orders', 'services', 'inquiries', 'hero', 'footer', 'users'],
+    'manager': ['orders', 'services', 'inquiries'],
+    'technician': ['orders', 'services'],
+    'support': ['orders', 'inquiries'],
+    'none': []
+  };
+  const target = permMap[preset] || [];
+  ['orders', 'services', 'inquiries', 'hero', 'footer', 'users'].forEach(p => {
+    const chk = document.getElementById(`perm-${p}`);
+    if (chk) chk.checked = target.includes(p);
+  });
+}
+
+function handleRolePresetChange(role) {
+  if (role === 'superadmin') {
+    applyPresetPermissions('all');
+  } else if (role === 'manager') {
+    applyPresetPermissions('manager');
+  } else if (role === 'technician') {
+    applyPresetPermissions('technician');
+  } else if (role === 'support') {
+    applyPresetPermissions('support');
+  }
+}
+
 function openCreateUserModal() {
   document.getElementById('manage-user-id').value = '';
-  document.getElementById('user-modal-title').textContent = 'নতুন প্রোফাইল তৈরি ও অ্যাক্সেস কন্ট্রোল';
+  document.getElementById('user-modal-title').textContent = 'নতুন প্রোফাইল তৈরি ও অপশন পারমিশন কন্ট্রোল';
   document.getElementById('manage-user-name').value = '';
   document.getElementById('manage-user-username').value = '';
   document.getElementById('manage-user-username').disabled = false;
@@ -1366,13 +1449,11 @@ function openCreateUserModal() {
   document.getElementById('manage-user-password').required = true;
   document.getElementById('manage-user-pwd-hint').classList.add('hidden');
   document.getElementById('manage-user-phone').value = '';
+  document.getElementById('manage-user-email').value = '';
   document.getElementById('manage-user-avatar').value = '';
   document.getElementById('manage-user-role').value = 'manager';
 
-  toggleAllPermissions(false);
-  document.getElementById('perm-orders').checked = true;
-  document.getElementById('perm-services').checked = true;
-  document.getElementById('perm-inquiries').checked = true;
+  applyPresetPermissions('manager');
 
   document.getElementById('admin-user-modal')?.classList.remove('hidden');
 }
@@ -1390,6 +1471,7 @@ function openEditUserModal(userId) {
   document.getElementById('manage-user-password').required = false;
   document.getElementById('manage-user-pwd-hint').classList.remove('hidden');
   document.getElementById('manage-user-phone').value = u.phone || '';
+  document.getElementById('manage-user-email').value = u.email || '';
   document.getElementById('manage-user-avatar').value = u.avatar || '';
   document.getElementById('manage-user-role').value = u.role || 'manager';
 
@@ -1420,6 +1502,7 @@ async function handleSaveAdminUser(e) {
   const password = document.getElementById('manage-user-password')?.value.trim();
   const role = document.getElementById('manage-user-role')?.value;
   const phone = document.getElementById('manage-user-phone')?.value.trim();
+  const email = document.getElementById('manage-user-email')?.value.trim();
   const avatar = document.getElementById('manage-user-avatar')?.value.trim();
   const btn = document.getElementById('btn-save-admin-user');
 
@@ -1442,6 +1525,7 @@ async function handleSaveAdminUser(e) {
     username,
     role,
     phone,
+    email,
     avatar,
     permissions: selectedPerms
   };
@@ -1506,6 +1590,23 @@ async function deleteAdminUser(userId, username) {
     alert('সার্ভার এরর।');
   }
 }
+
+// Window attachments for inline event handlers
+window.openAdminProfileModal = openAdminProfileModal;
+window.closeAdminProfileModal = closeAdminProfileModal;
+window.previewMyProfileAvatar = previewMyProfileAvatar;
+window.setMyAvatarPreset = setMyAvatarPreset;
+window.handleSaveOwnProfile = handleSaveOwnProfile;
+window.loadAdminUsers = loadAdminUsers;
+window.handleSearchAdminUsers = handleSearchAdminUsers;
+window.applyPresetPermissions = applyPresetPermissions;
+window.handleRolePresetChange = handleRolePresetChange;
+window.openCreateUserModal = openCreateUserModal;
+window.openEditUserModal = openEditUserModal;
+window.closeUserModal = closeUserModal;
+window.toggleAllPermissions = toggleAllPermissions;
+window.handleSaveAdminUser = handleSaveAdminUser;
+window.deleteAdminUser = deleteAdminUser;
 
 
 

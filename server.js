@@ -604,6 +604,11 @@ const server = http.createServer(async (req, res) => {
 
         const token = generateAdminToken(admin);
 
+        let perms = ["orders","services","inquiries","hero","footer","users"];
+        try {
+          if (admin.permissions) perms = JSON.parse(admin.permissions);
+        } catch (_) {}
+
         return jsonResponse(res, 200, {
           success: true,
           token,
@@ -611,7 +616,11 @@ const server = http.createServer(async (req, res) => {
             id: admin.id,
             username: admin.username,
             name: admin.name,
-            role: admin.role
+            role: admin.role,
+            avatar: admin.avatar || '',
+            phone: admin.phone || '',
+            email: admin.email || '',
+            permissions: perms
           }
         });
       }
@@ -942,10 +951,10 @@ const server = http.createServer(async (req, res) => {
       // Admin Update Own Profile
       if (pathname === '/api/admin/profile' && method === 'PUT') {
         const body = await parseBody(req);
-        const { name, avatar, phone, password } = body;
+        const { name, avatar, phone, email, password } = body;
 
-        let query = 'UPDATE admins SET name = ?, avatar = ?, phone = ?';
-        let params = [name || adminSession.name, avatar || '', phone || ''];
+        let query = 'UPDATE admins SET name = ?, avatar = ?, phone = ?, email = ?';
+        let params = [name || adminSession.name, avatar || '', phone || '', email || ''];
 
         if (password && password.trim().length >= 6) {
           query += ', password_hash = ?';
@@ -990,7 +999,7 @@ const server = http.createServer(async (req, res) => {
       // Create New Admin Profile
       if (pathname === '/api/admin/users' && method === 'POST') {
         const body = await parseBody(req);
-        const { username, password, name, role, avatar, phone, permissions } = body;
+        const { username, password, name, role, avatar, phone, email, permissions } = body;
 
         if (!username || !password || !name) {
           return errorResponse(res, 400, 'ইউজারনেম, পাসওয়ার্ড এবং পূর্ণ নাম আবশ্যক (Username, password, and name required)');
@@ -1007,8 +1016,8 @@ const server = http.createServer(async (req, res) => {
         const createdAt = new Date().toISOString();
 
         const result = db.prepare(`
-          INSERT INTO admins (username, password_hash, name, role, avatar, phone, permissions, created_at)
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+          INSERT INTO admins (username, password_hash, name, role, avatar, phone, email, permissions, created_at)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         `).run(
           cleanUsername,
           hashed,
@@ -1016,6 +1025,7 @@ const server = http.createServer(async (req, res) => {
           role || 'admin',
           avatar || '',
           phone || '',
+          email || '',
           permsStr,
           createdAt
         );
@@ -1030,6 +1040,7 @@ const server = http.createServer(async (req, res) => {
             role: role || 'admin',
             avatar: avatar || '',
             phone: phone || '',
+            email: email || '',
             permissions: Array.isArray(permissions) ? permissions : ["orders"],
             created_at: createdAt
           }
@@ -1042,11 +1053,11 @@ const server = http.createServer(async (req, res) => {
         if (!userId) return errorResponse(res, 400, 'Invalid user ID');
 
         const body = await parseBody(req);
-        const { name, role, avatar, phone, permissions, password } = body;
+        const { name, role, avatar, phone, email, permissions, password } = body;
 
-        let query = 'UPDATE admins SET name = ?, role = ?, avatar = ?, phone = ?, permissions = ?';
+        let query = 'UPDATE admins SET name = ?, role = ?, avatar = ?, phone = ?, email = ?, permissions = ?';
         let permsStr = JSON.stringify(Array.isArray(permissions) ? permissions : ["orders"]);
-        let params = [name, role, avatar || '', phone || '', permsStr];
+        let params = [name, role, avatar || '', phone || '', email || '', permsStr];
 
         if (password && password.trim().length >= 6) {
           query += ', password_hash = ?';
