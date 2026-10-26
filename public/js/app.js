@@ -1734,8 +1734,20 @@ async function loadAndApplyFooterSettings() {
 let customerToken = localStorage.getItem('repair_seba_customer_token');
 let currentCustomer = null;
 
+// Immediately restore cached customer profile on script load so reload never flickers!
+try {
+  const cachedProfileStr = localStorage.getItem('repair_seba_customer_profile');
+  if (cachedProfileStr && customerToken) {
+    currentCustomer = JSON.parse(cachedProfileStr);
+  }
+} catch (_) {}
+
 async function initCustomerAuth() {
-  if (!customerToken) {
+  // If we already have the cached profile and token, instantly show logged in UI
+  if (currentCustomer && customerToken) {
+    updateNavUserUI(true);
+    autofillBookingFormWithCustomer(currentCustomer);
+  } else if (!customerToken) {
     updateNavUserUI(false);
     return;
   }
@@ -1744,20 +1756,32 @@ async function initCustomerAuth() {
     const res = await fetch('/api/user/me', {
       headers: { 'Authorization': `Bearer ${customerToken}` }
     });
-    const data = await res.json();
-    if (data.success) {
-      currentCustomer = data.user;
-      updateNavUserUI(true);
-      autofillBookingFormWithCustomer(data.user);
-    } else {
+
+    if (res.status === 401) {
+      // Token is explicitly rejected by the server
       localStorage.removeItem('repair_seba_customer_token');
+  localStorage.removeItem('repair_seba_customer_profile');
+      localStorage.removeItem('repair_seba_customer_profile');
       customerToken = null;
       currentCustomer = null;
       updateNavUserUI(false);
+      return;
+    }
+
+    const data = await res.json();
+    if (data.success && data.user) {
+      currentCustomer = data.user;
+      localStorage.setItem('repair_seba_customer_profile', JSON.stringify(data.user));
+      updateNavUserUI(true);
+      autofillBookingFormWithCustomer(data.user);
     }
   } catch (err) {
-    console.error('Customer auth check error:', err);
-    updateNavUserUI(false);
+    console.warn('Customer auth network error, keeping active session:', err);
+    // On network glitch or offline, preserve existing user session
+    if (currentCustomer) {
+      updateNavUserUI(true);
+      autofillBookingFormWithCustomer(currentCustomer);
+    }
   }
 }
 
@@ -1979,6 +2003,7 @@ async function handleUserPhoneLogin(e) {
       customerToken = data.token;
       currentCustomer = data.user;
       localStorage.setItem('repair_seba_customer_token', customerToken);
+      localStorage.setItem('repair_seba_customer_profile', JSON.stringify(data.user));
 
       closeUserLoginModal();
       updateNavUserUI(true);
@@ -2113,6 +2138,7 @@ async function handleUserProfileSave(e) {
 
     if (data.success) {
       currentCustomer = data.user;
+      localStorage.setItem('repair_seba_customer_profile', JSON.stringify(data.user));
       updateNavUserUI(true);
       autofillBookingFormWithCustomer(data.user);
 
@@ -2236,6 +2262,7 @@ function handleUserLogout() {
   }
 
   localStorage.removeItem('repair_seba_customer_token');
+  localStorage.removeItem('repair_seba_customer_profile');
   customerToken = null;
   currentCustomer = null;
   updateNavUserUI(false);

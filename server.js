@@ -133,6 +133,29 @@ function generateAdminToken(admin) {
   return token;
 }
 
+function generateCustomerToken(user) {
+  // 1-year long-lived customer session so reload never logs out until explicit logout
+  const expiresAt = Date.now() + (365 * 24 * 60 * 60 * 1000);
+  const payload = JSON.stringify({
+    userId: user.id,
+    phone: user.phone,
+    name: user.name || 'সম্মানিত গ্রাহক',
+    role: 'customer',
+    expiresAt
+  });
+  const b64 = Buffer.from(payload).toString('base64url');
+  const hmac = crypto.createHmac('sha256', AUTH_SECRET).update(b64).digest('hex');
+  const token = `${b64}.${hmac}`;
+  customerSessions.set(token, {
+    userId: user.id,
+    phone: user.phone,
+    name: user.name || 'সম্মানিত গ্রাহক',
+    role: 'customer',
+    expiresAt
+  });
+  return token;
+}
+
 // Authentication middleware
 function getAuthenticatedAdmin(req) {
   const authHeader = req.headers['authorization'];
@@ -173,12 +196,27 @@ function getAuthenticatedCustomer(req) {
   const token = parts[1];
 
   const session = customerSessions.get(token);
-  if (!session) return null;
-  if (session.expiresAt < Date.now()) {
-    customerSessions.delete(token);
+  if (session) {
+    if (session.expiresAt < Date.now()) {
+      customerSessions.delete(token);
+      return null;
+    }
+    return session;
+  }
+
+  // Stateless HMAC verification fallback for customer sessions
+  try {
+    const [b64, hmac] = token.split('.');
+    if (!b64 || !hmac) return null;
+    const expected = crypto.createHmac('sha256', AUTH_SECRET).update(b64).digest('hex');
+    if (expected !== hmac) return null;
+    const data = JSON.parse(Buffer.from(b64, 'base64url').toString('utf8'));
+    if (!data || !data.expiresAt || data.expiresAt < Date.now()) return null;
+    customerSessions.set(token, data);
+    return data;
+  } catch {
     return null;
   }
-  return session;
 }
 
 // HTTP Server
@@ -623,13 +661,7 @@ const server = http.createServer(async (req, res) => {
           }
         }
 
-        const token = generateToken();
-        const expiresAt = Date.now() + (30 * 24 * 60 * 60 * 1000); // 30 days
-        customerSessions.set(token, {
-          userId: user.id,
-          phone: user.phone,
-          expiresAt
-        });
+        const token = generateCustomerToken(user);
 
         return jsonResponse(res, 200, {
           success: true,
@@ -651,11 +683,24 @@ const server = http.createServer(async (req, res) => {
       if (pathname === '/api/user/me' && method === 'GET') {
         const session = getAuthenticatedCustomer(req);
         if (!session) {
-          return errorResponse(res, 401, 'লগইন সেশন পাওয়া যায়নি');
+          return errorResponse(res, 401, 'লগইন সেশন পাওয়া যায়নি (Session expired or invalid)');
         }
-        const user = db.prepare('SELECT * FROM users WHERE id = ?').get(session.userId);
+        let user = db.prepare('SELECT * FROM users WHERE id = ?').get(session.userId);
+        if (!user && session.phone) {
+          user = db.prepare('SELECT * FROM users WHERE phone = ?').get(session.phone);
+        }
         if (!user) {
-          return errorResponse(res, 404, 'গ্রাহক অ্যাকাউন্ট পাওয়া যায়নি');
+          // Fallback from verified stateless token session
+          user = {
+            id: session.userId,
+            phone: session.phone,
+            name: session.name || 'সম্মানিত গ্রাহক',
+            email: '',
+            avatar: '',
+            address: '',
+            area: '',
+            city: 'Dhaka'
+          };
         }
         return jsonResponse(res, 200, {
           success: true,
@@ -721,14 +766,15 @@ const server = http.createServer(async (req, res) => {
         if (!session) {
           return errorResponse(res, 401, 'লগইন আবশ্যক');
         }
-        const user = db.prepare('SELECT * FROM users WHERE id = ?').get(session.userId);
-        if (!user) return errorResponse(res, 404, 'User not found');
+        let user = db.prepare('SELECT * FROM users WHERE id = ?').get(session.userId);
+        const userPhone = (user && user.phone) ? user.phone : session.phone;
+        if (!userPhone) return errorResponse(res, 404, 'User not found');
 
         const orders = db.prepare(`
           SELECT * FROM orders 
           WHERE customer_phone = ? OR customer_alt_phone = ?
           ORDER BY id DESC
-        `).all(user.phone, user.phone);
+        `).all(userPhone, userPhone);
 
         return jsonResponse(res, 200, {
           success: true,

@@ -85,7 +85,7 @@
         <div id="nav-user-container" class="relative">
           <!-- Logged Out State: Phone Login Button -->
           <button id="nav-btn-login" onclick="openUserLoginModal()" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-cyan-600 to-sky-600 hover:from-cyan-500 hover:to-sky-500 text-white font-bold text-xs sm:text-sm shadow-md shadow-cyan-600/20 hover:scale-105 transition">
-            <span>👤</span> <span>লগইন / প্রোফাইল</span>
+            <span>👤</span> <span>লগইন</span>
           </button>
 
           <!-- Logged In State: Matching Admin Panel Profile Capsule Design -->
@@ -141,7 +141,48 @@
         </div>
       </div>
 
-    </div>
+    
+          <!-- Instant Auth State Hydration Script (Zero flicker on reload) -->
+          <script>
+            (function() {
+              try {
+                var tok = localStorage.getItem('repair_seba_customer_token');
+                var prof = localStorage.getItem('repair_seba_customer_profile');
+                if (tok && prof) {
+                  var u = JSON.parse(prof);
+                  var btn = document.getElementById('nav-btn-login');
+                  var dd = document.getElementById('nav-user-dropdown');
+                  var dn = document.getElementById('nav-user-display-name');
+                  var ds = document.getElementById('nav-user-sub');
+                  var di = document.getElementById('nav-user-initial');
+                  var da = document.getElementById('nav-user-avatar');
+                  var ddn = document.getElementById('dropdown-user-name');
+                  var ddp = document.getElementById('dropdown-user-phone');
+                  var ddi = document.getElementById('dropdown-user-initial');
+                  var dda = document.getElementById('dropdown-user-avatar');
+                  if (btn) btn.classList.add('hidden');
+                  if (dd) { dd.classList.remove('hidden'); dd.style.display = 'flex'; }
+                  var name = u.name || 'সম্মানিত গ্রাহক';
+                  var init = (name.trim().charAt(0) || 'গ').toUpperCase();
+                  if (dn) dn.textContent = name;
+                  if (ds) ds.textContent = u.phone || '';
+                  if (ddn) ddn.textContent = name;
+                  if (ddp) ddp.textContent = u.phone || '';
+                  if (u.avatar && u.avatar.trim()) {
+                    if (da) { da.src = u.avatar; da.classList.remove('hidden'); }
+                    if (di) di.classList.add('hidden');
+                    if (dda) { dda.src = u.avatar; dda.classList.remove('hidden'); }
+                    if (ddi) ddi.classList.add('hidden');
+                  } else {
+                    if (di) { di.textContent = init; di.classList.remove('hidden'); }
+                    if (ddi) { ddi.textContent = init; ddi.classList.remove('hidden'); }
+                  }
+                }
+              } catch(e) {}
+            })();
+          </script>
+
+        </div>
   </header>
 
   <!-- Hero Section (Full Animated City Background with Delivery Cyclist) -->
