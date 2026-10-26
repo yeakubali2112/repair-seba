@@ -501,13 +501,13 @@ function renderAdminOrdersTable(orders) {
 
   const statusList = [
     { val: 'PENDING_PICKUP', label: '⏳ পিকআপ বাকি', color: 'bg-amber-50 text-amber-900 border-amber-300' },
-    { val: 'PICKUP_ASSIGNED', label: '🚴 রাইডার নির্ধারিত', color: 'bg-blue-50 text-blue-900 border-blue-300' },
-    { val: 'COLLECTED', label: '📦 ল্যাবের পথে', color: 'bg-indigo-50 text-indigo-900 border-indigo-300' },
+    { val: 'PICKUP_ASSIGNED', label: '🚴 রাইডার নিযুক্ত', color: 'bg-blue-50 text-blue-900 border-blue-300' },
+    { val: 'COLLECTED', label: '📦 ল্যাবে আসছে', color: 'bg-indigo-50 text-indigo-900 border-indigo-300' },
     { val: 'DIAGNOSING', label: '🔬 টেস্ট চলছে', color: 'bg-purple-50 text-purple-900 border-purple-300' },
-    { val: 'QUOTE_PENDING', label: '⚠️ মূল্য অনুমোদন বাকি', color: 'bg-orange-50 text-orange-900 border-orange-300' },
-    { val: 'QUOTE_APPROVED', label: '✅ অনুমোদন সম্পন্ন (Allow)', color: 'bg-emerald-50 text-emerald-900 border-emerald-300' },
+    { val: 'QUOTE_PENDING', label: '⚠️ কোটেশন বাকি', color: 'bg-orange-50 text-orange-900 border-orange-300' },
+    { val: 'QUOTE_APPROVED', label: '✅ অনুমোদিত', color: 'bg-emerald-50 text-emerald-900 border-emerald-300' },
     { val: 'IN_REPAIR', label: '🛠️ মেরামত চলছে', color: 'bg-cyan-50 text-cyan-900 border-cyan-300' },
-    { val: 'OUT_FOR_DELIVERY', label: '🚚 ডেলিভারির পথে', color: 'bg-teal-50 text-teal-900 border-teal-300' },
+    { val: 'OUT_FOR_DELIVERY', label: '🚚 ডেলিভারিতে', color: 'bg-teal-50 text-teal-900 border-teal-300' },
     { val: 'COMPLETED', label: '🎉 সম্পন্ন', color: 'bg-emerald-100 text-emerald-950 border-emerald-400' },
     { val: 'CANCELLED', label: '❌ বাতিল', color: 'bg-rose-50 text-rose-900 border-rose-300' }
   ];
@@ -518,14 +518,14 @@ function renderAdminOrdersTable(orders) {
 
     // Direct status dropdown (No modal/submit needed! Direct 1-click update/allow)
     const statusWidget = `
-      <div class="flex items-center gap-1.5 flex-nowrap">
-        <select onchange="quickUpdateOrderStatus(${o.id}, this.value)" class="text-[11px] font-bold py-1 px-2 rounded-lg border cursor-pointer transition focus:outline-none focus:ring-1 focus:ring-teal-500 shadow-2xs ${curStatus.color}" title="সরাসরি স্ট্যাটাস পরিবর্তন করুন (সাবমিট বাটন ছাড়া)">
+      <div class="flex items-center gap-1 flex-nowrap">
+        <select onchange="quickUpdateOrderStatus(${o.id}, this.value)" class="text-[11px] font-bold py-1 px-1.5 rounded-lg border cursor-pointer transition focus:outline-none focus:ring-1 focus:ring-teal-500 shadow-2xs max-w-[130px] ${curStatus.color}" title="সরাসরি স্ট্যাটাস পরিবর্তন">
           ${statusList.map(s => `
             <option value="${s.val}" ${s.val === o.status ? 'selected' : ''}>${s.label}</option>
           `).join('')}
         </select>
         ${o.status === 'QUOTE_PENDING' ? `
-          <button onclick="quickDirectApprove(${o.id})" class="px-2 py-1 rounded-md text-[10px] font-bold bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs transition shrink-0" title="সরাসরি অনুমোদন করুন (Direct Allow without submit)">
+          <button onclick="quickDirectApprove(${o.id})" class="px-1.5 py-1 rounded-md text-[10px] font-bold bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs transition shrink-0" title="সরাসরি অনুমোদন (Direct Allow)">
             ✓ অনুমোদন
           </button>
         ` : ''}
@@ -539,13 +539,13 @@ function renderAdminOrdersTable(orders) {
         </td>
 
         <td class="py-2.5 px-3">
-          <div class="font-bold text-slate-900 truncate max-w-[130px]" title="${o.customer_name}">${o.customer_name}</div>
-          <div class="text-[10px] text-slate-500 truncate max-w-[130px]">📍 ${o.area || 'ঢাকা'}</div>
+          <div class="font-bold text-slate-900 truncate max-w-[120px]" title="${o.customer_name}">${o.customer_name}</div>
+          <div class="text-[10px] text-slate-500 truncate max-w-[120px]">📍 ${o.area || 'ঢাকা'}</div>
         </td>
 
         <td class="py-2.5 px-3">
-          <div class="font-semibold text-slate-800 truncate max-w-[160px]" title="${o.brand} ${o.model}">${o.brand} ${o.model}</div>
-          <div class="text-[10px] text-slate-500 truncate max-w-[160px]">⚠️ ${Array.isArray(o.issues) ? o.issues.join(', ') : o.issues}</div>
+          <div class="font-semibold text-slate-800 truncate max-w-[135px]" title="${o.brand} ${o.model}">${o.brand} ${o.model}</div>
+          <div class="text-[10px] text-slate-500 truncate max-w-[135px]">⚠️ ${Array.isArray(o.issues) ? o.issues.join(', ') : o.issues}</div>
         </td>
 
         <td class="py-2.5 px-3 font-mono whitespace-nowrap">
@@ -563,8 +563,8 @@ function renderAdminOrdersTable(orders) {
           ${statusWidget}
         </td>
 
-        <td class="py-2.5 px-3 text-right whitespace-nowrap">
-          <button onclick="openEditModal(${o.id})" class="px-2.5 py-1.5 rounded-lg bg-[#0f766e] hover:bg-[#115e59] text-white font-bold text-xs shadow-2xs transition inline-flex items-center gap-1 shrink-0" title="কোটেশন ও বিস্তারিত বিবরণ সম্পাদনা">
+        <td class="py-2.5 px-3 text-center whitespace-nowrap">
+          <button onclick="openEditModal(${o.id})" class="px-3 py-1.5 rounded-lg bg-[#0f766e] hover:bg-[#115e59] text-white font-bold text-xs shadow-2xs transition inline-flex items-center justify-center gap-1 shrink-0" title="কোটেশন ও বিস্তারিত বিবরণ সম্পাদনা">
             <span>📝</span> <span>আপডেট</span>
           </button>
         </td>
