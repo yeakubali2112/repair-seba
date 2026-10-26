@@ -144,6 +144,15 @@
                 </div>
               </button>
 
+              <!-- 4. Registered Customers Tab (গ্রাহক একাউন্টসমূহ - CORE REQUEST) -->
+              <button onclick="switchTab('customers')" id="tab-btn-customers" class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-medium text-slate-700 hover:bg-slate-100 transition-all text-left">
+                <div class="flex items-center gap-2.5">
+                  <span class="text-sm">👥</span>
+                  <span>গ্রাহক একাউন্টসমূহ</span>
+                </div>
+                <span id="badge-sidebar-customers" class="px-2 py-0.5 text-[10px] font-bold rounded-full bg-teal-100 text-[#0f766e]">0</span>
+              </button>
+
               <!-- 4. Services Tab -->
               <button onclick="switchTab('services')" id="tab-btn-services" class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-medium text-slate-700 hover:bg-slate-100 transition-all text-left">
                 <div class="flex items-center gap-2.5">
@@ -388,6 +397,103 @@
                   </thead>
                   <tbody id="orders-table-body" class="divide-y divide-slate-100 text-slate-800">
                     <!-- Loaded by admin.js -->
+                  </tbody>
+                </table>
+              </div>
+
+            </div>
+
+          </section>
+
+          <!-- TAB: REGISTERED WEBSITE CUSTOMERS (👥 গ্রাহক একাউন্টসমূহ - CORE REQUEST) -->
+          <section id="tab-customers" class="hidden space-y-6">
+            
+            <!-- Top Header & Live Statistics Card -->
+            <div class="bg-gradient-to-r from-teal-900 via-[#0f766e] to-teal-800 rounded-3xl p-6 text-white shadow-lg border border-teal-700/50">
+              <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+                <div>
+                  <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-xs text-teal-200 text-xs font-bold mb-3 border border-white/20">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                    <span>রিয়েল-টাইম গ্রাহক ডাটাবেস</span>
+                  </div>
+                  <h2 class="text-2xl font-black text-white flex items-center gap-2.5">
+                    <span>👥</span> <span>ওয়েবসাইটে নিবন্ধিত গ্রাহক একাউন্টসমূহ</span>
+                  </h2>
+                  <p class="text-xs text-teal-100 max-w-2xl mt-1.5 leading-relaxed">
+                    ইউজার ওয়েবসাইট থেকে গ্রাহকরা যখনই নতুন একাউন্ট তৈরি করবে, ফোন দিয়ে লগইন করবে বা অর্ডার প্লেস করবে, তাদের প্রোফাইল ছবি, নাম, মোবাইল নম্বর, ঠিকানা ও সমস্ত বিবরণ স্বয়ংক্রিয়ভাবে এখানে চলে আসবে।
+                  </p>
+                </div>
+
+                <!-- 3 Top Quick Stat Badges -->
+                <div class="grid grid-cols-3 gap-3 shrink-0">
+                  <div class="bg-white/10 backdrop-blur-xs border border-white/20 rounded-2xl p-3.5 text-center min-w-[90px]">
+                    <div class="text-[11px] text-teal-200 font-medium">মোট গ্রাহক</div>
+                    <div id="cust-stat-total" class="text-xl sm:text-2xl font-black text-white mt-0.5">০</div>
+                  </div>
+                  <div class="bg-white/10 backdrop-blur-xs border border-white/20 rounded-2xl p-3.5 text-center min-w-[90px]">
+                    <div class="text-[11px] text-emerald-300 font-medium">অর্ডারকারী</div>
+                    <div id="cust-stat-ordered" class="text-xl sm:text-2xl font-black text-emerald-300 mt-0.5">০</div>
+                  </div>
+                  <div class="bg-white/10 backdrop-blur-xs border border-white/20 rounded-2xl p-3.5 text-center min-w-[90px]">
+                    <div class="text-[11px] text-amber-200 font-medium">নতুন যুক্ত</div>
+                    <div id="cust-stat-recent" class="text-xl sm:text-2xl font-black text-amber-200 mt-0.5">০</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Table Card with Toolbar -->
+            <div class="bg-white border border-slate-200/90 rounded-3xl shadow-sm overflow-hidden">
+              
+              <!-- Toolbar -->
+              <div class="p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 bg-slate-50/50">
+                <div class="flex items-center gap-3">
+                  <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2">
+                    <span>📋 সমস্ত গ্রাহকদের তালিকা ও প্রোফাইল বিবরণ</span>
+                  </h3>
+                  <span id="badge-customers-count" class="px-2.5 py-0.5 text-xs font-black rounded-full bg-teal-100 text-[#0f766e] border border-teal-200">
+                    ০ জন
+                  </span>
+                </div>
+
+                <div class="flex flex-wrap items-center gap-2">
+                  <!-- Search Box -->
+                  <div class="relative">
+                    <input type="text" id="customers-search-input" placeholder="নাম, ফোন বা এলাকা দিয়ে খুঁজুন..." oninput="handleSearchCustomers(this.value)" class="pl-8 pr-3 py-2 rounded-xl bg-white border border-slate-200 text-xs focus:border-teal-600 focus:outline-none transition w-56 sm:w-64 shadow-2xs">
+                    <span class="absolute left-2.5 top-2.5 text-slate-400 text-xs">🔍</span>
+                  </div>
+
+                  <!-- Quick Filter Dropdown -->
+                  <select id="customers-filter-select" onchange="handleFilterCustomers(this.value)" class="px-3 py-2 rounded-xl bg-white border border-slate-200 text-xs font-semibold text-slate-700 focus:border-teal-600 focus:outline-none transition shadow-2xs">
+                    <option value="all">সব গ্রাহক</option>
+                    <option value="with_orders">যাদের অর্ডার আছে</option>
+                    <option value="no_orders">নতুন (অর্ডার ছাড়া)</option>
+                  </select>
+
+                  <!-- Refresh Button -->
+                  <button onclick="loadAdminCustomers()" class="px-3 py-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-white bg-slate-100 border border-slate-200 transition text-xs font-bold flex items-center gap-1.5 shadow-2xs cursor-pointer" title="রিফ্রেশ করুন">
+                    <span id="cust-refresh-icon">🔄</span>
+                    <span class="hidden sm:inline">রিফ্রেশ</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Customers Table -->
+              <div class="w-full overflow-x-auto">
+                <table class="w-full text-left text-xs table-auto">
+                  <thead class="bg-slate-50 text-slate-600 font-bold uppercase tracking-wider border-b border-slate-200">
+                    <tr>
+                      <th class="py-3.5 px-4">গ্রাহকের প্রোফাইল ও নাম</th>
+                      <th class="py-3.5 px-4 whitespace-nowrap">মোবাইল নম্বর</th>
+                      <th class="py-3.5 px-4">ইমেইল</th>
+                      <th class="py-3.5 px-4">ঠিকানা ও এরিয়া</th>
+                      <th class="py-3.5 px-4 text-center whitespace-nowrap">সর্বমোট অর্ডার</th>
+                      <th class="py-3.5 px-4 whitespace-nowrap">রেজিস্ট্রেশন সময়</th>
+                      <th class="py-3.5 px-4 text-center whitespace-nowrap">অ্যাকশন</th>
+                    </tr>
+                  </thead>
+                  <tbody id="admin-customers-table-body" class="divide-y divide-slate-100 text-slate-800">
+                    <!-- Populated by admin.js -->
                   </tbody>
                 </table>
               </div>
@@ -828,20 +934,18 @@
             </div>
           </div>
 
-          <!-- User Management Subtabs (Admins vs Website Customers) -->
-          <div class="flex items-center gap-3 border-b border-slate-200/80 pb-3">
-            <button onclick="switchUserSubTab('admins')" id="subtab-btn-admins" type="button" class="px-4 py-2 rounded-xl text-xs font-bold bg-[#0f766e] text-white shadow-xs transition flex items-center gap-2">
-              <span>👥 টিম ও অ্যাডমিন প্রোফাইল</span>
-              <span id="badge-users-count" class="px-2 py-0.5 text-[10px] font-black rounded-md bg-teal-800 text-teal-100">১ জন</span>
-            </button>
-            <button onclick="switchUserSubTab('customers')" id="subtab-btn-customers" type="button" class="px-4 py-2 rounded-xl text-xs font-bold bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200 transition flex items-center gap-2">
-              <span>🛒 ওয়েবসাইট গ্রাহক / কাস্টমার একাউন্ট</span>
-              <span id="badge-customers-count" class="px-2 py-0.5 text-[10px] font-black rounded-md bg-amber-100 text-amber-800 border border-amber-200">০ জন</span>
+          <!-- Notice & Switch to Customers Tab -->
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 rounded-2xl bg-teal-50/70 border border-teal-200/80">
+            <div class="flex items-center gap-2.5 text-xs text-teal-950 font-medium">
+              <span class="text-base">👥</span>
+              <span>টিম অ্যাডমিন ও স্টাফদের এক্সেস কন্ট্রোল তালিকা (মোট <strong id="badge-users-count" class="text-teal-800">১ জন</strong>)</span>
+            </div>
+            <button onclick="switchTab('customers')" type="button" class="px-3.5 py-1.5 rounded-xl bg-white hover:bg-teal-50 text-teal-800 border border-teal-300 text-xs font-bold transition flex items-center gap-1.5 shadow-2xs self-start sm:self-auto cursor-pointer">
+              <span>🛒 ওয়েবসাইটের গ্রাহক একাউন্ট দেখতে এখানে যান</span> <span>→</span>
             </button>
           </div>
 
-          <!-- SUBTAB 1: ADMINS & TEAM MEMBERS -->
-          <div id="subtab-content-admins" class="space-y-6">
+          <div class="space-y-6">
 
             <!-- CARD 1: MY ACTIVE PROFILE CARD -->
             <div class="bg-gradient-to-r from-teal-900 via-[#0f766e] to-teal-800 rounded-2xl p-5 sm:p-6 text-white shadow-md shadow-teal-900/10 border border-teal-700/50">
@@ -937,65 +1041,6 @@
             </div>
 
           </div>
-
-          <!-- SUBTAB 2: REGISTERED WEBSITE CUSTOMERS -->
-          <div id="subtab-content-customers" class="hidden space-y-4">
-            
-            <!-- Information Banner -->
-            <div class="p-4 rounded-xl bg-teal-50/70 border border-teal-200/80 flex items-start gap-3">
-              <span class="text-xl shrink-0 mt-0.5">🛒</span>
-              <div class="text-xs text-teal-950 leading-relaxed">
-                <div class="font-bold mb-0.5">ওয়েবসাইট গ্রাহক প্রোফাইল তালিকা</div>
-                <div>গ্রাহকরা ওয়েবসাইট থেকে যখন একাউন্ট তৈরি করবে, ফোন দিয়ে লগইন করবে বা অর্ডার বুক করবে, তখন তাদের ছবি, নাম, মোবাইল নম্বর, ঠিকানা এবং সর্বমোট অর্ডারের হিসাব এখানে স্বয়ংক্রিয়ভাবে সংরক্ষিত ও প্রদর্শিত হবে।</div>
-              </div>
-            </div>
-
-            <!-- Toolbar: Search & Refresh -->
-            <div class="bg-white border border-slate-200/90 rounded-2xl shadow-sm overflow-hidden">
-              <div class="p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100">
-                <div class="flex items-center gap-2.5">
-                  <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2">
-                    <span>👥 ওয়েবসাইটে নিবন্ধিত কাস্টমার তালিকা</span>
-                  </h3>
-                </div>
-
-                <div class="flex flex-wrap items-center gap-2">
-                  <!-- Search Box -->
-                  <div class="relative">
-                    <input type="text" id="customers-search-input" placeholder="গ্রাহকের নাম বা ফোন দিয়ে খুঁজুন..." oninput="handleSearchCustomers(this.value)" class="pl-8 pr-3 py-1.5 rounded-xl bg-slate-50 border border-slate-200 text-xs focus:bg-white focus:border-teal-600 focus:outline-none transition w-56 sm:w-64">
-                    <span class="absolute left-2.5 top-2 text-slate-400 text-xs">🔍</span>
-                  </div>
-
-                  <!-- Refresh Button -->
-                  <button onclick="loadAdminCustomers()" class="p-2 rounded-xl text-slate-500 hover:text-slate-800 hover:bg-slate-100 border border-slate-200 transition text-xs" title="রিফ্রেশ">
-                    <span>🔄</span>
-                  </button>
-                </div>
-              </div>
-
-              <!-- Customers Table -->
-              <div class="w-full overflow-x-auto">
-                <table class="w-full text-left text-xs table-auto">
-                  <thead class="bg-slate-50 text-slate-600 font-bold uppercase tracking-wider border-b border-slate-200">
-                    <tr>
-                      <th class="py-3 px-4">গ্রাহকের প্রোফাইল ও নাম</th>
-                      <th class="py-3 px-4 whitespace-nowrap">মোবাইল নম্বর</th>
-                      <th class="py-3 px-4">ইমেইল</th>
-                      <th class="py-3 px-4">ঠিকানা ও এলাকা</th>
-                      <th class="py-3 px-4 text-center whitespace-nowrap">সর্বমোট অর্ডার</th>
-                      <th class="py-3 px-4 whitespace-nowrap">রেজিস্ট্রেশন তারিখ</th>
-                      <th class="py-3 px-4 text-center whitespace-nowrap">যোগাযোগ</th>
-                    </tr>
-                  </thead>
-                  <tbody id="admin-customers-table-body" class="divide-y divide-slate-100 text-slate-800">
-                    <!-- Populated by admin.js -->
-                  </tbody>
-                </table>
-              </div>
-
-            </div>
-
-          </div>
         </section>
 
       </main>
@@ -1004,6 +1049,27 @@
 
   </div>
 </div>
+
+  <!-- CUSTOMER DETAILS MODAL (গ্রাহকের প্রোফাইল ও সর্বমোট অর্ডার হিস্টোরি - CORE FEATURE) -->
+  <div id="customer-details-modal" class="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs hidden flex items-center justify-center p-4">
+    <div class="bg-white border border-slate-200 rounded-3xl max-w-xl w-full p-6 sm:p-7 shadow-2xl relative animate-fade-in text-slate-800 max-h-[92vh] overflow-y-auto">
+      
+      <div class="flex items-center justify-between pb-3.5 border-b border-slate-200 mb-5">
+        <div>
+          <span class="text-xs uppercase font-bold tracking-wider text-[#0f766e]">Customer Profile & Orders</span>
+          <h3 class="text-lg font-black text-slate-900">গ্রাহকের প্রোফাইল বিবরণ ও অর্ডারসমূহ</h3>
+        </div>
+        <button onclick="closeCustomerDetailsModal()" class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-800 flex items-center justify-center text-lg transition">
+          ✕
+        </button>
+      </div>
+
+      <div id="customer-details-content" class="space-y-4">
+        <!-- Rendered dynamically by admin.js -->
+      </div>
+
+    </div>
+  </div>
 
   <!-- ORDER MANAGEMENT MODAL (For Updating Diagnosis, Quote, Status & Rider) -->
   <div id="order-edit-modal" class="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs hidden flex items-center justify-center p-4">

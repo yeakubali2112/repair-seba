@@ -248,8 +248,10 @@ const server = http.createServer(async (req, res) => {
           return errorResponse(res, 400, 'Please fill in all required fields (নাম, ফোন নম্বর, ঠিকানা, এলাকা, ডিভাইসের নাম ও মডেল আবশ্যক)।');
         }
 
-        // Clean phone number
-        const cleanPhone = customer_phone.trim().replace(/[\s-]/g, '');
+        // Clean phone number (normalize to 11 digits)
+        let cleanPhone = customer_phone.trim().replace(/[^0-9+]/g, '');
+        if (cleanPhone.startsWith('+88')) cleanPhone = cleanPhone.substring(3);
+        if (cleanPhone.startsWith('88')) cleanPhone = cleanPhone.substring(2);
         if (cleanPhone.length < 11) {
           return errorResponse(res, 400, 'অনুগ্রহ করে সঠিক ১১ ডিজিটের মোবাইল নম্বর দিন (Valid 11-digit phone number is required)।');
         }
@@ -1116,7 +1118,7 @@ const server = http.createServer(async (req, res) => {
         const rows = db.prepare(`
           SELECT 
             u.id, u.phone, u.name, u.email, u.avatar, u.address, u.area, u.city, u.created_at, u.updated_at,
-            (SELECT COUNT(*) FROM orders o WHERE o.customer_phone = u.phone) as total_orders
+            (SELECT COUNT(*) FROM orders o WHERE o.customer_phone = u.phone OR o.customer_phone = ('+88' || u.phone) OR o.customer_phone = ('88' || u.phone)) as total_orders
           FROM users u
           ORDER BY u.id DESC
         `).all();

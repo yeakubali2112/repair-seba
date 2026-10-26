@@ -76,6 +76,7 @@ const ADMIN_STATUS_BADGES = {
 const TAB_TITLES = {
   'overview': 'ড্যাশবোর্ড ওভারভিউ',
   'orders': '<span>📦</span> অর্ডার আবেদন ও মেরামত ট্র্যাকিং ব্যবস্থাপনা',
+  'customers': '<span>👥</span> ওয়েবসাইটে নিবন্ধিত গ্রাহক একাউন্টসমূহ',
   'services': '<span>🛠️</span> রিপেয়ার সার্ভিস ও মূল্য তালিকা পরিচালনা',
   'inquiries': '<span>💬</span> গ্রাহকদের মেসেজ ও যোগাযোগ তালিকা',
   'hero': '<span>🎨</span> হিরো ব্যানার ও বাইক অ্যানিমেশন কন্ট্রোল',
@@ -199,6 +200,7 @@ function applyRolePermissions(perms, isSuper) {
   const tabElements = {
     'overview': [document.getElementById('tab-btn-overview')],
     'orders': [document.getElementById('tab-btn-orders')],
+    'customers': [document.getElementById('tab-btn-customers')],
     'services': [document.getElementById('tab-btn-services')],
     'inquiries': [document.getElementById('tab-btn-inquiries')],
     'hero': [document.getElementById('tab-btn-hero')],
@@ -207,7 +209,9 @@ function applyRolePermissions(perms, isSuper) {
   };
 
   Object.entries(tabElements).forEach(([key, btnList]) => {
-    const hasPerm = isSuper || perms.includes(key) || perms.includes('*') || (key === 'overview' && (perms.includes('orders') || isSuper));
+    const hasPerm = isSuper || perms.includes(key) || perms.includes('*') 
+      || (key === 'overview' && (perms.includes('orders') || isSuper))
+      || (key === 'customers' && (perms.includes('users') || perms.includes('orders') || isSuper));
     btnList.forEach(btn => {
       if (!btn) return;
       btn.style.display = hasPerm ? 'flex' : 'none';
@@ -216,7 +220,7 @@ function applyRolePermissions(perms, isSuper) {
 
   // If non-superadmin does not have orders permission and is on orders/overview tab, redirect to first permitted tab
   if (!isSuper && !perms.includes('orders') && !perms.includes('*') && (currentAdminTab === 'orders' || currentAdminTab === 'overview')) {
-    const allowed = ['services', 'inquiries', 'hero', 'footer', 'users'].find(p => perms.includes(p));
+    const allowed = ['customers', 'services', 'inquiries', 'hero', 'footer', 'users'].find(p => perms.includes(p));
     if (allowed) {
       switchTab(allowed);
     }
@@ -829,13 +833,14 @@ async function handleOrderUpdate() {
 function switchTab(tab) {
   if (currentAdminProfile && currentAdminProfile.role !== 'superadmin') {
     const isOverviewAllowed = tab === 'overview' && (currentAdminPermissions.includes('orders') || currentAdminPermissions.includes('*'));
-    if (!currentAdminPermissions.includes(tab) && !currentAdminPermissions.includes('*') && !isOverviewAllowed) {
+    const isCustomersAllowed = tab === 'customers' && (currentAdminPermissions.includes('users') || currentAdminPermissions.includes('orders') || currentAdminPermissions.includes('customers') || currentAdminPermissions.includes('*'));
+    if (!currentAdminPermissions.includes(tab) && !currentAdminPermissions.includes('*') && !isOverviewAllowed && !isCustomersAllowed) {
       alert('আপনার এই সেকশনে প্রবেশের অনুমতি নেই।');
       return;
     }
   }
   currentAdminTab = tab;
-  ['overview', 'orders', 'services', 'inquiries', 'hero', 'footer', 'users'].forEach(t => {
+  ['overview', 'orders', 'customers', 'services', 'inquiries', 'hero', 'footer', 'users'].forEach(t => {
     const sec = document.getElementById(`tab-${t}`);
     const btn = document.getElementById(`tab-btn-${t}`);
     
@@ -858,15 +863,16 @@ function switchTab(tab) {
   if (tab === 'overview') {
     loadAdminStats();
     loadOverviewOrders();
+    loadAdminCustomers();
   }
   if (tab === 'orders') loadAdminOrders();
+  if (tab === 'customers') loadAdminCustomers();
   if (tab === 'services') loadAdminServices();
   if (tab === 'inquiries') loadAdminContacts();
   if (tab === 'hero') loadAdminHeroSettings();
   if (tab === 'footer') loadAdminFooterSettings();
   if (tab === 'users') {
     loadAdminUsers();
-    loadAdminCustomers();
   }
 }
 
@@ -1875,41 +1881,23 @@ window.deleteAdminUser = deleteAdminUser;
 // REGISTERED WEBSITE CUSTOMERS MANAGEMENT (SUBTAB)
 // -------------------------------------------------------------
 let cachedAdminCustomers = [];
-let currentCustomerSubTab = 'admins';
 
 function switchUserSubTab(subtab) {
-  currentCustomerSubTab = subtab;
-  const adminsBtn = document.getElementById('subtab-btn-admins');
-  const customersBtn = document.getElementById('subtab-btn-customers');
-  const adminsContent = document.getElementById('subtab-content-admins');
-  const customersContent = document.getElementById('subtab-content-customers');
-
-  if (subtab === 'admins') {
-    adminsBtn?.classList.add('bg-[#0f766e]', 'text-white', 'shadow-xs');
-    adminsBtn?.classList.remove('bg-slate-100', 'text-slate-700', 'border');
-    customersBtn?.classList.remove('bg-[#0f766e]', 'text-white', 'shadow-xs');
-    customersBtn?.classList.add('bg-slate-100', 'text-slate-700', 'border');
-
-    adminsContent?.classList.remove('hidden');
-    customersContent?.classList.add('hidden');
-    loadAdminUsers();
-  } else {
-    customersBtn?.classList.add('bg-[#0f766e]', 'text-white', 'shadow-xs');
-    customersBtn?.classList.remove('bg-slate-100', 'text-slate-700', 'border');
-    adminsBtn?.classList.remove('bg-[#0f766e]', 'text-white', 'shadow-xs');
-    adminsBtn?.classList.add('bg-slate-100', 'text-slate-700', 'border');
-
-    adminsContent?.classList.add('hidden');
-    customersContent?.classList.remove('hidden');
-    loadAdminCustomers();
+  if (subtab === 'customers') {
+    switchTab('customers');
+    return;
   }
+  loadAdminUsers();
 }
 
 async function loadAdminCustomers() {
   const tbody = document.getElementById('admin-customers-table-body');
-  if (!tbody) return;
+  const refreshIcon = document.getElementById('cust-refresh-icon');
+  if (refreshIcon) refreshIcon.classList.add('animate-spin');
 
-  tbody.innerHTML = `<tr><td colspan="7" class="text-center py-6 text-slate-500">গ্রাহক তালিকা লোড হচ্ছে...</td></tr>`;
+  if (tbody && (!cachedAdminCustomers || cachedAdminCustomers.length === 0)) {
+    tbody.innerHTML = `<tr><td colspan="7" class="text-center py-8 text-slate-500 font-medium">গ্রাহক তালিকা লোড হচ্ছে...</td></tr>`;
+  }
 
   try {
     const res = await fetch('/api/admin/customers', {
@@ -1917,16 +1905,40 @@ async function loadAdminCustomers() {
     });
     const data = await res.json();
     if (data.success) {
-      cachedAdminCustomers = data.customers;
-      renderAdminCustomersTable(data.customers);
-      const badge = document.getElementById('badge-customers-count');
-      if (badge) badge.textContent = `${data.customers.length} জন`;
+      cachedAdminCustomers = data.customers || [];
+      renderAdminCustomersTable(cachedAdminCustomers);
+
+      // Update counters
+      const totalCount = cachedAdminCustomers.length;
+      const orderedCount = cachedAdminCustomers.filter(c => (c.total_orders || 0) > 0).length;
+      
+      const oneWeekAgo = Date.now() - (7 * 24 * 60 * 60 * 1000);
+      const recentCount = cachedAdminCustomers.filter(c => c.created_at && new Date(c.created_at).getTime() > oneWeekAgo).length;
+
+      const badgeSidebar = document.getElementById('badge-sidebar-customers');
+      if (badgeSidebar) badgeSidebar.textContent = totalCount;
+
+      const badgeCount = document.getElementById('badge-customers-count');
+      if (badgeCount) badgeCount.textContent = `${totalCount} জন`;
+
+      const statTotal = document.getElementById('cust-stat-total');
+      if (statTotal) statTotal.textContent = totalCount;
+
+      const statOrdered = document.getElementById('cust-stat-ordered');
+      if (statOrdered) statOrdered.textContent = orderedCount;
+
+      const statRecent = document.getElementById('cust-stat-recent');
+      if (statRecent) statRecent.textContent = recentCount;
     } else {
-      tbody.innerHTML = `<tr><td colspan="7" class="text-center py-6 text-rose-500">${data.error}</td></tr>`;
+      if (tbody) tbody.innerHTML = `<tr><td colspan="7" class="text-center py-6 text-rose-500">${data.error}</td></tr>`;
     }
   } catch (err) {
     console.error('Error loading customers:', err);
-    tbody.innerHTML = `<tr><td colspan="7" class="text-center py-6 text-rose-500">গ্রাহক তালিকা লোড করতে সমস্যা হয়েছে।</td></tr>`;
+    if (tbody) tbody.innerHTML = `<tr><td colspan="7" class="text-center py-6 text-rose-500">গ্রাহক তালিকা লোড করতে সমস্যা হয়েছে।</td></tr>`;
+  } finally {
+    if (refreshIcon) {
+      setTimeout(() => refreshIcon.classList.remove('animate-spin'), 400);
+    }
   }
 }
 
@@ -1934,8 +1946,18 @@ function renderAdminCustomersTable(customers) {
   const tbody = document.getElementById('admin-customers-table-body');
   if (!tbody) return;
 
-  if (customers.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="7" class="text-center py-10 text-slate-500 font-medium">বর্তমানে কোনো নিবন্ধিত ওয়েবসাইট গ্রাহক নেই।</td></tr>`;
+  if (!customers || customers.length === 0) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="7" class="text-center py-12 text-slate-500">
+          <div class="flex flex-col items-center justify-center gap-2">
+            <span class="text-3xl">👥</span>
+            <div class="font-bold text-slate-700">কোনো নিবন্ধিত গ্রাহক পাওয়া যায়নি</div>
+            <p class="text-xs text-slate-400 max-w-sm">গ্রাহকরা ওয়েবসাইট থেকে একাউন্ট তৈরি করলে বা অর্ডার প্লেস করলে তাদের বিবরণ এখানে দেখা যাবে।</p>
+          </div>
+        </td>
+      </tr>
+    `;
     return;
   }
 
@@ -1943,54 +1965,66 @@ function renderAdminCustomersTable(customers) {
     const initial = (c.name || 'গ').charAt(0).toUpperCase();
     const avatarHtml = c.avatar && c.avatar.trim() 
       ? `<img src="${c.avatar}" alt="${c.name || 'গ্রাহক'}" class="w-full h-full object-cover">`
-      : `<span>${initial}</span>`;
+      : `<span class="font-bold">${initial}</span>`;
     
-    const regDate = c.created_at ? new Date(c.created_at).toLocaleDateString('bn-BD', { year: 'numeric', month: 'short', day: 'numeric' }) : 'অজানা';
+    const regDate = c.created_at ? new Date(c.created_at).toLocaleDateString('bn-BD', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'অজানা';
     const totalOrders = c.total_orders || 0;
 
     return `
-      <tr class="hover:bg-slate-50/80 transition text-slate-800 text-xs">
-        <td class="py-3 px-4">
+      <tr class="hover:bg-slate-50/90 transition text-slate-800 text-xs">
+        <td class="py-3.5 px-4">
           <div class="flex items-center gap-3">
-            <div class="w-9 h-9 rounded-full overflow-hidden bg-[#0f766e] text-white flex items-center justify-center font-bold text-xs shrink-0 border border-teal-300 shadow-2xs">
+            <div class="relative w-10 h-10 rounded-full overflow-hidden bg-[#0f766e] text-white flex items-center justify-center font-bold text-sm shrink-0 border-2 border-teal-300 shadow-xs cursor-pointer group" onclick="openCustomerDetailsModal(${c.id})" title="প্রোফাইল দেখতে ক্লিক করুন">
               ${avatarHtml}
             </div>
             <div>
-              <div class="font-bold text-slate-900">${c.name || 'সম্মানিত গ্রাহক'}</div>
-              <div class="text-[10px] text-teal-800 font-medium">আইডি: #${c.id}</div>
+              <div class="font-bold text-slate-900 hover:text-teal-700 cursor-pointer flex items-center gap-1.5" onclick="openCustomerDetailsModal(${c.id})">
+                <span>${c.name || 'সম্মানিত গ্রাহক'}</span>
+              </div>
+              <div class="text-[10px] text-teal-800 font-medium">আইডি: #RS-C${c.id}</div>
             </div>
           </div>
         </td>
 
-        <td class="py-3 px-4 font-mono font-semibold text-slate-800 whitespace-nowrap">
-          ${c.phone}
-        </td>
-
-        <td class="py-3 px-4 text-slate-600">
-          ${c.email ? `<span class="font-sans">${c.email}</span>` : `<span class="text-slate-400 font-sans italic">দেওয়া হয়নি</span>`}
-        </td>
-
-        <td class="py-3 px-4 text-slate-700">
-          <div class="truncate max-w-[200px]" title="${c.address || ''}">
-            ${c.address || c.area ? `📍 ${[c.address, c.area].filter(Boolean).join(', ')}` : '<span class="text-slate-400 italic">ঠিকানা যুক্ত হয়নি</span>'}
+        <td class="py-3.5 px-4 whitespace-nowrap">
+          <div class="flex items-center gap-2">
+            <a href="tel:${c.phone}" class="font-mono font-bold text-slate-900 hover:text-teal-700 hover:underline" title="কল করুন">
+              ${c.phone}
+            </a>
+            <button onclick="navigator.clipboard.writeText('${c.phone}'); alert('ফোন নম্বর কপি করা হয়েছে: ${c.phone}');" class="text-slate-400 hover:text-slate-700 transition cursor-pointer" title="নম্বর কপি করুন">
+              📋
+            </button>
           </div>
         </td>
 
-        <td class="py-3 px-4 text-center whitespace-nowrap">
-          <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold ${totalOrders > 0 ? 'bg-emerald-50 text-emerald-800 border border-emerald-200' : 'bg-slate-100 text-slate-600 border border-slate-200'}">
-            ${totalOrders}টি অর্ডার
-          </span>
+        <td class="py-3.5 px-4 text-slate-600">
+          ${c.email ? `<span class="font-sans font-medium text-slate-800">${c.email}</span>` : `<span class="text-slate-400 italic">দেওয়া হয়নি</span>`}
         </td>
 
-        <td class="py-3 px-4 text-slate-500 whitespace-nowrap font-sans">
+        <td class="py-3.5 px-4 text-slate-700">
+          <div class="max-w-[220px]" title="${c.address || ''}">
+            ${c.address || c.area ? `<span class="font-medium text-slate-800">📍 ${[c.address, c.area, c.city].filter(Boolean).join(', ')}</span>` : '<span class="text-slate-400 italic">ঠিকানা যুক্ত হয়নি</span>'}
+          </div>
+        </td>
+
+        <td class="py-3.5 px-4 text-center whitespace-nowrap">
+          <button onclick="openCustomerDetailsModal(${c.id})" class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold transition cursor-pointer ${totalOrders > 0 ? 'bg-emerald-100 hover:bg-emerald-200 text-emerald-800 border border-emerald-300' : 'bg-slate-100 text-slate-600 border border-slate-200'}" title="অর্ডার দেখতে ক্লিক করুন">
+            📦 ${totalOrders}টি অর্ডার
+          </button>
+        </td>
+
+        <td class="py-3.5 px-4 text-slate-500 whitespace-nowrap font-sans text-[11px]">
           ${regDate}
         </td>
 
-        <td class="py-3 px-4 text-center whitespace-nowrap space-x-1.5">
-          <a href="https://wa.me/88${c.phone}?text=${encodeURIComponent(`Assalamu Alaikum ${c.name || ''}, Repair Seba থেকে আপনার সাথে যোগাযোগ করছি।`)}" target="_blank" class="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs transition inline-flex items-center gap-1 shadow-2xs" title="WhatsApp Chat">
-            <span>💬</span> <span>চ্যাট</span>
+        <td class="py-3.5 px-4 text-center whitespace-nowrap space-x-1.5">
+          <button onclick="openCustomerDetailsModal(${c.id})" class="px-2.5 py-1.5 rounded-lg bg-teal-50 hover:bg-teal-100 text-[#0f766e] border border-teal-200 font-bold text-xs transition inline-flex items-center gap-1 shadow-2xs cursor-pointer" title="বিস্তারিত প্রোফাইল">
+            <span>👁️</span> <span>বিস্তারিত</span>
+          </button>
+          <a href="https://wa.me/88${c.phone}?text=${encodeURIComponent(`Assalamu Alaikum ${c.name || ''}, Repair Seba থেকে আপনার সাথে যোগাযোগ করছি।`)}" target="_blank" class="px-2 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs transition inline-flex items-center gap-1 shadow-2xs" title="WhatsApp Message">
+            <span>💬</span>
           </a>
-          <button onclick="deleteAdminCustomer(${c.id}, '${(c.name || c.phone).replace(/'/g, "\\'")}')" class="px-2 py-1 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-bold text-xs transition inline-flex items-center gap-0.5" title="গ্রাহক মুছে ফেলুন">
+          <button onclick="deleteAdminCustomer(${c.id}, '${(c.name || c.phone).replace(/'/g, "\\'")}')" class="px-2 py-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-bold text-xs transition inline-flex items-center cursor-pointer" title="গ্রাহক মুছে ফেলুন">
             🗑️
           </button>
         </td>
@@ -2010,9 +2044,146 @@ function handleSearchCustomers(query) {
     (c.phone && c.phone.includes(q)) ||
     (c.email && c.email.toLowerCase().includes(q)) ||
     (c.address && c.address.toLowerCase().includes(q)) ||
-    (c.area && c.area.toLowerCase().includes(q))
+    (c.area && c.area.toLowerCase().includes(q)) ||
+    (c.city && c.city.toLowerCase().includes(q))
   );
   renderAdminCustomersTable(filtered);
+}
+
+function handleFilterCustomers(filter) {
+  if (filter === 'with_orders') {
+    renderAdminCustomersTable(cachedAdminCustomers.filter(c => (c.total_orders || 0) > 0));
+  } else if (filter === 'no_orders') {
+    renderAdminCustomersTable(cachedAdminCustomers.filter(c => (c.total_orders || 0) === 0));
+  } else {
+    renderAdminCustomersTable(cachedAdminCustomers);
+  }
+}
+
+function openCustomerDetailsModal(customerId) {
+  const customer = cachedAdminCustomers.find(c => c.id === customerId);
+  if (!customer) return;
+
+  const content = document.getElementById('customer-details-content');
+  if (!content) return;
+
+  const initial = (customer.name || 'গ').charAt(0).toUpperCase();
+  const avatarHtml = customer.avatar && customer.avatar.trim() 
+    ? `<img src="${customer.avatar}" alt="${customer.name}" class="w-full h-full object-cover">`
+    : `<span class="text-2xl font-black">${initial}</span>`;
+
+  const regDate = customer.created_at 
+    ? new Date(customer.created_at).toLocaleDateString('bn-BD', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })
+    : 'তারিখ নেই';
+
+  // Find customer's orders from cachedOrders
+  const custOrders = (window.cachedOrders || []).filter(o => {
+    let oPhone = (o.customer_phone || '').trim().replace(/[^0-9]/g, '');
+    let cPhone = (customer.phone || '').trim().replace(/[^0-9]/g, '');
+    if (oPhone.startsWith('88')) oPhone = oPhone.substring(2);
+    if (cPhone.startsWith('88')) cPhone = cPhone.substring(2);
+    return oPhone && cPhone && (oPhone === cPhone || oPhone.endsWith(cPhone) || cPhone.endsWith(oPhone));
+  });
+
+  const ordersListHtml = custOrders.length > 0 ? custOrders.map(o => `
+    <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+      <div>
+        <div class="flex items-center gap-2">
+          <span class="font-bold text-slate-900 font-mono text-sm">#${o.order_number}</span>
+          <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-teal-100 text-teal-800 border border-teal-200">${o.status}</span>
+        </div>
+        <div class="text-slate-600 font-medium mt-1">
+          📱 <strong>${o.brand || ''} ${o.model || ''}</strong> (${o.device_type || 'Device'})
+        </div>
+        <div class="text-[11px] text-slate-400 mt-0.5">
+          📅 ${new Date(o.created_at).toLocaleDateString('bn-BD', { month: 'short', day: 'numeric', year: 'numeric' })}
+        </div>
+      </div>
+      <div class="flex items-center gap-2 shrink-0">
+        <span class="font-bold text-slate-900 font-sans">৳${o.final_cost || o.estimated_cost || 0}</span>
+        <button onclick="closeCustomerDetailsModal(); switchTab('orders'); setTimeout(() => searchOrder('${o.order_number}'), 300);" class="px-3 py-1.5 rounded-xl bg-[#0f766e] hover:bg-[#115e59] text-white font-bold text-xs transition cursor-pointer">
+          অর্ডারে যান →
+        </button>
+      </div>
+    </div>
+  `).join('') : `
+    <div class="p-4 rounded-xl bg-slate-50 border border-dashed border-slate-200 text-center text-xs text-slate-500">
+      এই গ্রাহক এখনও ওয়েবসাইট থেকে কোনো মেরামতের অর্ডার প্লেস করেননি।
+    </div>
+  `;
+
+  content.innerHTML = `
+    <!-- Customer Header Card -->
+    <div class="p-4 rounded-2xl bg-gradient-to-r from-teal-900 to-teal-700 text-white flex items-center gap-4">
+      <div class="w-16 h-16 rounded-2xl overflow-hidden bg-white/10 border-2 border-white/30 flex items-center justify-center font-bold text-xl shrink-0 shadow-inner">
+        ${avatarHtml}
+      </div>
+      <div class="space-y-1 min-w-0 flex-1">
+        <div class="flex items-center gap-2">
+          <h4 class="text-lg font-black text-white truncate">${customer.name || 'সম্মানিত গ্রাহক'}</h4>
+          <span class="px-2 py-0.5 text-[10px] font-bold rounded-md bg-white/20 text-teal-100">আইডি: #RS-C${customer.id}</span>
+        </div>
+        <p class="text-xs text-teal-100 flex items-center gap-1.5 font-mono">
+          <span>📞 ${customer.phone}</span>
+        </p>
+        <p class="text-[11px] text-teal-200/90">
+          যুক্ত হয়েছেন: ${regDate}
+        </p>
+      </div>
+    </div>
+
+    <!-- Contact & Action Buttons -->
+    <div class="grid grid-cols-3 gap-2">
+      <a href="tel:${customer.phone}" class="py-2.5 px-3 rounded-xl bg-teal-50 hover:bg-teal-100 text-[#0f766e] border border-teal-200 font-bold text-xs transition flex items-center justify-center gap-1.5 shadow-2xs">
+        <span>📞</span> <span>সরাসরি কল</span>
+      </a>
+      <a href="https://wa.me/88${customer.phone}?text=${encodeURIComponent(`Assalamu Alaikum ${customer.name || ''}, Repair Seba থেকে আপনার সাথে যোগাযোগ করছি।`)}" target="_blank" class="py-2.5 px-3 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 font-bold text-xs transition flex items-center justify-center gap-1.5 shadow-2xs">
+        <span>💬</span> <span>WhatsApp</span>
+      </a>
+      <button onclick="navigator.clipboard.writeText('${customer.phone}'); alert('ফোন নম্বর কপি করা হয়েছে: ${customer.phone}');" class="py-2.5 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 font-bold text-xs transition flex items-center justify-center gap-1.5 shadow-2xs cursor-pointer">
+        <span>📋</span> <span>কপি ফোন</span>
+      </button>
+    </div>
+
+    <!-- Profile Details Grid -->
+    <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3 text-xs">
+      <div class="font-bold text-slate-800 border-b border-slate-200/80 pb-2 flex items-center gap-1.5">
+        <span>📍</span> <span>ঠিকানা ও ব্যক্তিগত বিবরণ</span>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-slate-700">
+        <div>
+          <span class="text-slate-400 block text-[10px] uppercase font-bold">ইমেইল এড্রেস:</span>
+          <span class="font-medium text-slate-900">${customer.email || 'দেওয়া হয়নি'}</span>
+        </div>
+        <div>
+          <span class="text-slate-400 block text-[10px] uppercase font-bold">সিটি / শহর:</span>
+          <span class="font-medium text-slate-900">${customer.city || 'ঢাকা'}</span>
+        </div>
+        <div class="sm:col-span-2">
+          <span class="text-slate-400 block text-[10px] uppercase font-bold">ডেলিভারি / বর্তমান ঠিকানা:</span>
+          <span class="font-medium text-slate-900">${[customer.address, customer.area].filter(Boolean).join(', ') || 'ঠিকানা দেওয়া হয়নি'}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Orders Section -->
+    <div class="space-y-2.5">
+      <div class="flex items-center justify-between">
+        <h5 class="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
+          <span>📦</span> <span>এই গ্রাহকের সমস্ত অর্ডার (${custOrders.length}টি)</span>
+        </h5>
+      </div>
+      <div class="space-y-2 max-h-56 overflow-y-auto pr-1">
+        ${ordersListHtml}
+      </div>
+    </div>
+  `;
+
+  document.getElementById('customer-details-modal')?.classList.remove('hidden');
+}
+
+function closeCustomerDetailsModal() {
+  document.getElementById('customer-details-modal')?.classList.add('hidden');
 }
 
 async function deleteAdminCustomer(customerId, customerName) {
@@ -2038,6 +2209,9 @@ async function deleteAdminCustomer(customerId, customerName) {
 window.switchUserSubTab = switchUserSubTab;
 window.loadAdminCustomers = loadAdminCustomers;
 window.handleSearchCustomers = handleSearchCustomers;
+window.handleFilterCustomers = handleFilterCustomers;
+window.openCustomerDetailsModal = openCustomerDetailsModal;
+window.closeCustomerDetailsModal = closeCustomerDetailsModal;
 window.deleteAdminCustomer = deleteAdminCustomer;
 window.handleAdminProfileFileUpload = handleAdminProfileFileUpload;
 window.handleTeamUserFileUpload = handleTeamUserFileUpload;
