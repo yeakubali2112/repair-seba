@@ -304,6 +304,29 @@ function showDashboardScreen() {
   }
 }
 
+function closeAllAdminModals() {
+  const modalIds = [
+    'admin-profile-modal',
+    'order-edit-modal',
+    'customer-details-modal',
+    'admin-user-modal',
+    'admin-service-modal',
+    'custom-message-modal'
+  ];
+  modalIds.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.classList.add('hidden');
+      el.style.display = 'none';
+    }
+  });
+  document.querySelectorAll('[id$="-modal"]').forEach(el => {
+    el.classList.add('hidden');
+    el.style.display = 'none';
+  });
+}
+window.closeAllAdminModals = closeAllAdminModals;
+
 function adminLogout() {
   if (adminToken) {
     fetch('/api/admin/logout', {
@@ -311,6 +334,11 @@ function adminLogout() {
       headers: { 'Authorization': `Bearer ${adminToken}` }
     }).catch(() => {});
   }
+  if (livePollingTimer) {
+    clearInterval(livePollingTimer);
+    livePollingTimer = null;
+  }
+  closeAllAdminModals();
   localStorage.removeItem('repair_seba_admin_token');
   localStorage.removeItem('repair_seba_admin_profile');
   adminToken = null;
