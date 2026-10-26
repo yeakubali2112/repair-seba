@@ -126,7 +126,7 @@
             <nav class="space-y-1.5">
               
               <!-- 1. Overview (Active by default) -->
-              <button onclick="switchTab('orders')" id="tab-btn-orders" class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold bg-[#0f766e] text-white shadow-md shadow-teal-700/20 transition-all text-left">
+              <button onclick="switchTab('overview')" id="tab-btn-overview" class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold bg-[#0f766e] text-white shadow-md shadow-teal-700/20 transition-all text-left">
                 <div class="flex items-center gap-2.5">
                   <span class="text-sm">▦</span>
                   <span>ওভারভিউ</span>
@@ -142,7 +142,7 @@
               </button>
 
               <!-- 3. Orders Tab -->
-              <button onclick="switchTab('orders')" id="tab-btn-orders-list" class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-medium text-slate-700 hover:bg-slate-100 transition-all text-left">
+              <button onclick="switchTab('orders')" id="tab-btn-orders" class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-medium text-slate-700 hover:bg-slate-100 transition-all text-left">
                 <div class="flex items-center gap-2.5">
                   <span class="text-sm">📦</span>
                   <span>অর্ডার আবেদন</span>
@@ -190,15 +190,21 @@
         <main class="flex-1 w-full min-w-0 space-y-6">
           
           <!-- TAB 1: OVERVIEW DASHBOARD -->
-          <section id="tab-orders" class="space-y-6">
+          <section id="tab-overview" class="space-y-6">
             
-            <div>
-              <h2 id="top-bar-title" class="text-2xl font-black text-slate-900 tracking-tight">
-                ড্যাশবোর্ড ওভারভিউ
-              </h2>
-              <p class="text-xs text-slate-500 mt-1">
-                রিপেয়ার সেবার সকল সার্ভিসের লাইভ ডাটা, পিকআপ ট্র্যাকিং, মেরামত পরিসংখ্যান ও সাম্প্রতিক কার্যক্রমের সারসংক্ষেপ
-              </p>
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div>
+                <h2 id="top-bar-title" class="text-2xl font-black text-slate-900 tracking-tight">
+                  ড্যাশবোর্ড ওভারভিউ
+                </h2>
+                <p class="text-xs text-slate-500 mt-1">
+                  রিপেয়ার সেবার সকল সার্ভিসের লাইভ ডাটা, পিকআপ ট্র্যাকিং, মেরামত পরিসংখ্যান ও সাম্প্রতিক কার্যক্রমের সারসংক্ষেপ
+                </p>
+              </div>
+              <button onclick="switchTab('orders')" class="px-3.5 py-2 rounded-xl bg-[#0f766e] hover:bg-[#115e59] text-white text-xs font-bold transition flex items-center gap-2 shadow-xs shrink-0">
+                <span>📦</span>
+                <span>অর্ডার আবেদন ও ব্যবস্থাপনা</span>
+              </button>
             </div>
 
             <!-- The 8 Pastel Stat Cards (Single Row of 8 Compact Cards) -->
@@ -210,35 +216,29 @@
             <div class="bg-white border border-slate-200/90 rounded-2xl shadow-sm overflow-hidden">
               
               <!-- Card Header Toolbar -->
-              <div class="p-4 sm:p-5 border-b border-slate-200/80 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+              <div class="p-4 sm:p-5 border-b border-slate-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 
                 <!-- Title & Count Badge -->
                 <div class="flex items-center gap-2.5">
                   <h3 class="text-base font-bold text-slate-900">
                     সর্বশেষ অর্ডারসমূহ (অনলাইন পোর্টাল)
                   </h3>
-                  <span id="badge-table-total" class="px-2.5 py-0.5 text-xs font-bold rounded-md bg-slate-100 text-slate-600 border border-slate-200">
-                    ৬টি মোট
+                  <span id="badge-overview-total" class="px-2.5 py-0.5 text-xs font-bold rounded-md bg-amber-50 text-amber-700 border border-amber-200">
+                    নতুন ৫টি অর্ডার
                   </span>
                 </div>
 
-                <!-- Right Actions: Filters + Search + Refresh -->
-                <div class="flex flex-wrap items-center gap-2">
-                  
-                  <!-- Filter Pills -->
-                  <div class="flex items-center gap-1 bg-slate-100 p-1 rounded-xl border border-slate-200 text-xs">
-                    <button onclick="filterOrders('ALL')" class="order-status-tab active px-2.5 py-1 rounded-lg font-bold bg-[#0f766e] text-white shadow-2xs transition">সকল</button>
-                    <button onclick="filterOrders('PENDING_PICKUP')" class="order-status-tab px-2.5 py-1 rounded-lg text-slate-700 hover:text-slate-900 transition font-medium">অপেক্ষমাণ</button>
-                    <button onclick="filterOrders('QUOTE_APPROVED')" class="order-status-tab px-2.5 py-1 rounded-lg text-slate-700 hover:text-slate-900 transition font-medium">অনুমোদিত</button>
-                    <button onclick="filterOrders('IN_REPAIR')" class="order-status-tab px-2.5 py-1 rounded-lg text-slate-700 hover:text-slate-900 transition font-medium">মেরামত</button>
-                    <button onclick="filterOrders('COMPLETED')" class="order-status-tab px-2.5 py-1 rounded-lg text-slate-700 hover:text-slate-900 transition font-medium">সম্পন্ন</button>
-                  </div>
-
+                <!-- Right Action: View All Orders in Orders Tab -->
+                <div class="flex items-center gap-2">
+                  <button onclick="switchTab('orders')" class="px-3.5 py-1.5 rounded-xl text-xs font-bold text-[#0f766e] hover:bg-teal-50 border border-teal-200 transition flex items-center gap-1.5">
+                    <span>📦</span>
+                    <span>সকল অর্ডার ব্যবস্থাপনা করুন →</span>
+                  </button>
                 </div>
 
               </div>
 
-              <!-- Orders Table -->
+              <!-- Overview Orders Table (5 columns only: No status dropdown, no action button) -->
               <div class="w-full overflow-x-auto lg:overflow-x-visible">
                 <table class="w-full text-left text-xs table-auto">
                   <thead class="bg-slate-50/80 text-slate-600 font-bold uppercase tracking-wider border-b border-slate-200/90">
@@ -248,12 +248,10 @@
                       <th class="py-2.5 px-3">ডিভাইস ও সমস্যা</th>
                       <th class="py-2.5 px-3 whitespace-nowrap">মোবাইল</th>
                       <th class="py-2.5 px-3 whitespace-nowrap">তারিখ</th>
-                      <th class="py-2.5 px-3">বর্তমান অবস্থা (সরাসরি পরিবর্তন)</th>
-                      <th class="py-2.5 px-3 text-right whitespace-nowrap">অ্যাকশন</th>
                     </tr>
                   </thead>
-                  <tbody id="orders-table-body" class="divide-y divide-slate-100 text-slate-800">
-                    <!-- Loaded by admin.js -->
+                  <tbody id="overview-orders-table-body" class="divide-y divide-slate-100 text-slate-800">
+                    <!-- Loaded by admin.js (5 new orders) -->
                   </tbody>
                 </table>
               </div>
@@ -325,7 +323,85 @@
 
           </section>
 
-        <!-- TAB 2: SERVICES CONFIG -->
+          <!-- TAB 2: ORDER MANAGEMENT (📦 অর্ডার আবেদন) -->
+          <section id="tab-orders" class="hidden space-y-6">
+            
+            <!-- Management Header Card -->
+            <div class="bg-white border border-slate-200/90 rounded-2xl p-5 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div>
+                <div class="flex items-center gap-2">
+                  <span class="text-xl">📦</span>
+                  <h2 class="text-xl font-bold text-slate-900">অর্ডার আবেদন ও মেরামত ট্র্যাকিং ব্যবস্থাপনা</h2>
+                </div>
+                <p class="text-xs text-slate-500 mt-1">
+                  ওয়েবসাইট থেকে আসা সকল অনলাইন সার্ভিস রিকোয়েস্ট পরিচালনা, স্ট্যাটাস পরিবর্তন, রাইডার নির্ধারণ ও কোটেশন আপডেট
+                </p>
+              </div>
+            </div>
+
+            <!-- Orders Table Card with Full Management Options -->
+            <div class="bg-white border border-slate-200/90 rounded-2xl shadow-sm overflow-hidden">
+              
+              <!-- Card Header Toolbar -->
+              <div class="p-4 sm:p-5 border-b border-slate-200/80 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                
+                <!-- Title & Count Badge -->
+                <div class="flex items-center gap-2.5">
+                  <h3 class="text-base font-bold text-slate-900">
+                    সকল অর্ডার আবেদন তালিকা
+                  </h3>
+                  <span id="badge-table-total" class="px-2.5 py-0.5 text-xs font-bold rounded-md bg-slate-100 text-slate-600 border border-slate-200">
+                    লোড হচ্ছে...
+                  </span>
+                </div>
+
+                <!-- Right Actions: Filters + Search -->
+                <div class="flex flex-wrap items-center gap-2">
+                  
+                  <!-- Filter Pills -->
+                  <div class="flex items-center gap-1 bg-slate-100 p-1 rounded-xl border border-slate-200 text-xs">
+                    <button onclick="filterOrders('ALL')" class="order-status-tab active px-2.5 py-1 rounded-lg font-bold bg-[#0f766e] text-white shadow-2xs transition">সকল</button>
+                    <button onclick="filterOrders('PENDING_PICKUP')" class="order-status-tab px-2.5 py-1 rounded-lg text-slate-700 hover:text-slate-900 transition font-medium">অপেক্ষমাণ</button>
+                    <button onclick="filterOrders('QUOTE_APPROVED')" class="order-status-tab px-2.5 py-1 rounded-lg text-slate-700 hover:text-slate-900 transition font-medium">অনুমোদিত</button>
+                    <button onclick="filterOrders('IN_REPAIR')" class="order-status-tab px-2.5 py-1 rounded-lg text-slate-700 hover:text-slate-900 transition font-medium">মেরামত</button>
+                    <button onclick="filterOrders('COMPLETED')" class="order-status-tab px-2.5 py-1 rounded-lg text-slate-700 hover:text-slate-900 transition font-medium">সম্পন্ন</button>
+                  </div>
+
+                  <!-- Search Input -->
+                  <div class="relative">
+                    <input type="text" id="order-search-input" placeholder="অর্ডার আইডি, ফোন বা নাম..." class="w-48 sm:w-56 pl-8 pr-3 py-1.5 text-xs rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:outline-none focus:ring-1 focus:ring-teal-500 transition">
+                    <span class="absolute left-2.5 top-1.5 text-slate-400 text-xs">🔍</span>
+                  </div>
+
+                </div>
+
+              </div>
+
+              <!-- Orders Management Table: Contains current status select & action buttons -->
+              <div class="w-full overflow-x-auto lg:overflow-x-visible">
+                <table class="w-full text-left text-xs table-auto">
+                  <thead class="bg-slate-50/80 text-slate-600 font-bold uppercase tracking-wider border-b border-slate-200/90">
+                    <tr>
+                      <th class="py-2.5 px-3 whitespace-nowrap">ট্র্যাকিং আইডি</th>
+                      <th class="py-2.5 px-3">গ্রাহকের নাম</th>
+                      <th class="py-2.5 px-3">ডিভাইস ও সমস্যা</th>
+                      <th class="py-2.5 px-3 whitespace-nowrap">মোবাইল</th>
+                      <th class="py-2.5 px-3 whitespace-nowrap">তারিখ</th>
+                      <th class="py-2.5 px-3">বর্তমান অবস্থা (সরাসরি পরিবর্তন)</th>
+                      <th class="py-2.5 px-3 text-right whitespace-nowrap">অ্যাকশন</th>
+                    </tr>
+                  </thead>
+                  <tbody id="orders-table-body" class="divide-y divide-slate-100 text-slate-800">
+                    <!-- Loaded by admin.js -->
+                  </tbody>
+                </table>
+              </div>
+
+            </div>
+
+          </section>
+
+        <!-- TAB 3: SERVICES CONFIG -->
         <section id="tab-services" class="hidden space-y-6">
           <div class="flex items-center justify-between bg-white border border-slate-200 p-5 rounded-2xl shadow-xs">
             <div>

@@ -16,7 +16,8 @@ const ADMIN_STATUS_BADGES = {
 };
 
 const TAB_TITLES = {
-  'orders': 'ড্যাশবোর্ড ওভারভিউ',
+  'overview': 'ড্যাশবোর্ড ওভারভিউ',
+  'orders': '<span>📦</span> অর্ডার আবেদন ও মেরামত ট্র্যাকিং ব্যবস্থাপনা',
   'services': '<span>🛠️</span> রিপেয়ার সার্ভিস ও মূল্য তালিকা পরিচালনা',
   'inquiries': '<span>💬</span> গ্রাহকদের মেসেজ ও যোগাযোগ তালিকা',
   'hero': '<span>🎨</span> হিরো ব্যানার ও বাইক অ্যানিমেশন কন্ট্রোল',
@@ -46,7 +47,7 @@ function openAddServiceModal() {
 }
 
 let adminToken = localStorage.getItem('repair_seba_admin_token');
-let currentAdminTab = 'orders';
+let currentAdminTab = 'overview';
 let currentStatusFilter = 'ALL';
 let adminOrdersCache = [];
 
@@ -138,7 +139,8 @@ function updateHeaderProfileUI(admin) {
 
 function applyRolePermissions(perms, isSuper) {
   const tabElements = {
-    'orders': [document.getElementById('tab-btn-orders'), document.getElementById('tab-btn-orders-list')],
+    'overview': [document.getElementById('tab-btn-overview')],
+    'orders': [document.getElementById('tab-btn-orders')],
     'services': [document.getElementById('tab-btn-services')],
     'inquiries': [document.getElementById('tab-btn-inquiries')],
     'hero': [document.getElementById('tab-btn-hero')],
@@ -147,15 +149,15 @@ function applyRolePermissions(perms, isSuper) {
   };
 
   Object.entries(tabElements).forEach(([key, btnList]) => {
-    const hasPerm = isSuper || perms.includes(key) || perms.includes('*');
+    const hasPerm = isSuper || perms.includes(key) || perms.includes('*') || (key === 'overview' && (perms.includes('orders') || isSuper));
     btnList.forEach(btn => {
       if (!btn) return;
       btn.style.display = hasPerm ? 'flex' : 'none';
     });
   });
 
-  // If non-superadmin does not have orders permission and is on orders tab, redirect to first permitted tab
-  if (!isSuper && !perms.includes('orders') && !perms.includes('*') && currentAdminTab === 'orders') {
+  // If non-superadmin does not have orders permission and is on orders/overview tab, redirect to first permitted tab
+  if (!isSuper && !perms.includes('orders') && !perms.includes('*') && (currentAdminTab === 'orders' || currentAdminTab === 'overview')) {
     const allowed = ['services', 'inquiries', 'hero', 'footer', 'users'].find(p => perms.includes(p));
     if (allowed) {
       switchTab(allowed);
@@ -310,6 +312,7 @@ function setupAdminListeners() {
 // -------------------------------------------------------------
 async function loadAdminDashboardData() {
   await loadAdminStats();
+  await loadOverviewOrders();
   await loadAdminOrders();
 }
 
@@ -570,6 +573,85 @@ function renderAdminOrdersTable(orders) {
   }).join('');
 }
 
+// Overview table (shows only up to 5 new orders, without direct status dropdown or action button)
+async function loadOverviewOrders() {
+  const tbody = document.getElementById('overview-orders-table-body');
+  if (!tbody) return;
+
+  tbody.innerHTML = `<tr><td colspan="5" class="text-center py-6 text-slate-500 font-medium">নতুন অর্ডার লোড হচ্ছে...</td></tr>`;
+
+  try {
+    const res = await fetch('/api/admin/orders', {
+      headers: { 'Authorization': `Bearer ${adminToken}` }
+    });
+    const data = await res.json();
+
+    if (data.success) {
+      // Filter for new/pending orders (status === 'PENDING_PICKUP')
+      const newOrders = data.orders.filter(o => o.status === 'PENDING_PICKUP');
+      // Show up to 5 new orders
+      const displayOrders = newOrders.slice(0, 5);
+      renderOverviewOrdersTable(displayOrders, newOrders.length);
+    } else {
+      tbody.innerHTML = `<tr><td colspan="5" class="text-center py-6 text-rose-400 font-medium">${data.error}</td></tr>`;
+    }
+  } catch (err) {
+    console.error('Error loading overview orders:', err);
+    tbody.innerHTML = `<tr><td colspan="5" class="text-center py-6 text-rose-400 font-medium">অর্ডার লোড করতে সমস্যা হয়েছে।</td></tr>`;
+  }
+}
+
+function renderOverviewOrdersTable(orders, totalNewCount = 0) {
+  const tbody = document.getElementById('overview-orders-table-body');
+  if (!tbody) return;
+
+  const countBadge = document.getElementById('badge-overview-total');
+  if (countBadge) {
+    countBadge.textContent = `${orders.length}টি নতুন আবেদন`;
+  }
+
+  if (orders.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="5" class="text-center py-10 text-slate-500 font-medium">বর্তমানে কোনো নতুন অপেক্ষমাণ অর্ডার নেই। <button onclick="switchTab('orders')" class="text-[#0f766e] font-bold underline hover:text-[#115e59] ml-1">সকল অর্ডার দেখুন →</button></td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = orders.map(o => {
+    const dateFormatted = new Date(o.created_at).toLocaleDateString('bn-BD', { year: 'numeric', month: '2-digit', day: '2-digit' });
+
+    return `
+      <tr class="hover:bg-slate-50/80 transition text-slate-800 text-xs">
+        <td class="py-3 px-3 font-bold font-mono text-[#0f766e] whitespace-nowrap">
+          <div class="flex items-center gap-1.5">
+            <span>${o.order_number}</span>
+            <span class="px-1.5 py-0.2 rounded text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-200">নতুন</span>
+          </div>
+        </td>
+
+        <td class="py-3 px-3">
+          <div class="font-bold text-slate-900 truncate max-w-[150px]" title="${o.customer_name}">${o.customer_name}</div>
+          <div class="text-[10px] text-slate-500 truncate max-w-[150px]">📍 ${o.area || 'ঢাকা'}</div>
+        </td>
+
+        <td class="py-3 px-3">
+          <div class="font-semibold text-slate-800 truncate max-w-[180px]" title="${o.brand} ${o.model}">${o.brand} ${o.model}</div>
+          <div class="text-[10px] text-slate-500 truncate max-w-[180px]">⚠️ ${Array.isArray(o.issues) ? o.issues.join(', ') : o.issues}</div>
+        </td>
+
+        <td class="py-3 px-3 font-mono whitespace-nowrap">
+          <div class="text-slate-800 text-xs font-semibold">${o.customer_phone}</div>
+          <a href="https://wa.me/88${o.customer_phone}?text=${encodeURIComponent(`Assalamu Alaikum, Repair Seba থেকে আপনার অর্ডার ${o.order_number} এর ব্যাপারে যোগাযোগ করছি।`)}" target="_blank" class="text-emerald-600 hover:text-emerald-700 text-[10px] font-bold inline-flex items-center gap-0.5 mt-0.5" title="WhatsApp Chat">
+            💬 চ্যাট
+          </a>
+        </td>
+
+        <td class="py-3 px-3 text-slate-600 whitespace-nowrap">
+          ${dateFormatted}
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
 // Direct 1-click status update without submit button or modal popup
 async function quickUpdateOrderStatus(orderId, newStatus) {
   try {
@@ -592,6 +674,7 @@ async function quickUpdateOrderStatus(orderId, newStatus) {
     if (data.success) {
       loadAdminOrders();
       loadAdminStats();
+      loadOverviewOrders();
     } else {
       alert(data.error || 'স্ট্যাটাস পরিবর্তন করা যায়নি।');
     }
@@ -687,13 +770,14 @@ async function handleOrderUpdate() {
 // -------------------------------------------------------------
 function switchTab(tab) {
   if (currentAdminProfile && currentAdminProfile.role !== 'superadmin') {
-    if (!currentAdminPermissions.includes(tab) && !currentAdminPermissions.includes('*')) {
+    const isOverviewAllowed = tab === 'overview' && (currentAdminPermissions.includes('orders') || currentAdminPermissions.includes('*'));
+    if (!currentAdminPermissions.includes(tab) && !currentAdminPermissions.includes('*') && !isOverviewAllowed) {
       alert('আপনার এই সেকশনে প্রবেশের অনুমতি নেই।');
       return;
     }
   }
   currentAdminTab = tab;
-  ['orders', 'services', 'inquiries', 'hero', 'footer', 'users'].forEach(t => {
+  ['overview', 'orders', 'services', 'inquiries', 'hero', 'footer', 'users'].forEach(t => {
     const sec = document.getElementById(`tab-${t}`);
     const btn = document.getElementById(`tab-btn-${t}`);
     
@@ -713,6 +797,11 @@ function switchTab(tab) {
     topTitle.innerHTML = TAB_TITLES[tab];
   }
 
+  if (tab === 'overview') {
+    loadAdminStats();
+    loadOverviewOrders();
+  }
+  if (tab === 'orders') loadAdminOrders();
   if (tab === 'services') loadAdminServices();
   if (tab === 'inquiries') loadAdminContacts();
   if (tab === 'hero') loadAdminHeroSettings();
