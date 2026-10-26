@@ -2,7 +2,23 @@ const { DatabaseSync } = require('node:sqlite');
 const path = require('node:path');
 const fs = require('node:fs');
 
-const DB_PATH = path.join(__dirname, 'repair_seba.db');
+let DB_PATH = path.join(__dirname, 'repair_seba.db');
+
+// On Vercel serverless environment, filesystem is read-only. Copy to /tmp for write access.
+if (process.env.VERCEL) {
+  const tmpDbPath = path.join('/tmp', 'repair_seba.db');
+  if (!fs.existsSync(tmpDbPath)) {
+    try {
+      if (fs.existsSync(DB_PATH)) {
+        fs.copyFileSync(DB_PATH, tmpDbPath);
+      }
+    } catch (e) {
+      console.error('Failed to copy db to /tmp:', e);
+    }
+  }
+  DB_PATH = tmpDbPath;
+}
+
 const db = new DatabaseSync(DB_PATH);
 
 // Initialize tables

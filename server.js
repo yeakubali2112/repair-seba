@@ -940,11 +940,15 @@ const server = http.createServer(async (req, res) => {
   }
 });
 
-server.listen(PORT, () => {
-  console.log(`====================================================`);
-  console.log(`  Repair Seba (রিপেয়ার সেবা) Server Running!`);
-  console.log(`  Local URL:        http://localhost:${PORT}`);
-  console.log(`  Admin Dashboard:  http://localhost:${PORT}/admin.html`);
-  console.log(`  Default Admin:    admin / admin123`);
-  console.log(`====================================================`);
-});
+if (require.main === module) {
+  server.listen(PORT, () => {
+    console.log(`====================================================`);
+    console.log(`  Repair Seba (রিপেয়ার সেবা) Server Running!`);
+    console.log(`  Local URL:        http://localhost:${PORT}`);
+    console.log(`  Admin Dashboard:  http://localhost:${PORT}/admin.html`);
+    console.log(`  Default Admin:    admin / admin123`);
+    console.log(`====================================================`);
+  });
+}
+
+module.exports = server;
