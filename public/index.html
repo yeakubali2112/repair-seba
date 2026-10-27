@@ -88,22 +88,17 @@
             <span class="text-xs sm:text-sm">👤</span> <span>লগইন</span>
           </button>
 
-          <!-- Logged In State: Matching Admin Panel Profile Capsule Design -->
-          <div id="nav-user-dropdown" class="hidden relative flex items-center gap-1 sm:gap-2">
+          <!-- Logged In State: Compact Single-Line Profile Pill Capsule -->
+          <div id="nav-user-dropdown" class="hidden relative flex items-center shrink-0">
             <!-- Profile Capsule Button (Click to open dropdown) -->
-            <button onclick="toggleUserDropdown()" type="button" class="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg sm:rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200/90 shadow-2xs transition group text-left cursor-pointer" title="ক্লিক করে প্রোফাইল দেখুন">
-              <div class="relative w-6 h-6 sm:w-8 sm:h-8 rounded-full overflow-hidden bg-[#0f766e] text-white flex items-center justify-center font-black text-[10px] sm:text-xs shrink-0 shadow-xs border border-teal-400">
+            <button onclick="toggleUserDropdown()" type="button" class="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-2.5 py-1 sm:py-1.5 rounded-full bg-slate-50 hover:bg-slate-100 border border-slate-200/90 shadow-2xs transition group text-left cursor-pointer" title="ক্লিক করে প্রোফাইল দেখুন">
+              <div class="relative w-6 h-6 sm:w-6.5 sm:h-6.5 rounded-full overflow-hidden bg-[#0f766e] text-white flex items-center justify-center font-black text-[10px] sm:text-xs shrink-0 shadow-xs border border-teal-400">
                 <img id="nav-user-avatar" src="" alt="Profile" class="w-full h-full object-cover hidden">
                 <span id="nav-user-initial">গ</span>
               </div>
-              <div class="text-left">
-                <div class="flex items-center gap-1">
-                  <span id="nav-user-display-name" class="text-[11px] sm:text-xs font-bold text-slate-900 leading-tight truncate max-w-[65px] xs:max-w-[85px] sm:max-w-[120px]">গ্রাহক নাম</span>
-                  <span class="hidden sm:inline-block px-1.5 py-0.2 text-[9px] font-black rounded bg-emerald-100 text-emerald-800 border border-emerald-200 shrink-0">গ্রাহক</span>
-                </div>
-                <p id="nav-user-sub" class="hidden sm:block text-[10px] text-slate-500 leading-tight mt-0.5 truncate max-w-[120px]">০১৭১১-XXXXXX</p>
-              </div>
-              <span class="text-[10px] sm:text-xs text-slate-400">▾</span>
+              <span id="nav-user-display-name" class="text-xs sm:text-sm font-bold text-slate-800 leading-none truncate max-w-[85px] xs:max-w-[110px] sm:max-w-[140px]">গ্রাহক নাম</span>
+              <span class="text-[10px] sm:text-xs text-slate-400 leading-none">▾</span>
+              <span id="nav-user-sub" class="hidden"></span>
             </button>
 
             <!-- Dropdown Menu -->
