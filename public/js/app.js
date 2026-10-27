@@ -40,6 +40,17 @@ let allServices = [];
 // -------------------------------------------------------------
 let customMessageCallback = null;
 
+function syncBodyScrollLock() {
+  const openModals = document.querySelectorAll(
+    '#user-profile-modal:not(.hidden), #user-login-modal:not(.hidden), #order-success-modal:not(.hidden), #custom-message-modal:not(.hidden)'
+  );
+  if (openModals.length > 0) {
+    document.body.style.overflow = 'hidden';
+  } else {
+    document.body.style.overflow = '';
+  }
+}
+
 function showCenterPopup(title, message, icon = '🎉', btnText = 'ঠিক আছে (OK)', callback = null) {
   const modal = document.getElementById('custom-message-modal');
   if (!modal) {
@@ -59,11 +70,13 @@ function showCenterPopup(title, message, icon = '🎉', btnText = 'ঠিক আ
 
   customMessageCallback = callback;
   modal.classList.remove('hidden');
+  syncBodyScrollLock();
 }
 
 function closeCustomMessageModal() {
   const modal = document.getElementById('custom-message-modal');
   if (modal) modal.classList.add('hidden');
+  syncBodyScrollLock();
   if (customMessageCallback) {
     const cb = customMessageCallback;
     customMessageCallback = null;
@@ -1062,11 +1075,13 @@ function showOrderSuccessModal(order) {
   };
 
   modal.classList.remove('hidden');
+  syncBodyScrollLock();
 }
 
 function closeSuccessModal() {
   const modal = document.getElementById('order-success-modal');
   if (modal) modal.classList.add('hidden');
+  syncBodyScrollLock();
 }
 
 // -------------------------------------------------------------
@@ -1943,6 +1958,7 @@ function openUserLoginModal() {
   const modal = document.getElementById('user-login-modal');
   if (modal) {
     modal.classList.remove('hidden');
+    syncBodyScrollLock();
     document.getElementById('user-login-phone')?.focus();
   }
 }
@@ -1950,6 +1966,7 @@ function openUserLoginModal() {
 function closeUserLoginModal() {
   const modal = document.getElementById('user-login-modal');
   if (modal) modal.classList.add('hidden');
+  syncBodyScrollLock();
 }
 
 function toggleUserDropdown() {
@@ -2061,11 +2078,13 @@ function openUserProfileModal(tab = 'profile') {
 
   switchProfileModalTab(tab);
   modal.classList.remove('hidden');
+  syncBodyScrollLock();
 }
 
 function closeUserProfileModal() {
   const modal = document.getElementById('user-profile-modal');
   if (modal) modal.classList.add('hidden');
+  syncBodyScrollLock();
 }
 
 function switchProfileModalTab(tab) {
