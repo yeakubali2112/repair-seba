@@ -717,11 +717,11 @@ const server = http.createServer(async (req, res) => {
         });
       }
 
-      // 3. Customer Profile Update (Allows user to edit name, email, avatar, address, area anytime)
+            // 3. Customer Profile Update (Allows user to edit name, email, avatar, address, area anytime)
       if (pathname === '/api/user/profile' && method === 'PUT') {
         const session = getAuthenticatedCustomer(req);
         if (!session) {
-          return errorResponse(res, 401, 'প্রোফাইল পরিবর্তন করতে লগইন করা আবশ্যক');
+          return errorResponse(res, 401, 'লগইন সেশন মেয়াদোত্তীর্ণ হয়ে গেছে। অনুগ্রহ করে আবার লগইন করুন।');
         }
         const body = await parseBody(req);
         const name = (body.name || '').trim();
@@ -733,29 +733,56 @@ const server = http.createServer(async (req, res) => {
         const now = new Date().toISOString();
 
         if (!name) {
-          return errorResponse(res, 400, 'অনুগ্রহ করে আপনার নাম দিন');
+          return errorResponse(res, 400, 'দয়া করে আপনার নাম দিন');
         }
 
-        db.prepare(`
-          UPDATE users 
-          SET name = ?, email = ?, avatar = ?, address = ?, area = ?, city = ?, updated_at = ?
-          WHERE id = ?
-        `).run(name, email, avatar, address, area, city, now, session.userId);
+        // Robust user lookup: match by userId first, then fallback to verified session phone
+        let user = null;
+        if (session.userId) {
+          user = db.prepare('SELECT * FROM users WHERE id = ?').get(session.userId);
+        }
+        if (!user && session.phone) {
+          user = db.prepare('SELECT * FROM users WHERE phone = ?').get(session.phone);
+        }
 
-        const updatedUser = db.prepare('SELECT * FROM users WHERE id = ?').get(session.userId);
+        if (user) {
+          db.prepare(`
+            UPDATE users 
+            SET name = ?, email = ?, avatar = ?, address = ?, area = ?, city = ?, updated_at = ?
+            WHERE id = ?
+          `).run(name, email, avatar, address, area, city, now, user.id);
+          user = db.prepare('SELECT * FROM users WHERE id = ?').get(user.id);
+        } else {
+          // If user record is missing in current SQLite instance (e.g. after container cold-start), insert them
+          const userPhone = session.phone || '01700000000';
+          const stmt = db.prepare(`
+            INSERT INTO users (phone, name, email, avatar, address, area, city, created_at, updated_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+          `);
+          const info = stmt.run(userPhone, name, email, avatar, address, area, city, now, now);
+          user = db.prepare('SELECT * FROM users WHERE id = ?').get(info.lastInsertRowid);
+        }
+
+        if (!user) {
+          return errorResponse(res, 500, 'প্রোফাইল আপডেট করতে সমস্যা হয়েছে');
+        }
+
+        // Generate refreshed token so local session stays perfectly in sync
+        const token = generateCustomerToken(user);
 
         return jsonResponse(res, 200, {
           success: true,
-          message: 'প্রোফাইল সফলভাবে আপডেট করা হয়েছে!',
+          message: 'গ্রাহক তথ্য সফলভাবে আপডেট হয়েছে!',
+          token,
           user: {
-            id: updatedUser.id,
-            phone: updatedUser.phone,
-            name: updatedUser.name,
-            email: updatedUser.email || '',
-            avatar: updatedUser.avatar || '',
-            address: updatedUser.address || '',
-            area: updatedUser.area || '',
-            city: updatedUser.city || 'Dhaka'
+            id: user.id,
+            phone: user.phone,
+            name: user.name,
+            email: user.email || '',
+            avatar: user.avatar || '',
+            address: user.address || '',
+            area: user.area || '',
+            city: user.city || 'Dhaka'
           }
         });
       }

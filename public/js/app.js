@@ -2156,17 +2156,28 @@ async function handleUserProfileSave(e) {
     const data = await res.json();
 
     if (data.success) {
+      if (data.token) {
+        customerToken = data.token;
+        localStorage.setItem('repair_seba_customer_token', data.token);
+      }
       currentCustomer = data.user;
       localStorage.setItem('repair_seba_customer_profile', JSON.stringify(data.user));
       updateNavUserUI(true);
       autofillBookingFormWithCustomer(data.user);
 
+      // Directly update top modal card in real-time
+      const modalName = document.getElementById('profile-modal-display-name');
+      const modalPhone = document.getElementById('profile-modal-display-phone');
+      if (modalName) modalName.textContent = data.user.name || 'সম্মানিত গ্রাহক';
+      if (modalPhone) modalPhone.textContent = data.user.phone || '';
+      updateProfileAvatarPreview(data.user.avatar || '');
+
       if (msgEl) {
-        msgEl.textContent = '✓ প্রোফাইল সফলভাবে আপডেট করা হয়েছে!';
+        msgEl.textContent = '✓ আপনার তথ্য সফলভাবে সংরক্ষণ করা হয়েছে!';
         msgEl.classList.remove('hidden');
         setTimeout(() => msgEl.classList.add('hidden'), 4000);
       }
-      alert('আপনার প্রোফাইল তথ্য সফলভাবে আপডেট ও সংরক্ষণ করা হয়েছে!');
+      alert('আপনার প্রোফাইল তথ্য সফলভাবে সংরক্ষণ করা হয়েছে!');
     } else {
       alert(data.error || 'আপডেট ব্যর্থ হয়েছে।');
     }
