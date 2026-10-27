@@ -187,6 +187,90 @@
 
   <!-- Hero Section (Full Animated City Background with Delivery Cyclist) -->
   <section id="hero-section" class="relative pt-6 pb-24 lg:pb-32 overflow-hidden min-h-[660px] lg:min-h-[730px] flex flex-col justify-between bg-gradient-to-b from-sky-100/70 via-sky-50/50 to-slate-100">
+    <!-- Dedicated High-Sky Express Jet Layer (100% visible on PC & Mobile) -->
+    <div class="hero-sky-aviation absolute inset-x-0 top-0 h-36 sm:h-44 overflow-hidden pointer-events-none z-1">
+      <div class="anim-airplane-flyer">
+        <svg width="280" height="65" viewBox="-180 -25 260 55" fill="none" xmlns="http://www.w3.org/2000/svg" class="overflow-visible block">
+          <defs>
+            <linearGradient id="skyPlaneContrail" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%" stop-color="#ffffff" stop-opacity="0"/>
+              <stop offset="60%" stop-color="#e0f2fe" stop-opacity="0.65"/>
+              <stop offset="100%" stop-color="#bae6fd" stop-opacity="0.95"/>
+            </linearGradient>
+            <linearGradient id="skyPlaneFuselage" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#ffffff"/>
+              <stop offset="60%" stop-color="#f8fafc"/>
+              <stop offset="100%" stop-color="#e2e8f0"/>
+            </linearGradient>
+            <linearGradient id="skyPlaneTail" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#0284c7"/>
+              <stop offset="100%" stop-color="#0369a1"/>
+            </linearGradient>
+          </defs>
+
+          <!-- Jet Engine Dual Vapor Contrails (উজ্জ্বল বাষ্পরেখা) -->
+          <line x1="-165" y1="4.5" x2="-8" y2="4.5" stroke="url(#skyPlaneContrail)" stroke-width="2.8" stroke-linecap="round"/>
+          <line x1="-125" y1="2.5" x2="-6" y2="2.5" stroke="url(#skyPlaneContrail)" stroke-width="2" stroke-linecap="round"/>
+
+          <!-- Far-Side Wing -->
+          <polygon points="8,-2 -6,-13 2,-14 18,-2" fill="#94a3b8"/>
+
+          <!-- Horizontal Stabilizer -->
+          <polygon points="-24,-1 -35,-5 -30,-6 -18,-2" fill="#64748b"/>
+
+          <!-- Main Fuselage -->
+          <path d="M -26 0 C -26 -4.5, 40 -4.5, 52 0 C 40 4.5, -26 4.5, -26 0 Z" fill="url(#skyPlaneFuselage)" stroke="#94a3b8" stroke-width="0.8"/>
+
+          <!-- Sleek Aerodynamic Nose Cone (Cyan) -->
+          <path d="M 45 -2.2 Q 53 0 45 2.2 Z" fill="#0284c7"/>
+
+          <!-- Brand Cyan Speed Stripe along Body -->
+          <path d="M -20 0 L 46 0" stroke="#0284c7" stroke-width="1.4"/>
+          <path d="M -15 1.5 L 38 1.5" stroke="#38bdf8" stroke-width="0.8"/>
+
+          <!-- Cockpit Windshield -->
+          <path d="M 43 -2.2 L 48 -0.8 L 46 0 L 41 -0.8 Z" fill="#0f172a"/>
+
+          <!-- Passenger Cabin Windows -->
+          <g fill="#0284c7" opacity="0.9">
+            <circle cx="34" cy="-1" r="0.9"/>
+            <circle cx="30" cy="-1" r="0.9"/>
+            <circle cx="26" cy="-1" r="0.9"/>
+            <circle cx="22" cy="-1" r="0.9"/>
+            <circle cx="18" cy="-1" r="0.9"/>
+            <circle cx="14" cy="-1" r="0.9"/>
+            <circle cx="10" cy="-1" r="0.9"/>
+            <circle cx="6" cy="-1" r="0.9"/>
+            <circle cx="2" cy="-1" r="0.9"/>
+            <circle cx="-2" cy="-1" r="0.9"/>
+            <circle cx="-6" cy="-1" r="0.9"/>
+            <circle cx="-10" cy="-1" r="0.9"/>
+            <circle cx="-14" cy="-1" r="0.9"/>
+          </g>
+
+          <!-- Vertical Tail Fin -->
+          <polygon points="-18,-3 -32,-16 -24,-16 -12,-3" fill="url(#skyPlaneTail)"/>
+          <!-- Tail Fin Amber Accent Stripe -->
+          <polygon points="-28,-14 -31,-16 -27,-16 -24,-14" fill="#f59e0b"/>
+
+          <!-- Near-Side Main Wing -->
+          <polygon points="12,0 -4,14 4,14 24,0" fill="#f1f5f9" stroke="#94a3b8" stroke-width="0.7"/>
+          <!-- Winglet Tip -->
+          <polygon points="-4,14 -2,17 1,17 4,14" fill="#0284c7"/>
+
+          <!-- Jet Turbofan Engine Pod -->
+          <g transform="translate(6, 2.5)">
+            <rect x="0" y="0" width="13" height="5.5" rx="2" fill="#334155" stroke="#1e293b" stroke-width="0.6"/>
+            <ellipse cx="13" cy="2.75" rx="1.2" ry="2.2" fill="#0284c7"/>
+            <ellipse cx="0" cy="2.75" rx="1" ry="2" fill="#0f172a"/>
+          </g>
+
+          <!-- Navigation Strobe Beacon Light -->
+          <circle cx="-1" cy="17" r="1.8" fill="#ef4444" class="anim-antenna-beacon"/>
+          <circle cx="-30" cy="-16" r="1.5" fill="#ffffff" class="anim-antenna-beacon"/>
+        </svg>
+      </div>
+    </div>
     
     <!-- 1. FULL BACKGROUND SVG CANVAS (City Skyline, Metro Rail, Road & Cyclist) -->
     <div class="hero-full-bg">
@@ -312,7 +396,7 @@
         <rect x="0" y="0" width="1440" height="520" fill="url(#skyGrad)"/>
 
         <!-- 2. Sun & Glow (Right side sky) -->
-        <g>
+        <g transform="translate(0, 45)">
           <circle cx="1200" cy="90" r="62" fill="url(#sunAura)" class="anim-sun-pulse"/>
           <g class="anim-sun-rays" stroke="#fbbf24" stroke-width="2" stroke-linecap="round" opacity="0.65">
             <line x1="1200" y1="50" x2="1200" y2="40"/>
@@ -340,7 +424,7 @@
         </g>
 
         <!-- 4. Traditional Colorful Kite (বাঙালি ঘুড়ি) -->
-        <g class="anim-kite">
+        <g class="anim-kite" transform="translate(0, 45)">
           <path d="M1000 102 Q1015 130 995 170 Q985 200 1010 240" fill="none" stroke="#cbd5e1" stroke-width="1.2" stroke-dasharray="2 2"/>
           <g id="kite-body">
             <polygon points="1000,60 1022,82 1000,104 978,82" fill="#ef4444"/>
@@ -366,71 +450,7 @@
           <path d="M18 12 Q23 8 28 12 Q33 8 38 12"/>
         </g>
 
-        <!-- 5.5. High Sky Commercial / Express Jet Airplane (আকাশে জেট বিমান উড্ডয়ন) -->
-        <g id="hero-sky-airplane" class="anim-airplane">
-          <!-- Jet Engine Vapor Contrail (ধোঁয়ার ট্রেইল) -->
-          <line x1="-150" y1="4.5" x2="-8" y2="4.5" stroke="url(#planeContrail)" stroke-width="2.5" stroke-linecap="round"/>
-          <line x1="-110" y1="2.5" x2="-6" y2="2.5" stroke="url(#planeContrail)" stroke-width="1.8" stroke-linecap="round"/>
-
-          <!-- Far-Side Wing (দূরের ডানা) -->
-          <polygon points="8,-2 -6,-13 2,-14 18,-2" fill="#cbd5e1"/>
-
-          <!-- Horizontal Stabilizer (পেছনের অনুভূমিক পাখা) -->
-          <polygon points="-24,-1 -35,-5 -30,-6 -18,-2" fill="#94a3b8"/>
-
-          <!-- Main Fuselage (বিমানের মূল বডি) -->
-          <path d="M -26 0 C -26 -4, 40 -4, 52 0 C 40 4, -26 4, -26 0 Z" fill="url(#planeFuselage)" stroke="#cbd5e1" stroke-width="0.6"/>
-
-          <!-- Sleek Aerodynamic Nose Cone -->
-          <path d="M 45 -2 Q 53 0 45 2 Z" fill="#0284c7"/>
-
-          <!-- Brand Cyan Speed Stripe along Body -->
-          <path d="M -20 0 L 46 0" stroke="#0284c7" stroke-width="1.2"/>
-          <path d="M -15 1.4 L 38 1.4" stroke="#38bdf8" stroke-width="0.6"/>
-
-          <!-- Cockpit Windshield (পাইলট উইন্ডশীল্ড) -->
-          <path d="M 43 -2.2 L 48 -0.8 L 46 0 L 41 -0.8 Z" fill="#0f172a"/>
-
-          <!-- Passenger Cabin Windows (কেবিন উইন্ডোজ) -->
-          <g fill="#0284c7" opacity="0.85">
-            <circle cx="34" cy="-0.8" r="0.8"/>
-            <circle cx="30" cy="-0.8" r="0.8"/>
-            <circle cx="26" cy="-0.8" r="0.8"/>
-            <circle cx="22" cy="-0.8" r="0.8"/>
-            <circle cx="18" cy="-0.8" r="0.8"/>
-            <circle cx="14" cy="-0.8" r="0.8"/>
-            <circle cx="10" cy="-0.8" r="0.8"/>
-            <circle cx="6" cy="-0.8" r="0.8"/>
-            <circle cx="2" cy="-0.8" r="0.8"/>
-            <circle cx="-2" cy="-0.8" r="0.8"/>
-            <circle cx="-6" cy="-0.8" r="0.8"/>
-            <circle cx="-10" cy="-0.8" r="0.8"/>
-            <circle cx="-14" cy="-0.8" r="0.8"/>
-          </g>
-
-          <!-- Vertical Tail Fin (উল্লম্ব লেজ) -->
-          <polygon points="-18,-3 -32,-16 -24,-16 -12,-3" fill="url(#planeTail)"/>
-          <!-- Tail Fin Amber Brand Accent Stripe -->
-          <polygon points="-28,-14 -31,-16 -27,-16 -24,-14" fill="#f59e0b"/>
-
-          <!-- Near-Side Main Wing (সামনের প্রধান ডানা) -->
-          <polygon points="12,0 -4,14 4,14 24,0" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="0.5"/>
-          <!-- Winglet Tip (উইংলেট) -->
-          <polygon points="-4,14 -2,17 1,17 4,14" fill="#0284c7"/>
-
-          <!-- Jet Turbofan Engine Pod (টার্বোফ্যান ইঞ্জিন) -->
-          <g transform="translate(6, 2.5)">
-            <rect x="0" y="0" width="13" height="5" rx="2" fill="#475569" stroke="#334155" stroke-width="0.5"/>
-            <ellipse cx="13" cy="2.5" rx="1.2" ry="2.2" fill="#0284c7"/>
-            <ellipse cx="0" cy="2.5" rx="1" ry="2" fill="#0f172a"/>
-          </g>
-
-          <!-- Anti-Collision Strobe / Navigation Beacon Light (ব্লিঙ্কিং সিগন্যাল লাইট) -->
-          <circle cx="-1" cy="17" r="1.5" fill="#ef4444" class="anim-antenna-beacon"/>
-          <circle cx="-30" cy="-16" r="1.2" fill="#ffffff" class="anim-antenna-beacon"/>
-        </g>
-
-
+        <!-- 5.5. High Sky Commercial Jet is moved to dedicated .hero-sky-aviation layer for perfect PC & mobile responsiveness -->
         <!-- 6. Distant & Mid City Skyline (Dhaka Urban Architecture) -->
         <g fill="#93c5fd" opacity="0.45">
           <rect x="70" y="320" width="45" height="195"/>

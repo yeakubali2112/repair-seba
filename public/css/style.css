@@ -178,30 +178,66 @@ html {
 
 /* Birds soaring */
 @keyframes birdsFly {
-  0% { transform: translate(1480px, 40px); }
-  100% { transform: translate(-150px, 15px); }
+  0% { transform: translate(1480px, 145px); }
+  100% { transform: translate(-150px, 125px); }
 }
 
 .anim-birds {
   animation: birdsFly 28s linear infinite;
 }
 
-/* Modern Jet Airplane Flight in High Sky (আকাশে জেট বিমান উড্ডয়ন) */
-@keyframes planeFlight {
+/* Modern Jet Airplane Flight Across Full Sky (পিসি ও মোবাইলে দৃশ্যমান জেট বিমান উড্ডয়ন) */
+@keyframes planeTransSky {
   0% {
-    transform: translate(-180px, 92px) rotate(-2deg);
+    transform: translate3d(-300px, 36px, 0) scale(0.95) rotate(-1.5deg);
+    opacity: 0;
+  }
+  3% {
+    opacity: 1;
   }
   25% {
-    transform: translate(260px, 80px) rotate(-2deg);
+    transform: translate3d(calc(25vw - 75px), 28px, 0) scale(1) rotate(-1deg);
   }
   50% {
-    transform: translate(700px, 70px) rotate(-1.5deg);
+    transform: translate3d(calc(50vw - 75px), 22px, 0) scale(1.04) rotate(-0.5deg);
   }
   75% {
-    transform: translate(1140px, 58px) rotate(-2deg);
+    transform: translate3d(calc(75vw - 75px), 18px, 0) scale(1.02) rotate(-1deg);
+  }
+  97% {
+    opacity: 1;
   }
   100% {
-    transform: translate(1580px, 46px) rotate(-2deg);
+    transform: translate3d(calc(100vw + 300px), 14px, 0) scale(0.95) rotate(-1.5deg);
+    opacity: 0;
+  }
+}
+
+.anim-airplane-flyer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  will-change: transform;
+  animation: planeTransSky 22s linear infinite;
+  pointer-events: none;
+  filter: drop-shadow(0 2px 6px rgba(15, 23, 42, 0.12));
+}
+
+@keyframes planeFlight {
+  0% {
+    transform: translate(-180px, 145px) rotate(-2deg);
+  }
+  25% {
+    transform: translate(260px, 135px) rotate(-2deg);
+  }
+  50% {
+    transform: translate(700px, 128px) rotate(-1.5deg);
+  }
+  75% {
+    transform: translate(1140px, 120px) rotate(-2deg);
+  }
+  100% {
+    transform: translate(1580px, 112px) rotate(-2deg);
   }
 }
 
@@ -304,6 +340,7 @@ html {
 .hero-animations-disabled .anim-kite-tail,
 .hero-animations-disabled .anim-birds,
 .hero-animations-disabled .anim-airplane,
+.hero-animations-disabled .anim-airplane-flyer,
 .hero-animations-disabled .anim-flyover-car,
 .hero-animations-disabled .anim-metro-train,
 .hero-animations-disabled .anim-parachute-descend,
