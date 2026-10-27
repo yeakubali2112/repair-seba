@@ -88,16 +88,16 @@
             <span class="text-xs sm:text-sm">👤</span> <span>লগইন</span>
           </button>
 
-          <!-- Logged In State: Compact Single-Line Profile Pill Capsule -->
+          <!-- Logged In State: Original Box Style showing only Avatar & Name -->
           <div id="nav-user-dropdown" class="hidden relative flex items-center shrink-0">
             <!-- Profile Capsule Button (Click to open dropdown) -->
-            <button onclick="toggleUserDropdown()" type="button" class="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-2.5 py-1 sm:py-1.5 rounded-full bg-slate-50 hover:bg-slate-100 border border-slate-200/90 shadow-2xs transition group text-left cursor-pointer" title="ক্লিক করে প্রোফাইল দেখুন">
-              <div class="relative w-6 h-6 sm:w-6.5 sm:h-6.5 rounded-full overflow-hidden bg-[#0f766e] text-white flex items-center justify-center font-black text-[10px] sm:text-xs shrink-0 shadow-xs border border-teal-400">
+            <button onclick="toggleUserDropdown()" type="button" class="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg sm:rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200/90 shadow-2xs transition group text-left cursor-pointer" title="ক্লিক করে প্রোফাইল দেখুন">
+              <div class="relative w-6 h-6 sm:w-8 sm:h-8 rounded-full overflow-hidden bg-[#0f766e] text-white flex items-center justify-center font-black text-[10px] sm:text-xs shrink-0 shadow-xs border border-teal-400">
                 <img id="nav-user-avatar" src="" alt="Profile" class="w-full h-full object-cover hidden">
                 <span id="nav-user-initial">গ</span>
               </div>
-              <span id="nav-user-display-name" class="text-xs sm:text-sm font-bold text-slate-800 leading-none truncate max-w-[85px] xs:max-w-[110px] sm:max-w-[140px]">গ্রাহক নাম</span>
-              <span class="text-[10px] sm:text-xs text-slate-400 leading-none">▾</span>
+              <span id="nav-user-display-name" class="text-xs sm:text-sm font-bold text-slate-900 leading-none truncate max-w-[90px] xs:max-w-[120px] sm:max-w-[160px]">গ্রাহক নাম</span>
+              <span class="text-[10px] sm:text-xs text-slate-400">▾</span>
               <span id="nav-user-sub" class="hidden"></span>
             </button>
 
@@ -157,7 +157,7 @@
                   var dda = document.getElementById('dropdown-user-avatar');
                   if (btn) btn.classList.add('hidden');
                   if (dd) { dd.classList.remove('hidden'); dd.style.display = 'flex'; }
-                  var name = u.name || 'সম্মানিত গ্রাহক';
+                  var name = (u.name || 'সম্মানিত গ্রাহক').replace(/\s*\(Updated\)/gi, '').trim();
                   var init = (name.trim().charAt(0) || 'গ').toUpperCase();
                   if (dn) dn.textContent = name;
                   if (ds) ds.textContent = u.phone || '';

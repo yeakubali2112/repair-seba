@@ -1819,7 +1819,8 @@ function updateNavUserUI(isLoggedIn) {
       userDropdown.style.display = 'flex';
     }
 
-    const name = currentCustomer.name || 'সম্মানিত গ্রাহক';
+    let name = (currentCustomer.name || 'সম্মানিত গ্রাহক').replace(/\s*\(Updated\)/gi, '').trim();
+    currentCustomer.name = name;
     const initial = (name.trim().charAt(0) || 'গ').toUpperCase();
 
     if (displayName) displayName.textContent = name;
