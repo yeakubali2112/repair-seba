@@ -443,3 +443,15 @@ function applyTranslations() {
     }
   });
 }
+
+
+// Global click listener for all language toggle buttons (Website & Admin Panel)
+document.addEventListener('click', (e) => {
+  const btn = e.target.closest('.lang-toggle-btn');
+  if (btn) {
+    const lang = btn.getAttribute('data-lang');
+    if (lang && typeof setLanguage === 'function') {
+      setLanguage(lang);
+    }
+  }
+});
