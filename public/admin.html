@@ -72,29 +72,29 @@
           🛠️
         </div>
         <h2 class="text-2xl font-black text-slate-900">Repair Seba Admin</h2>
-        <p class="text-xs text-slate-500 mt-1">ল্যাব ও ডোরস্টেপ রিপেয়ার ম্যানেজমেন্ট প্যানেল</p>
+        <p class="text-xs text-slate-500 mt-1" data-i18n="admin_login_subtitle">ল্যাব ও ডোরস্টেপ রিপেয়ার ম্যানেজমেন্ট প্যানেল</p>
       </div>
 
       <form id="admin-login-form" class="space-y-4" onsubmit="handleAdminLoginSubmit(event); return false;">
         <div>
-          <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">ইউজারনেম / Username</label>
+          <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1" data-i18n="admin_login_username_lbl">ইউজারনেম / Username</label>
           <input type="text" id="login-username" value="admin" required class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-300 text-slate-900 text-sm focus:bg-white focus:border-cyan-600 focus:outline-none focus:ring-1 focus:ring-cyan-500 transition">
         </div>
         <div>
-          <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">পাসওয়ার্ড / Password</label>
+          <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1" data-i18n="admin_login_password_lbl">পাসওয়ার্ড / Password</label>
           <input type="password" id="login-password" value="admin123" required class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-300 text-slate-900 text-sm focus:bg-white focus:border-cyan-600 focus:outline-none focus:ring-1 focus:ring-cyan-500 transition">
         </div>
 
-        <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 text-xs text-slate-600">
+        <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 text-xs text-slate-600" data-i18n="admin_login_demo_hint">
           🔑 ডিফল্ট লগইন: <span class="text-cyan-700 font-mono font-bold">admin</span> / <span class="text-cyan-700 font-mono font-bold">admin123</span>
         </div>
 
-        <button type="submit" class="w-full py-3.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-sm transition shadow-md shadow-cyan-600/20">
+        <button type="submit" class="w-full py-3.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-sm transition shadow-md shadow-cyan-600/20" data-i18n="admin_login_btn">
           লগইন করুন (Sign In)
         </button>
 
         <div class="text-center pt-2">
-          <a href="/" class="text-xs text-slate-500 hover:text-cyan-600 transition">← কাস্টমার ওয়েবসাইটে ফিরে যান</a>
+          <a href="/" class="text-xs text-slate-500 hover:text-cyan-600 transition" data-i18n="admin_back_to_site">← কাস্টমার ওয়েবসাইটে ফিরে যান</a>
         </div>
       </form>
     </div>
@@ -113,11 +113,11 @@
             <img src="/favicon.svg" alt="Repair Seba" class="w-9 h-9 rounded-xl">
           </div>
           <div>
-            <h1 class="text-base sm:text-lg font-black tracking-tight text-[#0f766e] leading-tight flex items-center gap-2">
+            <h1 class="text-base sm:text-lg font-black tracking-tight text-[#0f766e] leading-tight flex items-center gap-2" data-i18n="admin_brand_name">
               রিপেয়ার সেবা (Repair Seba)
             </h1>
             <p class="text-[11px] font-medium text-slate-500 mt-0.5 flex flex-wrap items-center gap-2">
-              <span>ট্রেড কোড: RS-২০২৬</span>
+              <span data-i18n="admin_trade_code">ট্রেড কোড: RS-২০২৬</span>
             </p>
           </div>
         </div>
@@ -190,7 +190,7 @@
         <aside id="admin-floating-sidebar" class="w-full lg:w-64 shrink-0 bg-white rounded-2xl border border-slate-200/90 shadow-sm p-3.5 lg:sticky lg:top-24 space-y-4">
           
           <div>
-            <div class="text-[11px] font-bold text-slate-400 px-3 uppercase tracking-wider mb-2">
+            <div class="text-[11px] font-bold text-slate-400 px-3 uppercase tracking-wider mb-2" data-i18n="admin_sidebar_menu">
               প্রধান মেনু
             </div>
             <nav class="space-y-1.5">
@@ -199,7 +199,7 @@
               <button onclick="switchTab('overview')" id="tab-btn-overview" class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold bg-[#0f766e] text-white shadow-md shadow-teal-700/20 transition-all text-left">
                 <div class="flex items-center gap-2.5">
                   <span class="text-sm">▦</span>
-                  <span>ওভারভিউ</span>
+                  <span data-i18n="admin_tab_overview">ওভারভিউ</span>
                 </div>
               </button>
 
@@ -207,7 +207,7 @@
               <button onclick="switchTab('hero')" id="tab-btn-hero" class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-medium text-slate-700 hover:bg-slate-100 transition-all text-left">
                 <div class="flex items-center gap-2.5">
                   <span class="text-sm">🎨</span>
-                  <span>হিরো ব্যানার</span>
+                  <span data-i18n="admin_tab_hero">হিরো ব্যানার</span>
                 </div>
               </button>
 
@@ -215,7 +215,7 @@
               <button onclick="switchTab('orders')" id="tab-btn-orders" class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-medium text-slate-700 hover:bg-slate-100 transition-all text-left">
                 <div class="flex items-center gap-2.5">
                   <span class="text-sm">📦</span>
-                  <span>অর্ডার আবেদন</span>
+                  <span data-i18n="admin_tab_orders">অর্ডার আবেদন</span>
                 </div>
               </button>
 
@@ -223,40 +223,40 @@
               <button onclick="switchTab('customers')" id="tab-btn-customers" class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-medium text-slate-700 hover:bg-slate-100 transition-all text-left">
                 <div class="flex items-center gap-2.5">
                   <span class="text-sm">👥</span>
-                  <span>গ্রাহক একাউন্টসমূহ</span>
+                  <span data-i18n="admin_tab_customers">গ্রাহক একাউন্টসমূহ</span>
                 </div>
                 <span id="badge-sidebar-customers" class="px-2 py-0.5 text-[10px] font-bold rounded-full bg-teal-100 text-[#0f766e]">0</span>
               </button>
 
-              <!-- 4. Services Tab -->
+              <!-- 5. Services Tab -->
               <button onclick="switchTab('services')" id="tab-btn-services" class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-medium text-slate-700 hover:bg-slate-100 transition-all text-left">
                 <div class="flex items-center gap-2.5">
                   <span class="text-sm">🛠️</span>
-                  <span>সার্ভিস ব্যবস্থাপনা</span>
+                  <span data-i18n="admin_tab_services">সার্ভিস ব্যবস্থাপনা</span>
                 </div>
               </button>
 
-              <!-- 5. Inquiries Tab -->
+              <!-- 6. Inquiries Tab -->
               <button onclick="switchTab('inquiries')" id="tab-btn-inquiries" class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-medium text-slate-700 hover:bg-slate-100 transition-all text-left">
                 <div class="flex items-center gap-2.5">
                   <span class="text-sm">💬</span>
-                  <span>প্রাপ্ত বার্তা ও ইনকোয়ারি</span>
+                  <span data-i18n="admin_tab_inquiries">প্রাপ্ত বার্তা ও ইনকোয়ারি</span>
                 </div>
               </button>
 
-              <!-- 6. Footer Tab -->
+              <!-- 7. Footer Tab -->
               <button onclick="switchTab('footer')" id="tab-btn-footer" class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-medium text-slate-700 hover:bg-slate-100 transition-all text-left">
                 <div class="flex items-center gap-2.5">
                   <span class="text-sm">🏢</span>
-                  <span>অফিস ও ফুটার</span>
+                  <span data-i18n="admin_tab_footer">অফিস ও ফুটার</span>
                 </div>
               </button>
 
-              <!-- 7. Profile & User Access Control Tab -->
+              <!-- 8. Profile & User Access Control Tab -->
               <button onclick="switchTab('users')" id="tab-btn-users" class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-medium text-slate-700 hover:bg-slate-100 transition-all text-left">
                 <div class="flex items-center gap-2.5">
                   <span class="text-sm">👤</span>
-                  <span>প্রোফাইল ও ইউজার কন্ট্রোল</span>
+                  <span data-i18n="admin_tab_users">প্রোফাইল ও ইউজার কন্ট্রোল</span>
                 </div>
               </button>
 
@@ -273,16 +273,16 @@
             
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
-                <h2 id="top-bar-title" class="text-2xl font-black text-slate-900 tracking-tight">
+                <h2 id="top-bar-title" class="text-2xl font-black text-slate-900 tracking-tight" data-i18n="admin_overview_title">
                   ড্যাশবোর্ড ওভারভিউ
                 </h2>
-                <p class="text-xs text-slate-500 mt-1">
+                <p class="text-xs text-slate-500 mt-1" data-i18n="admin_overview_sub">
                   রিপেয়ার সেবার সকল সার্ভিসের লাইভ ডাটা, পিকআপ ট্র্যাকিং, মেরামত পরিসংখ্যান ও সাম্প্রতিক কার্যক্রমের সারসংক্ষেপ
                 </p>
               </div>
               <button onclick="switchTab('orders')" class="px-3.5 py-2 rounded-xl bg-[#0f766e] hover:bg-[#115e59] text-white text-xs font-bold transition flex items-center gap-2 shadow-xs shrink-0">
                 <span>📦</span>
-                <span>অর্ডার আবেদন ও ব্যবস্থাপনা</span>
+                <span data-i18n="admin_btn_orders_shortcut">অর্ডার আবেদন ও ব্যবস্থাপনা</span>
               </button>
             </div>
 
@@ -299,7 +299,7 @@
                 
                 <!-- Title & Count Badge -->
                 <div class="flex items-center gap-2.5">
-                  <h3 class="text-base font-bold text-slate-900">
+                  <h3 class="text-base font-bold text-slate-900" data-i18n="admin_recent_orders_title">
                     সর্বশেষ অর্ডারসমূহ (অনলাইন পোর্টাল)
                   </h3>
                   <span id="badge-overview-total" class="px-2.5 py-0.5 text-xs font-bold rounded-md bg-amber-50 text-amber-700 border border-amber-200">
@@ -311,7 +311,7 @@
                 <div class="flex items-center gap-2">
                   <button onclick="switchTab('orders')" class="px-3.5 py-1.5 rounded-xl text-xs font-bold text-[#0f766e] hover:bg-teal-50 border border-teal-200 transition flex items-center gap-1.5">
                     <span>📦</span>
-                    <span>সকল অর্ডার ব্যবস্থাপনা করুন →</span>
+                    <span data-i18n="admin_btn_view_all_orders">সকল অর্ডার ব্যবস্থাপনা করুন →</span>
                   </button>
                 </div>
 
@@ -322,11 +322,11 @@
                 <table class="w-full text-left text-xs table-auto">
                   <thead class="bg-slate-50/80 text-slate-600 font-bold uppercase tracking-wider border-b border-slate-200/90">
                     <tr>
-                      <th class="py-2.5 px-3 whitespace-nowrap">ট্র্যাকিং আইডি</th>
-                      <th class="py-2.5 px-3">গ্রাহকের নাম</th>
-                      <th class="py-2.5 px-3">ডিভাইস ও সমস্যা</th>
-                      <th class="py-2.5 px-3 whitespace-nowrap">মোবাইল</th>
-                      <th class="py-2.5 px-3 whitespace-nowrap">তারিখ</th>
+                      <th class="py-2.5 px-3 whitespace-nowrap" data-i18n="admin_th_tracking_id">ট্র্যাকিং আইডি</th>
+                      <th class="py-2.5 px-3" data-i18n="admin_th_customer_name">গ্রাহকের নাম</th>
+                      <th class="py-2.5 px-3" data-i18n="admin_th_device_issue">ডিভাইস ও সমস্যা</th>
+                      <th class="py-2.5 px-3 whitespace-nowrap" data-i18n="admin_th_mobile">মোবাইল</th>
+                      <th class="py-2.5 px-3 whitespace-nowrap" data-i18n="admin_th_date">তারিখ</th>
                     </tr>
                   </thead>
                   <tbody id="overview-orders-table-body" class="divide-y divide-slate-100 text-slate-800">
@@ -345,10 +345,10 @@
                 <div class="flex items-center justify-between border-b border-slate-100 pb-3">
                   <div class="flex items-center gap-2">
                     <span class="text-base text-rose-600">💬</span>
-                    <h4 class="text-sm font-bold text-slate-900">সর্বশেষ প্রাপ্ত বার্তা (ওয়েবসাইট অনুসন্ধান)</h4>
+                    <h4 class="text-sm font-bold text-slate-900" data-i18n="admin_recent_messages_title">সর্বশেষ প্রাপ্ত বার্তা (ওয়েবসাইট অনুসন্ধান)</h4>
                   </div>
-                  <button onclick="switchTab('inquiries')" class="text-xs font-bold text-rose-600 hover:underline">
-                    সকল বার্তা (২) →
+                  <button onclick="switchTab('inquiries')" class="text-xs font-bold text-rose-600 hover:underline" data-i18n="admin_all_messages_btn">
+                    সকল বার্তা →
                   </button>
                 </div>
                 <div class="space-y-2.5 text-xs">
@@ -374,10 +374,10 @@
                 <div class="flex items-center justify-between border-b border-slate-100 pb-3">
                   <div class="flex items-center gap-2">
                     <span class="text-base text-purple-600">📢</span>
-                    <h4 class="text-sm font-bold text-slate-900">সর্বশেষ প্রকাশিত নোটিশ ও পলিসি আপডেট</h4>
+                    <h4 class="text-sm font-bold text-slate-900" data-i18n="admin_recent_notices_title">সর্বশেষ প্রকাশিত নোটিশ ও পলিসি আপডেট</h4>
                   </div>
-                  <button onclick="switchTab('services')" class="text-xs font-bold text-purple-600 hover:underline">
-                    সকল সার্ভিস (৯) →
+                  <button onclick="switchTab('services')" class="text-xs font-bold text-purple-600 hover:underline" data-i18n="admin_all_services_btn">
+                    সকল সার্ভিস →
                   </button>
                 </div>
                 <div class="space-y-2.5 text-xs">
@@ -410,9 +410,9 @@
               <div>
                 <div class="flex items-center gap-2">
                   <span class="text-xl">📦</span>
-                  <h2 class="text-xl font-bold text-slate-900">অর্ডার আবেদন ও মেরামত ট্র্যাকিং ব্যবস্থাপনা</h2>
+                  <h2 class="text-xl font-bold text-slate-900" data-i18n="admin_orders_title">অর্ডার আবেদন ও মেরামত ট্র্যাকিং ব্যবস্থাপনা</h2>
                 </div>
-                <p class="text-xs text-slate-500 mt-1">
+                <p class="text-xs text-slate-500 mt-1" data-i18n="admin_orders_sub">
                   ওয়েবসাইট থেকে আসা সকল অনলাইন সার্ভিস রিকোয়েস্ট পরিচালনা, স্ট্যাটাস পরিবর্তন, রাইডার নির্ধারণ ও কোটেশন আপডেট
                 </p>
               </div>
@@ -426,7 +426,7 @@
                 
                 <!-- Title & Count Badge -->
                 <div class="flex items-center gap-2.5">
-                  <h3 class="text-base font-bold text-slate-900">
+                  <h3 class="text-base font-bold text-slate-900" data-i18n="admin_orders_table_title">
                     সকল অর্ডার আবেদন তালিকা
                   </h3>
                   <span id="badge-table-total" class="px-2.5 py-0.5 text-xs font-bold rounded-md bg-slate-100 text-slate-600 border border-slate-200">
@@ -439,16 +439,16 @@
                   
                   <!-- Filter Pills -->
                   <div class="flex items-center gap-1 bg-slate-100 p-1 rounded-xl border border-slate-200 text-xs">
-                    <button onclick="filterOrders('ALL')" class="order-status-tab active px-2.5 py-1 rounded-lg font-bold bg-[#0f766e] text-white shadow-2xs transition">সকল</button>
-                    <button onclick="filterOrders('PENDING_PICKUP')" class="order-status-tab px-2.5 py-1 rounded-lg text-slate-700 hover:text-slate-900 transition font-medium">অপেক্ষমাণ</button>
-                    <button onclick="filterOrders('QUOTE_APPROVED')" class="order-status-tab px-2.5 py-1 rounded-lg text-slate-700 hover:text-slate-900 transition font-medium">অনুমোদিত</button>
-                    <button onclick="filterOrders('IN_REPAIR')" class="order-status-tab px-2.5 py-1 rounded-lg text-slate-700 hover:text-slate-900 transition font-medium">মেরামত</button>
-                    <button onclick="filterOrders('COMPLETED')" class="order-status-tab px-2.5 py-1 rounded-lg text-slate-700 hover:text-slate-900 transition font-medium">সম্পন্ন</button>
+                    <button onclick="filterOrders('ALL')" class="order-status-tab active px-2.5 py-1 rounded-lg font-bold bg-[#0f766e] text-white shadow-2xs transition" data-i18n="admin_filter_all">সকল</button>
+                    <button onclick="filterOrders('PENDING_PICKUP')" class="order-status-tab px-2.5 py-1 rounded-lg text-slate-700 hover:text-slate-900 transition font-medium" data-i18n="admin_filter_pending">অপেক্ষমাণ</button>
+                    <button onclick="filterOrders('QUOTE_APPROVED')" class="order-status-tab px-2.5 py-1 rounded-lg text-slate-700 hover:text-slate-900 transition font-medium" data-i18n="admin_filter_approved">অনুমোদিত</button>
+                    <button onclick="filterOrders('IN_REPAIR')" class="order-status-tab px-2.5 py-1 rounded-lg text-slate-700 hover:text-slate-900 transition font-medium" data-i18n="admin_filter_in_repair">মেরামত</button>
+                    <button onclick="filterOrders('COMPLETED')" class="order-status-tab px-2.5 py-1 rounded-lg text-slate-700 hover:text-slate-900 transition font-medium" data-i18n="admin_filter_completed">সম্পন্ন</button>
                   </div>
 
                   <!-- Search Input -->
                   <div class="relative">
-                    <input type="text" id="order-search-input" placeholder="অর্ডার আইডি, ফোন বা নাম..." class="w-48 sm:w-56 pl-8 pr-3 py-1.5 text-xs rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:outline-none focus:ring-1 focus:ring-teal-500 transition">
+                    <input type="text" id="order-search-input" placeholder="অর্ডার আইডি, ফোন বা নাম..." data-i18n-placeholder="admin_order_search_placeholder" class="w-48 sm:w-56 pl-8 pr-3 py-1.5 text-xs rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:outline-none focus:ring-1 focus:ring-teal-500 transition">
                     <span class="absolute left-2.5 top-1.5 text-slate-400 text-xs">🔍</span>
                   </div>
 
@@ -470,13 +470,13 @@
                   </colgroup>
                   <thead class="bg-slate-50/80 text-slate-600 font-bold uppercase tracking-wider border-b border-slate-200/90">
                     <tr>
-                      <th class="py-2.5 px-3">ট্র্যাকিং আইডি</th>
-                      <th class="py-2.5 px-3">গ্রাহকের নাম</th>
-                      <th class="py-2.5 px-3">ডিভাইস ও সমস্যা</th>
-                      <th class="py-2.5 px-3">মোবাইল</th>
-                      <th class="py-2.5 px-3">তারিখ</th>
-                      <th class="py-2.5 px-3">বর্তমান অবস্থা</th>
-                      <th class="py-2.5 px-2 text-center">অ্যাকশন</th>
+                      <th class="py-2.5 px-3" data-i18n="admin_th_tracking_id">ট্র্যাকিং আইডি</th>
+                      <th class="py-2.5 px-3" data-i18n="admin_th_customer_name">গ্রাহকের নাম</th>
+                      <th class="py-2.5 px-3" data-i18n="admin_th_device_issue">ডিভাইস ও সমস্যা</th>
+                      <th class="py-2.5 px-3" data-i18n="admin_th_mobile">মোবাইল</th>
+                      <th class="py-2.5 px-3" data-i18n="admin_th_date">তারিখ</th>
+                      <th class="py-2.5 px-3" data-i18n="admin_th_status">বর্তমান অবস্থা</th>
+                      <th class="py-2.5 px-2 text-center" data-i18n="admin_th_action">অ্যাকশন</th>
                     </tr>
                   </thead>
                   <tbody id="orders-table-body" class="divide-y divide-slate-100 text-slate-800">
@@ -498,12 +498,12 @@
                 <div>
                   <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-xs text-teal-200 text-xs font-bold mb-3 border border-white/20">
                     <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                    <span>রিয়েল-টাইম গ্রাহক ডাটাবেস</span>
+                    <span data-i18n="admin_cust_tag">রিয়েল-টাইম গ্রাহক ডাটাবেস</span>
                   </div>
                   <h2 class="text-2xl font-black text-white flex items-center gap-2.5">
-                    <span>👥</span> <span>ওয়েবসাইটে নিবন্ধিত গ্রাহক একাউন্টসমূহ</span>
+                    <span>👥</span> <span data-i18n="admin_cust_title">ওয়েবসাইটে নিবন্ধিত গ্রাহক একাউন্টসমূহ</span>
                   </h2>
-                  <p class="text-xs text-teal-100 max-w-2xl mt-1.5 leading-relaxed">
+                  <p class="text-xs text-teal-100 max-w-2xl mt-1.5 leading-relaxed" data-i18n="admin_cust_sub">
                     ইউজার ওয়েবসাইট থেকে গ্রাহকরা যখনই নতুন একাউন্ট তৈরি করবে, ফোন দিয়ে লগইন করবে বা অর্ডার প্লেস করবে, তাদের প্রোফাইল ছবি, নাম, মোবাইল নম্বর, ঠিকানা ও সমস্ত বিবরণ স্বয়ংক্রিয়ভাবে এখানে চলে আসবে।
                   </p>
                 </div>
@@ -511,15 +511,15 @@
                 <!-- 3 Top Quick Stat Badges -->
                 <div class="grid grid-cols-3 gap-3 shrink-0">
                   <div class="bg-white/10 backdrop-blur-xs border border-white/20 rounded-2xl p-3.5 text-center min-w-[90px]">
-                    <div class="text-[11px] text-teal-200 font-medium">মোট গ্রাহক</div>
+                    <div class="text-[11px] text-teal-200 font-medium" data-i18n="admin_cust_stat_total">মোট গ্রাহক</div>
                     <div id="cust-stat-total" class="text-xl sm:text-2xl font-black text-white mt-0.5">০</div>
                   </div>
                   <div class="bg-white/10 backdrop-blur-xs border border-white/20 rounded-2xl p-3.5 text-center min-w-[90px]">
-                    <div class="text-[11px] text-emerald-300 font-medium">অর্ডারকারী</div>
+                    <div class="text-[11px] text-emerald-300 font-medium" data-i18n="admin_cust_stat_ordered">অর্ডারকারী</div>
                     <div id="cust-stat-ordered" class="text-xl sm:text-2xl font-black text-emerald-300 mt-0.5">০</div>
                   </div>
                   <div class="bg-white/10 backdrop-blur-xs border border-white/20 rounded-2xl p-3.5 text-center min-w-[90px]">
-                    <div class="text-[11px] text-amber-200 font-medium">নতুন যুক্ত</div>
+                    <div class="text-[11px] text-amber-200 font-medium" data-i18n="admin_cust_stat_recent">নতুন যুক্ত</div>
                     <div id="cust-stat-recent" class="text-xl sm:text-2xl font-black text-amber-200 mt-0.5">০</div>
                   </div>
                 </div>
@@ -533,7 +533,7 @@
               <div class="p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 bg-slate-50/50">
                 <div class="flex items-center gap-3">
                   <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2">
-                    <span>📋 সমস্ত গ্রাহকদের তালিকা ও প্রোফাইল বিবরণ</span>
+                    <span>📋</span> <span data-i18n="admin_cust_table_title">সমস্ত গ্রাহকদের তালিকা ও প্রোফাইল বিবরণ</span>
                   </h3>
                   <span id="badge-customers-count" class="px-2.5 py-0.5 text-xs font-black rounded-full bg-teal-100 text-[#0f766e] border border-teal-200">
                     ০ জন
@@ -543,15 +543,15 @@
                 <div class="flex flex-wrap items-center gap-2">
                   <!-- Search Box -->
                   <div class="relative">
-                    <input type="text" id="customers-search-input" placeholder="নাম, ফোন বা এলাকা দিয়ে খুঁজুন..." oninput="handleSearchCustomers(this.value)" class="pl-8 pr-3 py-2 rounded-xl bg-white border border-slate-200 text-xs focus:border-teal-600 focus:outline-none transition w-56 sm:w-64 shadow-2xs">
+                    <input type="text" id="customers-search-input" placeholder="নাম, ফোন বা এলাকা দিয়ে খুঁজুন..." data-i18n-placeholder="admin_cust_search_placeholder" oninput="handleSearchCustomers(this.value)" class="pl-8 pr-3 py-2 rounded-xl bg-white border border-slate-200 text-xs focus:border-teal-600 focus:outline-none transition w-56 sm:w-64 shadow-2xs">
                     <span class="absolute left-2.5 top-2.5 text-slate-400 text-xs">🔍</span>
                   </div>
 
                   <!-- Quick Filter Dropdown -->
                   <select id="customers-filter-select" onchange="handleFilterCustomers(this.value)" class="px-3 py-2 rounded-xl bg-white border border-slate-200 text-xs font-semibold text-slate-700 focus:border-teal-600 focus:outline-none transition shadow-2xs">
-                    <option value="all">সব গ্রাহক</option>
-                    <option value="with_orders">যাদের অর্ডার আছে</option>
-                    <option value="no_orders">নতুন (অর্ডার ছাড়া)</option>
+                    <option value="all" data-i18n="admin_cust_filter_all">সব গ্রাহক</option>
+                    <option value="with_orders" data-i18n="admin_cust_filter_with_orders">যাদের অর্ডার আছে</option>
+                    <option value="no_orders" data-i18n="admin_cust_filter_no_orders">নতুন (অর্ডার ছাড়া)</option>
                   </select>
                 </div>
               </div>
@@ -570,13 +570,13 @@
                   </colgroup>
                   <thead class="bg-slate-50 text-slate-600 font-bold uppercase tracking-wider border-b border-slate-200">
                     <tr>
-                      <th class="py-2.5 px-2.5 sm:px-3">গ্রাহকের প্রোফাইল ও নাম</th>
-                      <th class="py-2.5 px-2.5 sm:px-3">মোবাইল নম্বর</th>
-                      <th class="py-2.5 px-2.5 sm:px-3">ইমেইল</th>
-                      <th class="py-2.5 px-2.5 sm:px-3">ঠিকানা ও এরিয়া</th>
-                      <th class="py-2.5 px-2.5 sm:px-3 text-center">সর্বমোট অর্ডার</th>
-                      <th class="py-2.5 px-2.5 sm:px-3">রেজিস্ট্রেশন</th>
-                      <th class="py-2.5 px-2.5 sm:px-3 text-center">অ্যাকশন</th>
+                      <th class="py-2.5 px-2.5 sm:px-3" data-i18n="admin_cust_th_profile">গ্রাহকের প্রোফাইল ও নাম</th>
+                      <th class="py-2.5 px-2.5 sm:px-3" data-i18n="admin_cust_th_phone">মোবাইল নম্বর</th>
+                      <th class="py-2.5 px-2.5 sm:px-3" data-i18n="admin_cust_th_email">ইমেইল</th>
+                      <th class="py-2.5 px-2.5 sm:px-3" data-i18n="admin_cust_th_address">ঠিকানা ও এরিয়া</th>
+                      <th class="py-2.5 px-2.5 sm:px-3 text-center" data-i18n="admin_cust_th_orders">সর্বমোট অর্ডার</th>
+                      <th class="py-2.5 px-2.5 sm:px-3" data-i18n="admin_cust_th_registered">রেজিস্ট্রেশন</th>
+                      <th class="py-2.5 px-2.5 sm:px-3 text-center" data-i18n="admin_th_action">অ্যাকশন</th>
                     </tr>
                   </thead>
                   <tbody id="admin-customers-table-body" class="divide-y divide-slate-100 text-slate-800">
@@ -595,13 +595,13 @@
             <div>
               <div class="flex items-center gap-2">
                 <span class="text-xl">🛠️</span>
-                <h2 class="text-xl font-bold text-slate-900">আমাদের রিপেয়ার সার্ভিসসমূহ</h2>
+                <h2 class="text-xl font-bold text-slate-900" data-i18n="admin_services_title">আমাদের রিপেয়ার সার্ভিসসমূহ</h2>
               </div>
-              <p class="text-xs text-slate-500 mt-1">হোমপেজে প্রদর্শিত রিপেয়ার সার্ভিসের নাম, ফি, বিবরণ, আইকন ও স্ট্যাটাস সরাসরি সম্পাদনা ও নিয়ন্ত্রণ করুন</p>
+              <p class="text-xs text-slate-500 mt-1" data-i18n="admin_services_sub">হোমপেজে প্রদর্শিত রিপেয়ার সার্ভিসের নাম, ফি, বিবরণ, আইকন ও স্ট্যাটাস সরাসরি সম্পাদনা ও নিয়ন্ত্রণ করুন</p>
             </div>
             <button onclick="openAddServiceModal()" class="px-4 py-2.5 rounded-xl bg-[#0f766e] hover:bg-[#115e59] text-white font-bold text-xs transition shadow-md shadow-teal-700/20 flex items-center gap-2 shrink-0">
               <span class="text-base leading-none">+</span>
-              <span>নতুন সার্ভিস যোগ করুন</span>
+              <span data-i18n="admin_btn_add_service">নতুন সার্ভিস যোগ করুন</span>
             </button>
           </div>
           <div id="admin-services-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -612,8 +612,8 @@
         <!-- TAB 3: CONTACT INQUIRIES -->
         <section id="tab-inquiries" class="hidden space-y-6">
           <div class="bg-white border border-slate-200 p-5 rounded-2xl shadow-xs">
-            <h2 class="text-xl font-bold text-slate-900">গ্রাহকদের মেসেজ ও যোগাযোগ</h2>
-            <p class="text-xs text-slate-500 mt-0.5">কন্টাক্ট ফর্মের মাধ্যমে পাঠানো কাস্টমার অনুসন্ধানসমূহ</p>
+            <h2 class="text-xl font-bold text-slate-900" data-i18n="admin_inquiries_title">গ্রাহকদের মেসেজ ও যোগাযোগ</h2>
+            <p class="text-xs text-slate-500 mt-0.5" data-i18n="admin_inquiries_sub">কন্টাক্ট ফর্মের মাধ্যমে পাঠানো কাস্টমার অনুসন্ধানসমূহ</p>
           </div>
           <div id="admin-contacts-list" class="space-y-3">
             <!-- Populated by JS -->
@@ -626,16 +626,16 @@
             <div>
               <div class="flex items-center gap-2">
                 <span class="text-2xl">🎨</span>
-                <h2 class="text-xl font-bold text-slate-900">হিরো ব্যানার ও বাইক অ্যানিমেশন কন্ট্রোল</h2>
+                <h2 class="text-xl font-bold text-slate-900" data-i18n="admin_hero_title">হিরো ব্যানার ও বাইক অ্যানিমেশন কন্ট্রোল</h2>
               </div>
-              <p class="text-xs text-slate-500 mt-1">ওয়েবসাইটের হোমপেজের হিরো ব্যানার, ডেলিভারি বাইক, গতি ও টেক্সট কাস্টমাইজ করুন</p>
+              <p class="text-xs text-slate-500 mt-1" data-i18n="admin_hero_sub">ওয়েবসাইটের হোমপেজের হিরো ব্যানার, ডেলিভারি বাইক, গতি ও টেক্সট কাস্টমাইজ করুন</p>
             </div>
             <div class="flex items-center gap-3">
-              <button onclick="resetAdminHeroSettings()" type="button" class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition border border-slate-300">
+              <button onclick="resetAdminHeroSettings()" type="button" class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition border border-slate-300" data-i18n="admin_btn_restore_default">
                 🔄 ডিফল্ট রিস্টোর
               </button>
               <button onclick="saveAdminHeroSettings()" type="button" id="btn-save-hero" class="px-6 py-2.5 rounded-xl bg-gradient-to-r from-cyan-600 to-sky-600 hover:from-cyan-500 hover:to-sky-500 text-white font-bold text-xs shadow-md shadow-cyan-600/20 transition flex items-center gap-2">
-                <span>💾</span> পরিবর্তন সংরক্ষণ করুন
+                <span>💾</span> <span data-i18n="admin_btn_save_changes">পরিবর্তন সংরক্ষণ করুন</span>
               </button>
             </div>
           </div>
@@ -827,9 +827,9 @@
             <div>
               <span class="text-xs font-bold uppercase tracking-wider text-cyan-700">Website Footer & Info Settings</span>
               <h2 class="text-xl font-black text-slate-900 mt-1 flex items-center gap-2">
-                <span>🏢</span> অফিস ঠিকানা, যোগাযোগ নম্বর ও সোশ্যাল মিডিয়া কন্ট্রোল
+                <span>🏢</span> <span data-i18n="admin_footer_title">অফিস ঠিকানা, যোগাযোগ নম্বর ও সোশ্যাল মিডিয়া কন্ট্রোল</span>
               </h2>
-              <p class="text-xs text-slate-500 mt-1">
+              <p class="text-xs text-slate-500 mt-1" data-i18n="admin_footer_sub">
                 ওয়েবসাইটের নিচের ফুটারে প্রদর্শিত অফিস লোকেশন, কাস্টমার হেল্পলাইন ও সোশ্যাল লিংক আপডেট করুন।
               </p>
             </div>
@@ -1009,18 +1009,18 @@
             <div>
               <div class="flex items-center gap-2">
                 <span class="text-2xl">👤</span>
-                <h2 class="text-lg sm:text-xl font-bold text-slate-900">প্রোফাইল তৈরি, টিম ও এক্সেস কন্ট্রোল</h2>
+                <h2 class="text-lg sm:text-xl font-bold text-slate-900" data-i18n="admin_users_title">প্রোফাইল তৈরি, টিম ও এক্সেস কন্ট্রোল</h2>
               </div>
-              <p class="text-xs text-slate-500 mt-1 max-w-2xl leading-relaxed">
+              <p class="text-xs text-slate-500 mt-1 max-w-2xl leading-relaxed" data-i18n="admin_users_sub">
                 এখানে আপনি নিজের প্রোফাইল সাজাতে পারবেন, নতুন সাব-অ্যাডমিন ও টিম মেম্বারদের প্রোফাইল তৈরি করতে পারবেন এবং তারা অ্যাডমিন প্যানেলে কি কি অপশন ব্যবহার করতে পারবে তা নিয়ন্ত্রণ করতে পারবেন।
               </p>
             </div>
             <div class="flex flex-wrap items-center gap-2 shrink-0">
               <button onclick="openCreateUserModal()" type="button" class="px-4 py-2.5 rounded-xl bg-[#0f766e] hover:bg-[#115e59] text-white font-bold text-xs shadow-md shadow-teal-700/20 transition flex items-center gap-2">
-                <span>➕ নতুন প্রোফাইল তৈরি</span>
+                <span data-i18n="admin_btn_create_profile">➕ নতুন প্রোফাইল তৈরি</span>
               </button>
               <button onclick="openAdminProfileModal()" type="button" class="px-3.5 py-2.5 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200 text-xs font-bold transition flex items-center gap-1.5">
-                <span>✏️ আমার প্রোফাইল</span>
+                <span data-i18n="admin_btn_my_profile">✏️ আমার প্রোফাইল</span>
               </button>
             </div>
           </div>
@@ -1323,7 +1323,7 @@
       <div class="flex items-center justify-between pb-3 border-b border-slate-200 mb-5">
         <div>
           <span class="text-xs uppercase font-bold tracking-wider text-[#0f766e]">Account Settings</span>
-          <h3 class="text-lg font-black text-slate-900">আমার প্রোফাইল ও ছবি</h3>
+          <h3 class="text-lg font-black text-slate-900" data-i18n="admin_profile_settings_title">আমার প্রোফাইল ও ছবি</h3>
         </div>
         <button onclick="closeAdminProfileModal()" class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-800 flex items-center justify-center text-lg transition">
           ✕

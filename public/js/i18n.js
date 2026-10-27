@@ -153,7 +153,110 @@ const translations = {
     contact_phone: "ফোন নম্বর",
     contact_message: "আপনার বার্তা",
     contact_submit: "বার্তা পাঠান",
-    footer_text: "© ২০২৬ রিপেয়ার সেবা (Repair Seba). সর্বস্বত্ব সংরক্ষিত। নির্ভরযোগ্য মোবাইল ও ট্যাবলেট মেরামত প্রতিষ্ঠান।"
+    footer_text: "© ২০২৬ রিপেয়ার সেবা (Repair Seba). সর্বস্বত্ব সংরক্ষিত। নির্ভরযোগ্য মোবাইল ও ট্যাবলেট মেরামত প্রতিষ্ঠান।",
+
+    // Admin Management Portal Translations (Bangla)
+    admin_brand_name: "রিপেয়ার সেবা (Repair Seba)",
+    admin_trade_code: "ট্রেড কোড: RS-২০২৬",
+    admin_login_subtitle: "ল্যাব ও ডোরস্টেপ রিপেয়ার ম্যানেজমেন্ট প্যানেল",
+    admin_login_username_lbl: "ইউজারনেম / Username",
+    admin_login_password_lbl: "পাসওয়ার্ড / Password",
+    admin_login_demo_hint: "🔑 ডিফল্ট লগইন: admin / admin123",
+    admin_login_btn: "লগইন করুন (Sign In)",
+    admin_back_to_site: "← কাস্টমার ওয়েবসাইটে ফিরে যান",
+    admin_sidebar_menu: "প্রধান মেনু",
+    admin_tab_overview: "ওভারভিউ",
+    admin_tab_hero: "হিরো ব্যানার",
+    admin_tab_orders: "অর্ডার আবেদন",
+    admin_tab_customers: "গ্রাহক একাউন্টসমূহ",
+    admin_tab_services: "সার্ভিস ব্যবস্থাপনা",
+    admin_tab_inquiries: "প্রাপ্ত বার্তা ও ইনকোয়ারি",
+    admin_tab_footer: "অফিস ও ফুটার",
+    admin_tab_users: "প্রোফাইল ও ইউজার কন্ট্রোল",
+    admin_overview_title: "ড্যাশবোর্ড ওভারভিউ",
+    admin_overview_sub: "রিপেয়ার সেবার সকল সার্ভিসের লাইভ ডাটা, পিকআপ ট্র্যাকিং, মেরামত পরিসংখ্যান ও সাম্প্রতিক কার্যক্রমের সারসংক্ষেপ",
+    admin_btn_orders_shortcut: "অর্ডার আবেদন ও ব্যবস্থাপনা",
+    admin_stat_total_orders: "মোট অর্ডার",
+    admin_stat_pending: "অপেক্ষমাণ",
+    admin_stat_repair_lab: "মেরামত ও ল্যাব",
+    admin_stat_quote_pending: "অনুমোদন বাকি",
+    admin_stat_inquiries: "প্রাপ্ত বার্তা",
+    admin_stat_completed: "পুরাতন ডিভাইস",
+    admin_stat_services: "সার্ভিস ক্যাটাগরি",
+    admin_stat_revenue: "মোট আদায়",
+    admin_unit_pcs: "টি",
+    admin_badge_live: "রিয়েল",
+    admin_badge_new: "নতুন",
+    admin_recent_orders_title: "সর্বশেষ অর্ডারসমূহ (অনলাইন পোর্টাল)",
+    admin_btn_view_all_orders: "সকল অর্ডার ব্যবস্থাপনা করুন →",
+    admin_th_tracking_id: "ট্র্যাকিং আইডি",
+    admin_th_customer_name: "গ্রাহকের নাম",
+    admin_th_device_issue: "ডিভাইস ও সমস্যা",
+    admin_th_mobile: "মোবাইল",
+    admin_th_date: "তারিখ",
+    admin_th_status: "বর্তমান অবস্থা",
+    admin_th_action: "অ্যাকশন",
+    admin_recent_messages_title: "সর্বশেষ প্রাপ্ত বার্তা (ওয়েবসাইট অনুসন্ধান)",
+    admin_all_messages_btn: "সকল বার্তা →",
+    admin_recent_notices_title: "সর্বশেষ প্রকাশিত নোটিশ ও পলিসি আপডেট",
+    admin_all_services_btn: "সকল সার্ভিস →",
+    admin_orders_title: "অর্ডার আবেদন ও মেরামত ট্র্যাকিং ব্যবস্থাপনা",
+    admin_orders_sub: "ওয়েবসাইট থেকে আসা সকল অনলাইন সার্ভিস রিকোয়েস্ট পরিচালনা, স্ট্যাটাস পরিবর্তন, রাইডার নির্ধারণ ও কোটেশন আপডেট",
+    admin_orders_table_title: "সকল অর্ডার আবেদন তালিকা",
+    admin_filter_all: "সকল",
+    admin_filter_pending: "অপেক্ষমাণ",
+    admin_filter_approved: "অনুমোদিত",
+    admin_filter_in_repair: "মেরামত",
+    admin_filter_completed: "সম্পন্ন",
+    admin_order_search_placeholder: "অর্ডার আইডি, ফোন বা নাম...",
+    admin_cust_tag: "রিয়েল-টাইম গ্রাহক ডাটাবেস",
+    admin_cust_title: "ওয়েবসাইটে নিবন্ধিত গ্রাহক একাউন্টসমূহ",
+    admin_cust_sub: "ইউজার ওয়েবসাইট থেকে গ্রাহকরা যখনই নতুন একাউন্ট তৈরি করবে, ফোন দিয়ে লগইন করবে বা অর্ডার প্লেস করবে, তাদের প্রোফাইল ছবি, নাম, মোবাইল নম্বর, ঠিকানা ও সমস্ত বিবরণ স্বয়ংক্রিয়ভাবে এখানে চলে আসবে।",
+    admin_cust_stat_total: "মোট গ্রাহক",
+    admin_cust_stat_ordered: "অর্ডারকারী",
+    admin_cust_stat_recent: "নতুন যুক্ত",
+    admin_cust_table_title: "সমস্ত গ্রাহকদের তালিকা ও প্রোফাইল বিবরণ",
+    admin_cust_search_placeholder: "নাম, ফোন বা এলাকা দিয়ে খুঁজুন...",
+    admin_cust_filter_all: "সব গ্রাহক",
+    admin_cust_filter_with_orders: "যাদের অর্ডার আছে",
+    admin_cust_filter_no_orders: "নতুন (অর্ডার ছাড়া)",
+    admin_cust_th_profile: "গ্রাহকের প্রোফাইল ও নাম",
+    admin_cust_th_phone: "মোবাইল নম্বর",
+    admin_cust_th_email: "ইমেইল",
+    admin_cust_th_address: "ঠিকানা ও এরিয়া",
+    admin_cust_th_orders: "সর্বমোট অর্ডার",
+    admin_cust_th_registered: "রেজিস্ট্রেশন",
+    admin_services_title: "আমাদের রিপেয়ার সার্ভিসসমূহ",
+    admin_services_sub: "হোমপেজে প্রদর্শিত রিপেয়ার সার্ভিসের নাম, ফি, বিবরণ, আইকন ও স্ট্যাটাস সরাসরি সম্পাদনা ও নিয়ন্ত্রণ করুন",
+    admin_btn_add_service: "নতুন সার্ভিস যোগ করুন",
+    admin_inquiries_title: "গ্রাহকদের মেসেজ ও যোগাযোগ",
+    admin_inquiries_sub: "কন্টাক্ট ফর্মের মাধ্যমে পাঠানো কাস্টমার অনুসন্ধানসমূহ",
+    admin_hero_title: "হিরো ব্যানার ও বাইক অ্যানিমেশন কন্ট্রোল",
+    admin_hero_sub: "ওয়েবসাইটের হোমপেজের হিরো ব্যানার, ডেলিভারি বাইক, গতি ও টেক্সট কাস্টমাইজ করুন",
+    admin_btn_restore_default: "🔄 ডিফল্ট রিস্টোর",
+    admin_btn_save_changes: "পরিবর্তন সংরক্ষণ করুন",
+    admin_footer_title: "অফিস ঠিকানা, যোগাযোগ নম্বর ও সোশ্যাল মিডিয়া কন্ট্রোল",
+    admin_footer_sub: "ওয়েবসাইটের নিচের ফুটারে প্রদর্শিত অফিস লোকেশন, কাস্টমার হেল্পলাইন ও সোশ্যাল লিংক আপডেট করুন।",
+    admin_users_title: "প্রোফাইল তৈরি, টিম ও এক্সেস কন্ট্রোল",
+    admin_users_sub: "এখানে আপনি নিজের প্রোফাইল সাজাতে পারবেন, নতুন সাব-অ্যাডমিন ও টিম মেম্বারদের প্রোফাইল তৈরি করতে পারবেন এবং তারা অ্যাডমিন প্যানেলে কি কি অপশন ব্যবহার করতে পারবে তা নিয়ন্ত্রণ করতে পারবেন।",
+    admin_btn_create_profile: "➕ নতুন প্রোফাইল তৈরি",
+    admin_btn_my_profile: "✏️ আমার প্রোফাইল",
+    admin_btn_logout: "লগআউট",
+    admin_btn_save: "সংরক্ষণ করুন",
+    admin_btn_cancel: "বাতিল",
+    admin_profile_settings_title: "আমার প্রোফাইল ও ছবি",
+    admin_profile_full_name: "পূর্ণ নাম (Full Name)*",
+    admin_profile_username: "ইউজারনেম (Username)",
+    admin_profile_phone: "মোবাইল ফোন (Phone)",
+    admin_profile_email: "ইমেইল (Email)",
+    admin_profile_new_pwd: "নতুন পাসওয়ার্ড (ঐচ্ছিক / Leave blank to keep current)",
+    admin_profile_upload_btn: "মোবাইল বা পিসি থেকে ছবি দিন",
+    admin_profile_remove_pic: "✕ ছবি মুছুন",
+    admin_role_superadmin: "সুপার অ্যাডমিন",
+    admin_role_admin: "অ্যাডমিন",
+    admin_role_manager: "অপারেশন ম্যানেজার",
+    admin_role_technician: "ল্যাব টেকনিশিয়ান",
+    admin_role_support: "কাস্টমার সাপোর্ট"
   },
 
   en: {
@@ -308,7 +411,110 @@ const translations = {
     contact_phone: "Phone Number",
     contact_message: "Your Message",
     contact_submit: "Send Message",
-    footer_text: "© 2026 Repair Seba. All rights reserved. Trusted Doorstep Smartphone & Tablet Repair Platform."
+    footer_text: "© 2026 Repair Seba. All rights reserved. Trusted Doorstep Smartphone & Tablet Repair Platform.",
+
+    // Admin Management Portal Translations (English)
+    admin_brand_name: "Repair Seba Portal",
+    admin_trade_code: "Trade Code: RS-2026",
+    admin_login_subtitle: "Lab & Doorstep Repair Management Portal",
+    admin_login_username_lbl: "Username",
+    admin_login_password_lbl: "Password",
+    admin_login_demo_hint: "🔑 Default Login: admin / admin123",
+    admin_login_btn: "Sign In",
+    admin_back_to_site: "← Back to Customer Website",
+    admin_sidebar_menu: "Main Menu",
+    admin_tab_overview: "Overview",
+    admin_tab_hero: "Hero Banner",
+    admin_tab_orders: "Orders",
+    admin_tab_customers: "Customer Accounts",
+    admin_tab_services: "Services",
+    admin_tab_inquiries: "Inquiries & Messages",
+    admin_tab_footer: "Office & Footer",
+    admin_tab_users: "Profile & Users",
+    admin_overview_title: "Dashboard Overview",
+    admin_overview_sub: "Live data, pickup tracking, repair statistics, and recent activity summary across all services",
+    admin_btn_orders_shortcut: "Order Management",
+    admin_stat_total_orders: "Total Orders",
+    admin_stat_pending: "Pending Pickup",
+    admin_stat_repair_lab: "In Repair & Lab",
+    admin_stat_quote_pending: "Quote Pending",
+    admin_stat_inquiries: "Received Messages",
+    admin_stat_completed: "Completed Devices",
+    admin_stat_services: "Service Categories",
+    admin_stat_revenue: "Total Revenue",
+    admin_unit_pcs: "pcs",
+    admin_badge_live: "Live",
+    admin_badge_new: "New",
+    admin_recent_orders_title: "Recent Orders (Online Portal)",
+    admin_btn_view_all_orders: "Manage All Orders →",
+    admin_th_tracking_id: "Tracking ID",
+    admin_th_customer_name: "Customer Name",
+    admin_th_device_issue: "Device & Issue",
+    admin_th_mobile: "Mobile",
+    admin_th_date: "Date",
+    admin_th_status: "Status",
+    admin_th_action: "Action",
+    admin_recent_messages_title: "Recent Inquiries (Website)",
+    admin_all_messages_btn: "All Messages →",
+    admin_recent_notices_title: "Latest Notices & Policy Updates",
+    admin_all_services_btn: "All Services →",
+    admin_orders_title: "Order Requests & Repair Tracking",
+    admin_orders_sub: "Manage online service requests, update statuses, assign couriers, and update lab quotes",
+    admin_orders_table_title: "All Order Requests",
+    admin_filter_all: "All",
+    admin_filter_pending: "Pending",
+    admin_filter_approved: "Approved",
+    admin_filter_in_repair: "In Repair",
+    admin_filter_completed: "Completed",
+    admin_order_search_placeholder: "Order ID, phone, or name...",
+    admin_cust_tag: "Real-time Customer Database",
+    admin_cust_title: "Registered Customer Accounts",
+    admin_cust_sub: "Whenever customers sign up, log in with phone, or place repair orders, their profile and history sync here instantly.",
+    admin_cust_stat_total: "Total Customers",
+    admin_cust_stat_ordered: "With Orders",
+    admin_cust_stat_recent: "New Joined",
+    admin_cust_table_title: "All Registered Customers & Profile Details",
+    admin_cust_search_placeholder: "Search by name, phone, or area...",
+    admin_cust_filter_all: "All Customers",
+    admin_cust_filter_with_orders: "With Orders",
+    admin_cust_filter_no_orders: "New (No Orders)",
+    admin_cust_th_profile: "Customer Profile & Name",
+    admin_cust_th_phone: "Mobile Number",
+    admin_cust_th_email: "Email",
+    admin_cust_th_address: "Address & Area",
+    admin_cust_th_orders: "Total Orders",
+    admin_cust_th_registered: "Registered",
+    admin_services_title: "Repair Services Management",
+    admin_services_sub: "Manage titles, pricing, descriptions, icons, and active display on the website homepage",
+    admin_btn_add_service: "Add New Service",
+    admin_inquiries_title: "Customer Messages & Inquiries",
+    admin_inquiries_sub: "Direct queries received through the customer contact form",
+    admin_hero_title: "Hero Banner & Animation Control",
+    admin_hero_sub: "Customize homepage promotional banner, delivery bike motion, speed, and headline texts",
+    admin_btn_restore_default: "🔄 Restore Default",
+    admin_btn_save_changes: "Save Changes",
+    admin_footer_title: "Office Address, Helpline & Social Settings",
+    admin_footer_sub: "Update physical office address, customer hotlines, WhatsApp link, and social profiles displayed on the footer.",
+    admin_users_title: "Profiles, Team & Access Control",
+    admin_users_sub: "Customize your profile, invite staff members, and assign role-based dashboard permissions.",
+    admin_btn_create_profile: "➕ Create New Profile",
+    admin_btn_my_profile: "✏️ My Profile",
+    admin_btn_logout: "Logout",
+    admin_btn_save: "Save Changes",
+    admin_btn_cancel: "Cancel",
+    admin_profile_settings_title: "My Profile & Avatar",
+    admin_profile_full_name: "Full Name*",
+    admin_profile_username: "Username",
+    admin_profile_phone: "Mobile Phone",
+    admin_profile_email: "Email Address",
+    admin_profile_new_pwd: "New Password (Leave blank to keep current)",
+    admin_profile_upload_btn: "Upload Photo from Device",
+    admin_profile_remove_pic: "✕ Remove Photo",
+    admin_role_superadmin: "Super Admin",
+    admin_role_admin: "Admin",
+    admin_role_manager: "Operations Manager",
+    admin_role_technician: "Lab Technician",
+    admin_role_support: "Customer Support"
   }
 };
 
@@ -395,10 +601,14 @@ function setLanguage(lang) {
   if (lang !== 'bn' && lang !== 'en') lang = 'bn';
   currentLang = lang;
   localStorage.setItem('repair_seba_lang', lang);
-  document.documentElement.lang = lang;
+  if (typeof document !== 'undefined') {
+    document.documentElement.lang = lang;
+  }
   applyTranslations();
   // Dispatch custom event for reactive UI updates
-  window.dispatchEvent(new CustomEvent('languageChanged', { detail: { lang } }));
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new CustomEvent('languageChanged', { detail: { lang } }));
+  }
 }
 
 function getTranslation(key) {
@@ -411,7 +621,14 @@ function getTranslation(key) {
   return key;
 }
 
+function t(key, fallback = '') {
+  const val = getTranslation(key);
+  return (val && val !== key) ? val : (fallback || key);
+}
+
 function applyTranslations() {
+  if (typeof document === 'undefined') return;
+
   document.querySelectorAll('[data-i18n]').forEach(el => {
     const key = el.getAttribute('data-i18n');
     const text = getTranslation(key);
@@ -431,27 +648,55 @@ function applyTranslations() {
     if (text) el.placeholder = text;
   });
 
-  // Update language toggle buttons visual active state
+  // Handle title tooltips
+  document.querySelectorAll('[data-i18n-title]').forEach(el => {
+    const key = el.getAttribute('data-i18n-title');
+    const text = getTranslation(key);
+    if (text) el.title = text;
+  });
+
+  // Update language toggle buttons visual active state across site & admin
   document.querySelectorAll('.lang-toggle-btn').forEach(btn => {
     const targetLang = btn.getAttribute('data-lang');
     if (targetLang === currentLang) {
       btn.classList.add('bg-cyan-600', 'text-white', 'shadow-sm');
-      btn.classList.remove('text-gray-700', 'hover:bg-gray-100');
+      btn.classList.remove('text-slate-700', 'hover:bg-slate-100', 'text-gray-700', 'hover:bg-gray-100');
     } else {
       btn.classList.remove('bg-cyan-600', 'text-white', 'shadow-sm');
-      btn.classList.add('text-gray-700', 'hover:bg-gray-100');
+      btn.classList.add('text-slate-700', 'hover:bg-slate-100');
     }
   });
 }
 
-
 // Global click listener for all language toggle buttons (Website & Admin Panel)
-document.addEventListener('click', (e) => {
-  const btn = e.target.closest('.lang-toggle-btn');
-  if (btn) {
-    const lang = btn.getAttribute('data-lang');
-    if (lang && typeof setLanguage === 'function') {
-      setLanguage(lang);
+if (typeof document !== 'undefined') {
+  document.addEventListener('click', (e) => {
+    const btn = e.target.closest('.lang-toggle-btn');
+    if (btn) {
+      const lang = btn.getAttribute('data-lang');
+      if (lang && typeof setLanguage === 'function') {
+        setLanguage(lang);
+      }
     }
+  });
+
+  // Auto initialize on DOM ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+      applyTranslations();
+    });
+  } else {
+    applyTranslations();
   }
-});
+}
+
+// Expose globals
+if (typeof window !== 'undefined') {
+  window.translations = translations;
+  window.STATUS_MAP = STATUS_MAP;
+  window.currentLang = currentLang;
+  window.setLanguage = setLanguage;
+  window.getTranslation = getTranslation;
+  window.applyTranslations = applyTranslations;
+  window.t = t;
+}

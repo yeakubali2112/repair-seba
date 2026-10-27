@@ -74,14 +74,14 @@ const ADMIN_STATUS_BADGES = {
 };
 
 const TAB_TITLES = {
-  'overview': 'ড্যাশবোর্ড ওভারভিউ',
-  'orders': '<span>📦</span> অর্ডার আবেদন ও মেরামত ট্র্যাকিং ব্যবস্থাপনা',
-  'customers': '<span>👥</span> ওয়েবসাইটে নিবন্ধিত গ্রাহক একাউন্টসমূহ',
-  'services': '<span>🛠️</span> রিপেয়ার সার্ভিস ও মূল্য তালিকা পরিচালনা',
-  'inquiries': '<span>💬</span> গ্রাহকদের মেসেজ ও যোগাযোগ তালিকা',
-  'hero': '<span>🎨</span> হিরো ব্যানার ও বাইক অ্যানিমেশন কন্ট্রোল',
-  'footer': '<span>🏢</span> অফিস ঠিকানা ও ফুটার সেটিংস',
-  'users': '<span>👤</span> প্রোফাইল তৈরি, টিম ও এক্সেস কন্ট্রোল'
+  'overview': { bn: 'ড্যাশবোর্ড ওভারভিউ', en: 'Dashboard Overview' },
+  'orders': { bn: '<span>📦</span> অর্ডার আবেদন ও মেরামত ট্র্যাকিং ব্যবস্থাপনা', en: '<span>📦</span> Order Requests & Repair Tracking' },
+  'customers': { bn: '<span>👥</span> ওয়েবসাইটে নিবন্ধিত গ্রাহক একাউন্টসমূহ', en: '<span>👥</span> Registered Customer Accounts' },
+  'services': { bn: '<span>🛠️</span> রিপেয়ার সার্ভিস ও মূল্য তালিকা পরিচালনা', en: '<span>🛠️</span> Repair Services & Pricing Management' },
+  'inquiries': { bn: '<span>💬</span> গ্রাহকদের মেসেজ ও যোগাযোগ তালিকা', en: '<span>💬</span> Customer Messages & Inquiries' },
+  'hero': { bn: '<span>🎨</span> হিরো ব্যানার ও বাইক অ্যানিমেশন কন্ট্রোল', en: '<span>🎨</span> Hero Banner & Animation Control' },
+  'footer': { bn: '<span>🏢</span> অফিস ঠিকানা ও ফুটার সেটিংস', en: '<span>🏢</span> Office Info & Footer Settings' },
+  'users': { bn: '<span>👤</span> প্রোফাইল তৈরি, টিম ও এক্সেস কন্ট্রোল', en: '<span>👤</span> Profiles, Team & Access Control' }
 };
 
 function toggleAdminSidebar(open) {
@@ -147,12 +147,13 @@ function updateHeaderProfileUI(admin) {
 
   if (nameEl) nameEl.textContent = admin.name || 'Yeakub Ali';
   
+  const isBn = (window.currentLang || 'bn') === 'bn';
   const roleMap = {
-    'superadmin': { label: 'সুপার', fullLabel: 'সুপার অ্যাডমিন', color: 'bg-emerald-100 text-emerald-800 border-emerald-200' },
-    'manager': { label: 'ম্যানেজার', fullLabel: 'অপারেশন ম্যানেজার', color: 'bg-blue-100 text-blue-800 border-blue-200' },
-    'technician': { label: 'টেকনিশিয়ান', fullLabel: 'ল্যাব টেকনিশিয়ান', color: 'bg-amber-100 text-amber-800 border-amber-200' },
-    'support': { label: 'সাপোর্ট', fullLabel: 'কাস্টমার সাপোর্ট ও রাইডার', color: 'bg-purple-100 text-purple-800 border-purple-200' },
-    'admin': { label: 'অ্যাডমিন', fullLabel: 'অ্যাডমিন', color: 'bg-teal-100 text-teal-800 border-teal-200' }
+    'superadmin': { label: isBn ? 'সুপার' : 'Super', fullLabel: isBn ? 'সুপার অ্যাডমিন' : 'Super Admin', color: 'bg-emerald-100 text-emerald-800 border-emerald-200' },
+    'manager': { label: isBn ? 'ম্যানেজার' : 'Manager', fullLabel: isBn ? 'অপারেশন ম্যানেজার' : 'Operations Manager', color: 'bg-blue-100 text-blue-800 border-blue-200' },
+    'technician': { label: isBn ? 'টেকনিশিয়ান' : 'Technician', fullLabel: isBn ? 'ল্যাব টেকনিশিয়ান' : 'Lab Technician', color: 'bg-amber-100 text-amber-800 border-amber-200' },
+    'support': { label: isBn ? 'সাপোর্ট' : 'Support', fullLabel: isBn ? 'কাস্টমার সাপোর্ট ও রাইডার' : 'Support & Courier', color: 'bg-purple-100 text-purple-800 border-purple-200' },
+    'admin': { label: isBn ? 'অ্যাডমিন' : 'Admin', fullLabel: isBn ? 'অ্যাডমিন' : 'Admin', color: 'bg-teal-100 text-teal-800 border-teal-200' }
   };
   const roleInfo = roleMap[admin.role] || { label: admin.role, fullLabel: admin.role, color: 'bg-slate-100 text-slate-800 border-slate-200' };
 
@@ -160,7 +161,7 @@ function updateHeaderProfileUI(admin) {
     roleEl.textContent = roleInfo.label;
     roleEl.className = `px-1.5 py-0.2 text-[9px] font-black rounded ${roleInfo.color} border`;
   }
-  if (subEl) subEl.textContent = `${admin.role === 'superadmin' ? 'সুপার অ্যাডমিন' : admin.name} • @${admin.username}`;
+  if (subEl) subEl.textContent = `${admin.role === 'superadmin' ? (isBn ? 'সুপার অ্যাডমিন' : 'Super Admin') : admin.name} • @${admin.username}`;
 
   if (admin.avatar && admin.avatar.trim() !== '') {
     if (avatarEl) {
@@ -427,6 +428,48 @@ function setupAdminListeners() {
       await handleOrderUpdate();
     });
   }
+
+  // Language Change Listener for dynamic Admin UI update
+  window.addEventListener('languageChanged', (e) => {
+    const lang = e.detail?.lang || window.currentLang || 'bn';
+    const isBn = lang === 'bn';
+
+    // 1. Re-apply translations for static elements with data-i18n
+    if (typeof applyTranslations === 'function') {
+      applyTranslations();
+    }
+
+    // 2. Update active tab title in header
+    const topTitle = document.getElementById('top-bar-title');
+    if (topTitle && TAB_TITLES[currentAdminTab]) {
+      topTitle.innerHTML = typeof TAB_TITLES[currentAdminTab] === 'object'
+        ? (isBn ? TAB_TITLES[currentAdminTab].bn : TAB_TITLES[currentAdminTab].en)
+        : TAB_TITLES[currentAdminTab];
+    }
+
+    // 3. Update top admin profile capsule
+    if (currentAdminProfile) {
+      updateHeaderProfileUI(currentAdminProfile);
+    }
+
+    // 4. Re-render stats cards
+    if (cachedAdminStats) {
+      renderAdminStats(cachedAdminStats);
+    }
+
+    // 5. Re-render orders table / overview table
+    if (currentAdminTab === 'overview') {
+      loadOverviewOrders();
+    } else if (currentAdminTab === 'orders') {
+      if (adminOrdersCache && adminOrdersCache.length > 0) {
+        renderAdminOrdersTable(adminOrdersCache);
+      }
+    } else if (currentAdminTab === 'customers') {
+      if (typeof cachedAdminCustomers !== 'undefined' && cachedAdminCustomers && cachedAdminCustomers.length > 0) {
+        renderAdminCustomersTable(cachedAdminCustomers);
+      }
+    }
+  });
 }
 
 // -------------------------------------------------------------
@@ -439,6 +482,8 @@ async function loadAdminDashboardData() {
   startAdminLivePolling();
 }
 
+let cachedAdminStats = null;
+
 async function loadAdminStats() {
   try {
     const res = await fetch('/api/admin/stats', {
@@ -446,6 +491,7 @@ async function loadAdminStats() {
     });
     const data = await res.json();
     if (data.success) {
+      cachedAdminStats = data.stats;
       renderAdminStats(data.stats);
     }
   } catch (err) {
@@ -457,106 +503,111 @@ function renderAdminStats(s) {
   const container = document.getElementById('stats-container');
   if (!container) return;
 
+  const isBn = (window.currentLang || 'bn') === 'bn';
+  const unitPcs = isBn ? 'টি' : ' pcs';
+  const badgeLive = isBn ? 'রিয়েল' : 'Live';
+  const badgeNew = isBn ? 'নতুন' : 'New';
+
   const countAll = document.getElementById('count-all');
   if (countAll) countAll.textContent = s.total_orders;
 
   const sidebarOrderBadge = document.getElementById('badge-tab-orders');
-  if (sidebarOrderBadge) sidebarOrderBadge.textContent = `${s.pending_pickup}টি নতুন`;
+  if (sidebarOrderBadge) sidebarOrderBadge.textContent = isBn ? `${s.pending_pickup}টি নতুন` : `${s.pending_pickup} new`;
 
   const badgeTotal = document.getElementById('badge-table-total');
-  if (badgeTotal) badgeTotal.textContent = `${s.total_orders}টি মোট`;
+  if (badgeTotal) badgeTotal.textContent = isBn ? `${s.total_orders}টি মোট` : `${s.total_orders} total`;
 
   container.innerHTML = `
     <!-- Card 1: মোট অর্ডার - Mint Green -->
     <div class="bg-[#ecfdf5] border border-[#a7f3d0] rounded-xl p-2 sm:p-2.5 shadow-2xs flex flex-col justify-center min-w-0">
       <div class="flex items-center justify-between text-[11px] font-bold text-emerald-800 mb-1">
-        <span class="truncate">মোট অর্ডার</span>
+        <span class="truncate">${isBn ? 'মোট অর্ডার' : 'Total Orders'}</span>
         <span class="text-xs shrink-0">👥</span>
       </div>
       <div class="flex items-baseline gap-1">
         <span class="text-base sm:text-lg font-black text-slate-900 leading-none">${s.total_orders || 0}</span>
-        <span class="text-[10px] font-bold text-slate-600">টি</span>
-        <span class="px-1 py-0.2 text-[8px] font-bold rounded bg-emerald-200/70 text-emerald-900 border border-emerald-300">রিয়েল</span>
+        <span class="text-[10px] font-bold text-slate-600">${unitPcs}</span>
+        <span class="px-1 py-0.2 text-[8px] font-bold rounded bg-emerald-200/70 text-emerald-900 border border-emerald-300">${badgeLive}</span>
       </div>
     </div>
 
     <!-- Card 2: অপেক্ষমাণ - Amber/Cream -->
     <div class="bg-[#fffbeb] border border-[#fde68a] rounded-xl p-2 sm:p-2.5 shadow-2xs flex flex-col justify-center min-w-0">
       <div class="flex items-center justify-between text-[11px] font-bold text-amber-800 mb-1">
-        <span class="truncate">অপেক্ষমাণ</span>
+        <span class="truncate">${isBn ? 'অপেক্ষমাণ' : 'Pending'}</span>
         <span class="text-xs shrink-0">📦</span>
       </div>
       <div class="flex items-baseline gap-1">
         <span class="text-base sm:text-lg font-black text-slate-900 leading-none">${s.pending_pickup || 0}</span>
-        <span class="text-[10px] font-bold text-slate-600">টি</span>
-        ${s.pending_pickup > 0 ? `<span class="px-1 py-0.2 text-[8px] font-bold rounded bg-amber-200/70 text-amber-900 border border-amber-300 animate-pulse">${s.pending_pickup} নতুন</span>` : ''}
+        <span class="text-[10px] font-bold text-slate-600">${unitPcs}</span>
+        ${s.pending_pickup > 0 ? `<span class="px-1 py-0.2 text-[8px] font-bold rounded bg-amber-200/70 text-amber-900 border border-amber-300 animate-pulse">${s.pending_pickup} ${badgeNew}</span>` : ''}
       </div>
     </div>
 
     <!-- Card 3: মেরামত ও ল্যাব - Soft Blue -->
     <div class="bg-[#eff6ff] border border-[#bfdbfe] rounded-xl p-2 sm:p-2.5 shadow-2xs flex flex-col justify-center min-w-0">
       <div class="flex items-center justify-between text-[11px] font-bold text-blue-800 mb-1">
-        <span class="truncate">মেরামত ও ল্যাব</span>
+        <span class="truncate">${isBn ? 'মেরামত ও ল্যাব' : 'Repair & Lab'}</span>
         <span class="text-xs shrink-0">🔬</span>
       </div>
       <div class="flex items-baseline gap-1">
         <span class="text-base sm:text-lg font-black text-slate-900 leading-none">${(s.in_repair || 0) + (s.in_lab || 0)}</span>
-        <span class="text-[10px] font-bold text-slate-600">টি</span>
+        <span class="text-[10px] font-bold text-slate-600">${unitPcs}</span>
       </div>
     </div>
 
     <!-- Card 4: অনুমোদন বাকি - Soft Purple -->
     <div class="bg-[#faf5ff] border border-[#e9d5ff] rounded-xl p-2 sm:p-2.5 shadow-2xs flex flex-col justify-center min-w-0">
       <div class="flex items-center justify-between text-[11px] font-bold text-purple-800 mb-1">
-        <span class="truncate">অনুমোদন বাকি</span>
+        <span class="truncate">${isBn ? 'অনুমোদন বাকি' : 'Quote Pending'}</span>
         <span class="text-xs shrink-0">🔔</span>
       </div>
       <div class="flex items-baseline gap-1">
         <span class="text-base sm:text-lg font-black text-slate-900 leading-none">${s.quote_pending || 0}</span>
-        <span class="text-[10px] font-bold text-slate-600">টি</span>
+        <span class="text-[10px] font-bold text-slate-600">${unitPcs}</span>
       </div>
     </div>
 
     <!-- Card 5: প্রাপ্ত বার্তা - Soft Rose -->
     <div class="bg-[#fff1f2] border border-[#fecdd3] rounded-xl p-2 sm:p-2.5 shadow-2xs flex flex-col justify-center min-w-0">
       <div class="flex items-center justify-between text-[11px] font-bold text-rose-800 mb-1">
-        <span class="truncate">প্রাপ্ত বার্তা</span>
+        <span class="truncate">${isBn ? 'প্রাপ্ত বার্তা' : 'Messages'}</span>
         <span class="text-xs shrink-0">💬</span>
       </div>
       <div class="flex items-baseline gap-1">
         <span class="text-base sm:text-lg font-black text-slate-900 leading-none" id="stat-card-inq-count">${s.total_contacts !== undefined ? s.total_contacts : 0}</span>
-        <span class="text-[10px] font-bold text-slate-600">টি</span>
+        <span class="text-[10px] font-bold text-slate-600">${unitPcs}</span>
       </div>
     </div>
 
     <!-- Card 6: পুরাতন (Alumni) - Soft Teal -->
     <div class="bg-[#f0fdfa] border border-[#99f6e4] rounded-xl p-2 sm:p-2.5 shadow-2xs flex flex-col justify-center min-w-0">
       <div class="flex items-center justify-between text-[11px] font-bold text-teal-800 mb-1">
-        <span class="truncate">পুরাতন ডিভাইস</span>
+        <span class="truncate">${isBn ? 'পুরাতন ডিভাইস' : 'Completed'}</span>
         <span class="text-xs shrink-0">🎓</span>
       </div>
       <div class="flex items-baseline gap-1">
         <span class="text-base sm:text-lg font-black text-slate-900 leading-none">${s.completed || 0}</span>
-        <span class="text-[10px] font-bold text-slate-600">টি</span>
+        <span class="text-[10px] font-bold text-slate-600">${unitPcs}</span>
       </div>
     </div>
 
     <!-- Card 7: সার্ভিসসমূহ - Soft Sky -->
     <div class="bg-[#f0f9ff] border border-[#bae6fd] rounded-xl p-2 sm:p-2.5 shadow-2xs flex flex-col justify-center min-w-0">
       <div class="flex items-center justify-between text-[11px] font-bold text-sky-800 mb-1">
-        <span class="truncate">সার্ভিস ক্যাটাগরি</span>
+        <span class="truncate">${isBn ? 'সার্ভিস ক্যাটাগরি' : 'Services'}</span>
         <span class="text-xs shrink-0">🛠️</span>
       </div>
       <div class="flex items-baseline gap-1">
         <span class="text-base sm:text-lg font-black text-slate-900 leading-none" id="stat-card-serv-count">${s.total_services !== undefined ? s.total_services : 0}</span>
-        <span class="text-[10px] font-bold text-slate-600">টি</span>
+        <span class="text-[10px] font-bold text-slate-600">${unitPcs}</span>
       </div>
     </div>
 
     <!-- Card 8: মোট আদায় - Mint Emerald -->
     <div class="bg-[#ecfdf5] border border-[#a7f3d0] rounded-xl p-2 sm:p-2.5 shadow-2xs flex flex-col justify-center min-w-0">
       <div class="flex items-center justify-between text-[11px] font-bold text-emerald-800 mb-1">
-        <span class="truncate">মোট আদায়</span>
+        <span class="truncate">${isBn ? 'মোট আদায়' : 'Total Revenue'}</span>
         <span class="text-xs shrink-0">💰</span>
       </div>
       <div class="flex items-baseline gap-1">
@@ -627,12 +678,13 @@ function renderOrderMediaBadges(o) {
   const hasVoice = o.voice_url || (typeof o.attachments === 'string' && o.attachments.includes('"voice"'));
 
   if (!hasPhoto && !hasVideo && !hasVoice) return '';
+  const isBn = (window.currentLang || 'bn') === 'bn';
 
   return `
     <div class="flex items-center gap-1 mt-1">
-      ${hasPhoto ? `<span class="inline-flex items-center gap-0.5 px-1.5 py-0.2 text-[9px] font-bold bg-sky-50 text-sky-700 border border-sky-200 rounded">📷 ছবি</span>` : ''}
-      ${hasVideo ? `<span class="inline-flex items-center gap-0.5 px-1.5 py-0.2 text-[9px] font-bold bg-purple-50 text-purple-700 border border-purple-200 rounded">🎥 ভিডিও</span>` : ''}
-      ${hasVoice ? `<span class="inline-flex items-center gap-0.5 px-1.5 py-0.2 text-[9px] font-bold bg-amber-50 text-amber-700 border border-amber-200 rounded">🎙️ ভয়েস</span>` : ''}
+      ${hasPhoto ? `<span class="inline-flex items-center gap-0.5 px-1.5 py-0.2 text-[9px] font-bold bg-sky-50 text-sky-700 border border-sky-200 rounded">📷 ${isBn ? 'ছবি' : 'Photo'}</span>` : ''}
+      ${hasVideo ? `<span class="inline-flex items-center gap-0.5 px-1.5 py-0.2 text-[9px] font-bold bg-purple-50 text-purple-700 border border-purple-200 rounded">🎥 ${isBn ? 'ভিডিও' : 'Video'}</span>` : ''}
+      ${hasVoice ? `<span class="inline-flex items-center gap-0.5 px-1.5 py-0.2 text-[9px] font-bold bg-amber-50 text-amber-700 border border-amber-200 rounded">🎙️ ${isBn ? 'ভয়েস' : 'Voice'}</span>` : ''}
     </div>
   `;
 }
@@ -641,27 +693,29 @@ function renderAdminOrdersTable(orders) {
   const tbody = document.getElementById('orders-table-body');
   if (!tbody) return;
 
+  const isBn = (window.currentLang || 'bn') === 'bn';
+
   if (orders.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="7" class="text-center py-12 text-slate-500 font-medium">কোনো অর্ডার পাওয়া যায়নি।</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="7" class="text-center py-12 text-slate-500 font-medium">${isBn ? 'কোনো অর্ডার পাওয়া যায়নি।' : 'No orders found.'}</td></tr>`;
     return;
   }
 
   const statusList = [
-    { val: 'PENDING_PICKUP', label: '⏳ পিকআপ বাকি', color: 'bg-amber-50 text-amber-900 border-amber-300' },
-    { val: 'PICKUP_ASSIGNED', label: '🚴 রাইডার নিযুক্ত', color: 'bg-blue-50 text-blue-900 border-blue-300' },
-    { val: 'COLLECTED', label: '📦 ল্যাবে আসছে', color: 'bg-indigo-50 text-indigo-900 border-indigo-300' },
-    { val: 'DIAGNOSING', label: '🔬 টেস্ট চলছে', color: 'bg-purple-50 text-purple-900 border-purple-300' },
-    { val: 'QUOTE_PENDING', label: '⚠️ কোটেশন বাকি', color: 'bg-orange-50 text-orange-900 border-orange-300' },
-    { val: 'QUOTE_APPROVED', label: '✅ অনুমোদিত', color: 'bg-emerald-50 text-emerald-900 border-emerald-300' },
-    { val: 'IN_REPAIR', label: '🛠️ মেরামত চলছে', color: 'bg-cyan-50 text-cyan-900 border-cyan-300' },
-    { val: 'OUT_FOR_DELIVERY', label: '🚚 ডেলিভারিতে', color: 'bg-teal-50 text-teal-900 border-teal-300' },
-    { val: 'COMPLETED', label: '🎉 সম্পন্ন', color: 'bg-emerald-100 text-emerald-950 border-emerald-400' },
-    { val: 'CANCELLED', label: '❌ বাতিল', color: 'bg-rose-50 text-rose-900 border-rose-300' }
+    { val: 'PENDING_PICKUP', label: isBn ? '⏳ পিকআপ বাকি' : '⏳ Pending Pickup', color: 'bg-amber-50 text-amber-900 border-amber-300' },
+    { val: 'PICKUP_ASSIGNED', label: isBn ? '🚴 রাইডার নিযুক্ত' : '🚴 Rider Assigned', color: 'bg-blue-50 text-blue-900 border-blue-300' },
+    { val: 'COLLECTED', label: isBn ? '📦 ল্যাবে আসছে' : '📦 In Transit', color: 'bg-indigo-50 text-indigo-900 border-indigo-300' },
+    { val: 'DIAGNOSING', label: isBn ? '🔬 টেস্ট চলছে' : '🔬 Diagnosing', color: 'bg-purple-50 text-purple-900 border-purple-300' },
+    { val: 'QUOTE_PENDING', label: isBn ? '⚠️ কোটেশন বাকি' : '⚠️ Quote Pending', color: 'bg-orange-50 text-orange-900 border-orange-300' },
+    { val: 'QUOTE_APPROVED', label: isBn ? '✅ অনুমোদিত' : '✅ Quote Approved', color: 'bg-emerald-50 text-emerald-900 border-emerald-300' },
+    { val: 'IN_REPAIR', label: isBn ? '🛠️ মেরামত চলছে' : '🛠️ In Repair', color: 'bg-cyan-50 text-cyan-900 border-cyan-300' },
+    { val: 'OUT_FOR_DELIVERY', label: isBn ? '🚚 ডেলিভারিতে' : '🚚 Out for Delivery', color: 'bg-teal-50 text-teal-900 border-teal-300' },
+    { val: 'COMPLETED', label: isBn ? '🎉 সম্পন্ন' : '🎉 Completed', color: 'bg-emerald-100 text-emerald-950 border-emerald-400' },
+    { val: 'CANCELLED', label: isBn ? '❌ বাতিল' : '❌ Cancelled', color: 'bg-rose-50 text-rose-900 border-rose-300' }
   ];
 
   tbody.innerHTML = orders.map(o => {
     const curStatus = statusList.find(s => s.val === o.status) || { color: 'bg-slate-50 text-slate-800 border-slate-300' };
-    const dateFormatted = new Date(o.created_at).toLocaleDateString('bn-BD', { year: 'numeric', month: '2-digit', day: '2-digit' });
+    const dateFormatted = new Date(o.created_at).toLocaleDateString(isBn ? 'bn-BD' : 'en-US', { year: 'numeric', month: '2-digit', day: '2-digit' });
 
     // Direct status dropdown (No modal/submit needed! Direct 1-click update)
     const statusWidget = `
@@ -680,7 +734,7 @@ function renderAdminOrdersTable(orders) {
 
         <td class="py-2.5 px-3">
           <div class="font-bold text-slate-900 truncate" title="${o.customer_name}">${o.customer_name}</div>
-          <div class="text-[10px] text-slate-500 truncate">📍 ${o.area || 'ঢাকা'}</div>
+          <div class="text-[10px] text-slate-500 truncate">📍 ${o.area || (isBn ? 'ঢাকা' : 'Dhaka')}</div>
         </td>
 
         <td class="py-2.5 px-3">
@@ -692,7 +746,7 @@ function renderAdminOrdersTable(orders) {
         <td class="py-2.5 px-3 font-mono">
           <div class="text-slate-800 text-xs font-semibold truncate">${o.customer_phone}</div>
           <a href="https://wa.me/88${o.customer_phone}?text=${encodeURIComponent(`Assalamu Alaikum, Repair Seba থেকে আপনার অর্ডার ${o.order_number} এর ব্যাপারে যোগাযোগ করছি।`)}" target="_blank" class="text-emerald-600 hover:text-emerald-700 text-[10px] font-bold inline-flex items-center gap-0.5 mt-0.5" title="WhatsApp Chat">
-            💬 চ্যাট
+            ${isBn ? '💬 চ্যাট' : '💬 Chat'}
           </a>
         </td>
 
@@ -751,31 +805,33 @@ function renderOverviewOrdersTable(orders, totalNewCount = 0) {
   const tbody = document.getElementById('overview-orders-table-body');
   if (!tbody) return;
 
+  const isBn = (window.currentLang || 'bn') === 'bn';
+
   const countBadge = document.getElementById('badge-overview-total');
   if (countBadge) {
-    countBadge.textContent = `${orders.length}টি নতুন আবেদন`;
+    countBadge.textContent = isBn ? `${orders.length}টি নতুন আবেদন` : `${orders.length} New Orders`;
   }
 
   if (orders.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="5" class="text-center py-10 text-slate-500 font-medium">বর্তমানে কোনো নতুন অপেক্ষমাণ অর্ডার নেই। <button onclick="switchTab('orders')" class="text-[#0f766e] font-bold underline hover:text-[#115e59] ml-1">সকল অর্ডার দেখুন →</button></td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="5" class="text-center py-10 text-slate-500 font-medium">${isBn ? 'বর্তমানে কোনো নতুন অপেক্ষমাণ অর্ডার নেই।' : 'No pending orders at this moment.'} <button onclick="switchTab('orders')" class="text-[#0f766e] font-bold underline hover:text-[#115e59] ml-1">${isBn ? 'সকল অর্ডার দেখুন →' : 'View all orders →'}</button></td></tr>`;
     return;
   }
 
   tbody.innerHTML = orders.map(o => {
-    const dateFormatted = new Date(o.created_at).toLocaleDateString('bn-BD', { year: 'numeric', month: '2-digit', day: '2-digit' });
+    const dateFormatted = new Date(o.created_at).toLocaleDateString(isBn ? 'bn-BD' : 'en-US', { year: 'numeric', month: '2-digit', day: '2-digit' });
 
     return `
       <tr class="hover:bg-slate-50/80 transition text-slate-800 text-xs">
         <td class="py-3 px-3 font-bold font-mono text-[#0f766e] whitespace-nowrap">
           <div class="flex items-center gap-1.5">
             <span>${o.order_number}</span>
-            <span class="px-1.5 py-0.2 rounded text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-200">নতুন</span>
+            <span class="px-1.5 py-0.2 rounded text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-200">${isBn ? 'নতুন' : 'New'}</span>
           </div>
         </td>
 
         <td class="py-3 px-3">
           <div class="font-bold text-slate-900 truncate max-w-[150px]" title="${o.customer_name}">${o.customer_name}</div>
-          <div class="text-[10px] text-slate-500 truncate max-w-[150px]">📍 ${o.area || 'ঢাকা'}</div>
+          <div class="text-[10px] text-slate-500 truncate max-w-[150px]">📍 ${o.area || (isBn ? 'ঢাকা' : 'Dhaka')}</div>
         </td>
 
         <td class="py-3 px-3">
@@ -786,7 +842,7 @@ function renderOverviewOrdersTable(orders, totalNewCount = 0) {
         <td class="py-3 px-3 font-mono whitespace-nowrap">
           <div class="text-slate-800 text-xs font-semibold">${o.customer_phone}</div>
           <a href="https://wa.me/88${o.customer_phone}?text=${encodeURIComponent(`Assalamu Alaikum, Repair Seba থেকে আপনার অর্ডার ${o.order_number} এর ব্যাপারে যোগাযোগ করছি।`)}" target="_blank" class="text-emerald-600 hover:text-emerald-700 text-[10px] font-bold inline-flex items-center gap-0.5 mt-0.5" title="WhatsApp Chat">
-            💬 চ্যাট
+            ${isBn ? '💬 চ্যাট' : '💬 Chat'}
           </a>
         </td>
 
@@ -1254,7 +1310,10 @@ function switchTab(tab) {
 
   const topTitle = document.getElementById('top-bar-title');
   if (topTitle && TAB_TITLES[tab]) {
-    topTitle.innerHTML = TAB_TITLES[tab];
+    const isBn = (window.currentLang || 'bn') === 'bn';
+    topTitle.innerHTML = typeof TAB_TITLES[tab] === 'object'
+      ? (isBn ? TAB_TITLES[tab].bn : TAB_TITLES[tab].en)
+      : TAB_TITLES[tab];
   }
 
   if (tab === 'overview') {
@@ -2603,14 +2662,16 @@ function renderAdminCustomersTable(customers) {
   const tbody = document.getElementById('admin-customers-table-body');
   if (!tbody) return;
 
+  const isBn = (window.currentLang || 'bn') === 'bn';
+
   if (!customers || customers.length === 0) {
     tbody.innerHTML = `
       <tr>
         <td colspan="7" class="text-center py-12 text-slate-500">
           <div class="flex flex-col items-center justify-center gap-2">
             <span class="text-3xl">👥</span>
-            <div class="font-bold text-slate-700">কোনো নিবন্ধিত গ্রাহক পাওয়া যায়নি</div>
-            <p class="text-xs text-slate-400 max-w-sm">গ্রাহকরা ওয়েবসাইট থেকে একাউন্ট তৈরি করলে বা অর্ডার প্লেস করলে তাদের বিবরণ এখানে দেখা যাবে।</p>
+            <div class="font-bold text-slate-700">${isBn ? 'কোনো নিবন্ধিত গ্রাহক পাওয়া যায়নি' : 'No registered customers found'}</div>
+            <p class="text-xs text-slate-400 max-w-sm">${isBn ? 'গ্রাহকরা ওয়েবসাইট থেকে একাউন্ট তৈরি করলে বা অর্ডার প্লেস করলে তাদের বিবরণ এখানে দেখা যাবে।' : 'Customer profiles and order histories will appear here once they register or place orders.'}</p>
           </div>
         </td>
       </tr>
@@ -2624,18 +2685,18 @@ function renderAdminCustomersTable(customers) {
       ? `<img src="${c.avatar}" alt="${c.name || 'গ্রাহক'}" class="w-full h-full object-cover">`
       : `<span class="font-bold text-xs">${initial}</span>`;
     
-    let dateStr = 'অজানা';
+    let dateStr = isBn ? 'অজানা' : 'Unknown';
     let timeStr = '';
     if (c.created_at) {
       const d = new Date(c.created_at);
-      dateStr = d.toLocaleDateString('bn-BD', { year: 'numeric', month: 'short', day: 'numeric' });
-      timeStr = d.toLocaleTimeString('bn-BD', { hour: '2-digit', minute: '2-digit' });
+      dateStr = d.toLocaleDateString(isBn ? 'bn-BD' : 'en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+      timeStr = d.toLocaleTimeString(isBn ? 'bn-BD' : 'en-US', { hour: '2-digit', minute: '2-digit' });
     }
     const totalOrders = c.total_orders || 0;
 
-    const displayArea = c.area || c.address || 'ঠিকানা নেই';
+    const displayArea = c.area || c.address || (isBn ? 'ঠিকানা নেই' : 'No address');
     const displayDetails = c.area && c.address && c.area !== c.address ? c.address : (c.city || '');
-    const fullAddressTooltip = [c.address, c.area, c.city].filter(Boolean).join(', ') || 'ঠিকানা দেওয়া হয়নি';
+    const fullAddressTooltip = [c.address, c.area, c.city].filter(Boolean).join(', ') || (isBn ? 'ঠিকানা দেওয়া হয়নি' : 'No address provided');
 
     return `
       <tr class="hover:bg-slate-50/90 transition text-slate-800 text-xs">
@@ -2643,12 +2704,12 @@ function renderAdminCustomersTable(customers) {
         <!-- 1. Avatar & Name -->
         <td class="py-2.5 px-2.5 sm:px-3">
           <div class="flex items-center gap-2.5 min-w-0">
-            <div class="relative w-8 h-8 rounded-full overflow-hidden bg-[#0f766e] text-white flex items-center justify-center font-bold text-xs shrink-0 border border-teal-300 shadow-2xs cursor-pointer group" onclick="openCustomerDetailsModal(${c.id})" title="প্রোফাইল দেখতে ক্লিক করুন">
+            <div class="relative w-8 h-8 rounded-full overflow-hidden bg-[#0f766e] text-white flex items-center justify-center font-bold text-xs shrink-0 border border-teal-300 shadow-2xs cursor-pointer group" onclick="openCustomerDetailsModal(${c.id})" title="${isBn ? 'প্রোফাইল দেখতে ক্লিক করুন' : 'Click to view profile'}">
               ${avatarHtml}
             </div>
             <div class="min-w-0 flex-1">
-              <div class="font-bold text-slate-900 hover:text-teal-700 cursor-pointer truncate" onclick="openCustomerDetailsModal(${c.id})" title="${c.name || 'সম্মানিত গ্রাহক'}">
-                ${c.name || 'সম্মানিত গ্রাহক'}
+              <div class="font-bold text-slate-900 hover:text-teal-700 cursor-pointer truncate" onclick="openCustomerDetailsModal(${c.id})" title="${c.name || (isBn ? 'সম্মানিত গ্রাহক' : 'Valued Customer')}">
+                ${c.name || (isBn ? 'সম্মানিত গ্রাহক' : 'Valued Customer')}
               </div>
               <div class="text-[10px] text-teal-800 font-medium font-mono">#RS-C${c.id}</div>
             </div>
@@ -2658,10 +2719,10 @@ function renderAdminCustomersTable(customers) {
         <!-- 2. Phone Number -->
         <td class="py-2.5 px-2.5 sm:px-3">
           <div class="flex items-center gap-1.5 font-mono font-bold text-slate-900">
-            <a href="tel:${c.phone}" class="hover:text-teal-700 hover:underline truncate" title="কল করুন">
+            <a href="tel:${c.phone}" class="hover:text-teal-700 hover:underline truncate" title="${isBn ? 'কল করুন' : 'Call'}">
               ${c.phone}
             </a>
-            <button onclick="navigator.clipboard.writeText('${c.phone}'); alert('ফোন নম্বর কপি করা হয়েছে: ${c.phone}');" class="text-slate-400 hover:text-slate-600 transition shrink-0 cursor-pointer text-[11px]" title="নম্বর কপি করুন">
+            <button onclick="navigator.clipboard.writeText('${c.phone}'); alert('${isBn ? 'ফোন নম্বর কপি করা হয়েছে' : 'Phone number copied'}: ${c.phone}');" class="text-slate-400 hover:text-slate-600 transition shrink-0 cursor-pointer text-[11px]" title="${isBn ? 'নম্বর কপি করুন' : 'Copy phone'}">
               📋
             </button>
           </div>
@@ -2670,7 +2731,7 @@ function renderAdminCustomersTable(customers) {
         <!-- 3. Email -->
         <td class="py-2.5 px-2.5 sm:px-3">
           <div class="truncate text-slate-600 font-sans" title="${c.email || ''}">
-            ${c.email ? `<span class="font-medium text-slate-800">${c.email}</span>` : `<span class="text-slate-400 italic text-[11px]">দেওয়া হয়নি</span>`}
+            ${c.email ? `<span class="font-medium text-slate-800">${c.email}</span>` : `<span class="text-slate-400 italic text-[11px]">${isBn ? 'দেওয়া হয়নি' : 'Not given'}</span>`}
           </div>
         </td>
 
@@ -2686,8 +2747,8 @@ function renderAdminCustomersTable(customers) {
 
         <!-- 5. Total Orders -->
         <td class="py-2.5 px-2.5 sm:px-3 text-center">
-          <button onclick="openCustomerDetailsModal(${c.id})" class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-bold transition cursor-pointer ${totalOrders > 0 ? 'bg-emerald-100 hover:bg-emerald-200 text-emerald-800 border border-emerald-300' : 'bg-slate-100 text-slate-600 border border-slate-200'}" title="অর্ডার দেখতে ক্লিক করুন">
-            ${totalOrders}টি অর্ডার
+          <button onclick="openCustomerDetailsModal(${c.id})" class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-bold transition cursor-pointer ${totalOrders > 0 ? 'bg-emerald-100 hover:bg-emerald-200 text-emerald-800 border border-emerald-300' : 'bg-slate-100 text-slate-600 border border-slate-200'}" title="${isBn ? 'অর্ডার দেখতে ক্লিক করুন' : 'Click to view orders'}">
+            ${totalOrders} ${isBn ? 'টি অর্ডার' : 'orders'}
           </button>
         </td>
 
@@ -2700,10 +2761,10 @@ function renderAdminCustomersTable(customers) {
         <!-- 7. Actions (Only Edit icon and Delete icon) -->
         <td class="py-2.5 px-2.5 sm:px-3 text-center">
           <div class="flex items-center justify-center gap-1.5 whitespace-nowrap">
-            <button onclick="openCustomerEditModal(${c.id})" class="w-7 h-7 rounded-lg bg-teal-50 hover:bg-teal-100 text-[#0f766e] border border-teal-200/90 flex items-center justify-center text-xs transition shadow-2xs hover:scale-105 cursor-pointer" title="গ্রাহকের তথ্য সম্পাদনা ও বিস্তারিত">
+            <button onclick="openCustomerEditModal(${c.id})" class="w-7 h-7 rounded-lg bg-teal-50 hover:bg-teal-100 text-[#0f766e] border border-teal-200/90 flex items-center justify-center text-xs transition shadow-2xs hover:scale-105 cursor-pointer" title="${isBn ? 'গ্রাহকের তথ্য সম্পাদনা ও বিস্তারিত' : 'Edit customer info'}">
               ✏️
             </button>
-            <button onclick="deleteAdminCustomer(${c.id}, '${(c.name || c.phone).replace(/'/g, "\\'")}')" class="w-7 h-7 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200/90 flex items-center justify-center text-xs transition shadow-2xs hover:scale-105 cursor-pointer" title="গ্রাহক মুছে ফেলুন">
+            <button onclick="deleteAdminCustomer(${c.id}, '${(c.name || c.phone).replace(/'/g, "\\'")}')" class="w-7 h-7 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200/90 flex items-center justify-center text-xs transition shadow-2xs hover:scale-105 cursor-pointer" title="${isBn ? 'গ্রাহক মুছে ফেলুন' : 'Delete customer'}">
               🗑️
             </button>
           </div>
