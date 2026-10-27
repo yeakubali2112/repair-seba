@@ -596,6 +596,10 @@ const STATUS_MAP = {
 
 // Current language manager
 let currentLang = localStorage.getItem('repair_seba_lang') || 'bn';
+// In admin panel, ensure standard Bangla default
+if (typeof window !== 'undefined' && window.location && window.location.pathname.includes('admin')) {
+  currentLang = 'bn';
+}
 
 function setLanguage(lang) {
   if (lang !== 'bn' && lang !== 'en') lang = 'bn';

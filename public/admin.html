@@ -59,13 +59,6 @@
 
   <!-- 1. LOGIN SCREEN (Visible when logged out) -->
   <div id="admin-login-screen" class="min-h-screen flex items-center justify-center p-4 bg-slate-100 relative">
-    <!-- Top-Right Language Switcher -->
-    <div id="admin-login-lang-container" class="absolute top-4 right-4">
-      <div class="bg-white p-0.5 rounded-lg flex items-center border border-slate-200 shrink-0 shadow-xs">
-        <button class="lang-toggle-btn px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-md text-[10px] sm:text-[11px] font-black tracking-wider transition flex items-center justify-center cursor-pointer uppercase" data-lang="bn">BD</button>
-        <button class="lang-toggle-btn px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-md text-[10px] sm:text-[11px] font-black tracking-wider transition flex items-center justify-center cursor-pointer uppercase" data-lang="en">EN</button>
-      </div>
-    </div>
     <div class="bg-white border border-slate-200 rounded-3xl p-8 max-w-md w-full shadow-xl">
       <div class="text-center mb-8">
         <div class="w-16 h-16 rounded-2xl bg-cyan-50 text-cyan-600 border border-cyan-200 flex items-center justify-center text-3xl mx-auto mb-4 shadow-sm">
@@ -122,19 +115,9 @@
           </div>
         </div>
 
-                <!-- Right: Language Switcher & Admin Profile -->
+                <!-- Right: Admin Profile -->
         <div class="flex items-center gap-2 sm:gap-3">
           
-          <!-- Language Switcher Toggle: Compact BD / EN -->
-          <div class="bg-slate-100 p-0.5 rounded-lg flex items-center border border-slate-200 shrink-0 shadow-2xs">
-            <button class="lang-toggle-btn px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-md text-[10px] sm:text-[11px] font-black tracking-wider transition flex items-center justify-center cursor-pointer uppercase" data-lang="bn">
-              BD
-            </button>
-            <button class="lang-toggle-btn px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-md text-[10px] sm:text-[11px] font-black tracking-wider transition flex items-center justify-center cursor-pointer uppercase" data-lang="en">
-              EN
-            </button>
-          </div>
-
           <!-- User Profile Capsule (Clean Box Style matching user site) -->
           <button onclick="openAdminProfileModal()" type="button" class="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg sm:rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200/90 shadow-2xs transition group text-left cursor-pointer" title="ক্লিক করে প্রোফাইল ও লগআউট অপশন দেখুন">
             <div class="relative w-6 h-6 sm:w-8 sm:h-8 rounded-full overflow-hidden bg-[#0f766e] text-white flex items-center justify-center font-black text-[10px] sm:text-xs shrink-0 shadow-xs border border-teal-400">
