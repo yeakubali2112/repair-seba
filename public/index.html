@@ -44,18 +44,18 @@
 
   <!-- Main Navigation Bar -->
   <header class="sticky top-0 z-50 glass-nav border-b border-slate-200/80 shadow-sm">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+    <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between">
       
       <!-- Logo -->
-      <a href="/" class="flex items-center gap-3 group">
-        <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-cyan-600 to-sky-500 text-white flex items-center justify-center font-black text-2xl shadow-md group-hover:scale-105 transition">
+      <a href="/" class="flex items-center gap-2 sm:gap-3 group shrink-0">
+        <div class="w-9 h-9 sm:w-11 sm:h-11 rounded-xl sm:rounded-2xl bg-gradient-to-tr from-cyan-600 to-sky-500 text-white flex items-center justify-center font-black text-xl sm:text-2xl shadow-md group-hover:scale-105 transition shrink-0">
           🛠️
         </div>
         <div>
-          <span class="text-2xl font-black tracking-tight text-slate-900 group-hover:text-cyan-600 transition flex items-center gap-1">
+          <span class="text-base sm:text-2xl font-black tracking-tight text-slate-900 group-hover:text-cyan-600 transition flex items-center gap-1 leading-none">
             Repair <span class="text-cyan-600">Seba</span>
           </span>
-          <span class="block text-[11px] font-semibold text-slate-500 tracking-wider" data-i18n="brand_tagline">ডোরস্টেপ ফোন ও ট্যাব মেরামত</span>
+          <span class="hidden sm:block text-[11px] font-semibold text-slate-500 tracking-wider mt-0.5" data-i18n="brand_tagline">ডোরস্টেপ ফোন ও ট্যাব মেরামত</span>
         </div>
       </a>
 
@@ -69,41 +69,41 @@
       </nav>
 
       <!-- Language Switcher & Action CTA -->
-      <div class="flex items-center gap-4">
+      <div class="flex items-center gap-1.5 sm:gap-3 shrink-0">
         
-        <!-- Language Switcher Toggle -->
-        <div class="bg-slate-100 p-1 rounded-xl flex items-center border border-slate-200">
-          <button class="lang-toggle-btn px-3 py-1 rounded-lg text-xs font-bold transition flex items-center gap-1" data-lang="bn">
-            <span>🇧🇩</span> <span>বাংলা</span>
+        <!-- Language Switcher Toggle (Compact on Phone) -->
+        <div class="bg-slate-100 p-0.5 sm:p-1 rounded-lg sm:rounded-xl flex items-center border border-slate-200 shrink-0">
+          <button class="lang-toggle-btn px-1.5 sm:px-3 py-1 rounded-md sm:rounded-lg text-[10px] sm:text-xs font-bold transition flex items-center gap-1 cursor-pointer" data-lang="bn">
+            <span class="text-xs sm:text-sm leading-none">🇧🇩</span> <span>বাংলা</span>
           </button>
-          <button class="lang-toggle-btn px-3 py-1 rounded-lg text-xs font-bold transition flex items-center gap-1" data-lang="en">
-            <span>🇬🇧</span> <span>English</span>
+          <button class="lang-toggle-btn px-1.5 sm:px-3 py-1 rounded-md sm:rounded-lg text-[10px] sm:text-xs font-bold transition flex items-center gap-1 cursor-pointer" data-lang="en">
+            <span class="text-xs sm:text-sm leading-none">🇬🇧</span> <span class="hidden sm:inline">English</span><span class="sm:hidden">EN</span>
           </button>
         </div>
 
         <!-- User Authentication & Profile Menu (Replaces Pickup Button) -->
-        <div id="nav-user-container" class="relative">
+        <div id="nav-user-container" class="relative shrink-0">
           <!-- Logged Out State: Phone Login Button -->
-          <button id="nav-btn-login" onclick="openUserLoginModal()" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-cyan-600 to-sky-600 hover:from-cyan-500 hover:to-sky-500 text-white font-bold text-xs sm:text-sm shadow-md shadow-cyan-600/20 hover:scale-105 transition">
-            <span>👤</span> <span>লগইন</span>
+          <button id="nav-btn-login" onclick="openUserLoginModal()" class="inline-flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl bg-gradient-to-r from-cyan-600 to-sky-600 hover:from-cyan-500 hover:to-sky-500 text-white font-bold text-xs sm:text-sm shadow-md shadow-cyan-600/20 hover:scale-105 transition cursor-pointer">
+            <span class="text-xs sm:text-sm">👤</span> <span>লগইন</span>
           </button>
 
           <!-- Logged In State: Matching Admin Panel Profile Capsule Design -->
-          <div id="nav-user-dropdown" class="hidden relative flex items-center gap-2">
+          <div id="nav-user-dropdown" class="hidden relative flex items-center gap-1 sm:gap-2">
             <!-- Profile Capsule Button (Click to open dropdown) -->
-            <button onclick="toggleUserDropdown()" type="button" class="flex items-center gap-2 px-2.5 sm:px-3 py-1.5 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200/90 shadow-2xs transition group text-left cursor-pointer" title="ক্লিক করে প্রোফাইল দেখুন">
-              <div class="relative w-8 h-8 rounded-full overflow-hidden bg-[#0f766e] text-white flex items-center justify-center font-black text-xs shrink-0 shadow-xs border border-teal-400">
+            <button onclick="toggleUserDropdown()" type="button" class="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg sm:rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200/90 shadow-2xs transition group text-left cursor-pointer" title="ক্লিক করে প্রোফাইল দেখুন">
+              <div class="relative w-6 h-6 sm:w-8 sm:h-8 rounded-full overflow-hidden bg-[#0f766e] text-white flex items-center justify-center font-black text-[10px] sm:text-xs shrink-0 shadow-xs border border-teal-400">
                 <img id="nav-user-avatar" src="" alt="Profile" class="w-full h-full object-cover hidden">
                 <span id="nav-user-initial">গ</span>
               </div>
               <div class="text-left">
-                <div class="flex items-center gap-1.5">
-                  <span id="nav-user-display-name" class="text-xs font-bold text-slate-900 leading-none truncate max-w-[90px] sm:max-w-[120px]">গ্রাহক নাম</span>
-                  <span class="px-1.5 py-0.2 text-[9px] font-black rounded bg-emerald-100 text-emerald-800 border border-emerald-200 shrink-0">গ্রাহক</span>
+                <div class="flex items-center gap-1">
+                  <span id="nav-user-display-name" class="text-[11px] sm:text-xs font-bold text-slate-900 leading-tight truncate max-w-[65px] xs:max-w-[85px] sm:max-w-[120px]">গ্রাহক নাম</span>
+                  <span class="hidden sm:inline-block px-1.5 py-0.2 text-[9px] font-black rounded bg-emerald-100 text-emerald-800 border border-emerald-200 shrink-0">গ্রাহক</span>
                 </div>
-                <p id="nav-user-sub" class="text-[10px] text-slate-500 leading-tight mt-0.5 truncate max-w-[120px]">০১৭১১-XXXXXX</p>
+                <p id="nav-user-sub" class="hidden sm:block text-[10px] text-slate-500 leading-tight mt-0.5 truncate max-w-[120px]">০১৭১১-XXXXXX</p>
               </div>
-              <span class="text-xs text-slate-400 ml-0.5">▾</span>
+              <span class="text-[10px] sm:text-xs text-slate-400">▾</span>
             </button>
 
             <!-- Dropdown Menu -->
