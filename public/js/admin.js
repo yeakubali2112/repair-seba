@@ -429,6 +429,9 @@ function setupAdminListeners() {
     });
   }
 
+  // Real-time synchronization for instant live admin updates
+  initAdminRealtimeSync();
+
   // Language Change Listener for dynamic Admin UI update
   window.addEventListener('languageChanged', (e) => {
     const lang = e.detail?.lang || window.currentLang || 'bn';
@@ -729,16 +732,18 @@ function renderAdminOrdersTable(orders) {
     return `
       <tr class="hover:bg-slate-50/80 transition text-slate-800 text-xs">
         <td class="py-2.5 px-3 font-bold font-mono text-[#0f766e] truncate">
-          ${o.order_number}
+          <button onclick="openOrderDetailsModal(${o.id})" class="font-bold font-mono text-[#0f766e] hover:underline cursor-pointer text-left inline-flex items-center gap-1" title="ক্লিক করে A to Z বিস্তারিত দেখুন">
+            <span>${o.order_number}</span>
+          </button>
         </td>
 
         <td class="py-2.5 px-3">
-          <div class="font-bold text-slate-900 truncate" title="${o.customer_name}">${o.customer_name}</div>
+          <div onclick="openOrderDetailsModal(${o.id})" class="font-bold text-slate-900 truncate hover:text-[#0f766e] cursor-pointer" title="ক্লিক করে বিস্তারিত দেখুন">${o.customer_name}</div>
           <div class="text-[10px] text-slate-500 truncate">📍 ${o.area || (isBn ? 'ঢাকা' : 'Dhaka')}</div>
         </td>
 
         <td class="py-2.5 px-3">
-          <div class="font-semibold text-slate-800 truncate" title="${o.brand} ${o.model}">${o.brand} ${o.model}</div>
+          <div onclick="openOrderDetailsModal(${o.id})" class="font-semibold text-slate-800 truncate hover:text-[#0f766e] cursor-pointer" title="${o.brand} ${o.model}">${o.brand} ${o.model}</div>
           <div class="text-[10px] text-slate-500 truncate">⚠️ ${Array.isArray(o.issues) ? o.issues.join(', ') : o.issues}</div>
           ${renderOrderMediaBadges(o)}
         </td>
@@ -760,7 +765,10 @@ function renderAdminOrdersTable(orders) {
 
         <td class="py-2.5 px-2 text-center whitespace-nowrap">
           <div class="flex items-center justify-center gap-1.5">
-            <button onclick="openEditModal(${o.id})" class="w-7 h-7 rounded-lg bg-teal-50 hover:bg-teal-100 text-[#0f766e] border border-teal-200/90 flex items-center justify-center text-xs transition shadow-2xs hover:scale-105 cursor-pointer" title="অর্ডার কোটেশন ও বিবরণ এডিট করুন">
+            <button onclick="openOrderDetailsModal(${o.id})" class="w-7 h-7 rounded-lg bg-teal-50 hover:bg-teal-100 text-[#0f766e] border border-teal-200/90 flex items-center justify-center text-xs transition shadow-2xs hover:scale-105 cursor-pointer" title="অর্ডারের A to Z সম্পূর্ণ বিস্তারিত বিবরণ দেখুন">
+              👁️
+            </button>
+            <button onclick="openEditModal(${o.id})" class="w-7 h-7 rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200/90 flex items-center justify-center text-xs transition shadow-2xs hover:scale-105 cursor-pointer" title="অর্ডার কোটেশন ও বিবরণ এডিট করুন">
               ✏️
             </button>
             <button onclick="deleteAdminOrder(${o.id}, '${o.order_number}')" class="w-7 h-7 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200/90 flex items-center justify-center text-xs transition shadow-2xs hover:scale-105 cursor-pointer" title="অর্ডার ডিলিট করুন">
@@ -877,6 +885,29 @@ async function quickUpdateOrderStatus(orderId, newStatus) {
       loadAdminOrders();
       loadAdminStats();
       loadOverviewOrders();
+
+      // Broadcast status update for instant live sync across user and admin tabs
+      try {
+        if (typeof BroadcastChannel !== 'undefined') {
+          const bc = new BroadcastChannel('repair_seba_realtime_orders');
+          bc.postMessage({
+            type: 'ORDER_UPDATED',
+            order_id: orderId,
+            order_number: data.order?.order_number,
+            status: newStatus,
+            order: data.order
+          });
+          bc.close();
+        }
+      } catch (_) {}
+      try {
+        localStorage.setItem('repair_seba_status_ping', JSON.stringify({
+          time: Date.now(),
+          order_id: orderId,
+          order_number: data.order?.order_number,
+          status: newStatus
+        }));
+      } catch (_) {}
     } else {
       alert(data.error || 'স্ট্যাটাস পরিবর্তন করা যায়নি।');
     }
@@ -894,6 +925,365 @@ window.quickUpdateOrderStatus = quickUpdateOrderStatus;
 window.quickDirectApprove = quickDirectApprove;
 
 // -------------------------------------------------------------
+// COMPREHENSIVE A TO Z ORDER DETAILS MODAL (VIEW EVERYTHING)
+// -------------------------------------------------------------
+let currentViewOrderId = null;
+
+function openOrderDetailsModal(orderId) {
+  const order = adminOrdersCache.find(o => o.id === orderId);
+  if (!order) return;
+
+  currentViewOrderId = order.id;
+  const isBn = (window.currentLang || 'bn') === 'bn';
+
+  const orderNoEl = document.getElementById('view-modal-orderno');
+  const deviceSubEl = document.getElementById('view-modal-device-sub');
+  const createdEl = document.getElementById('view-modal-created-at');
+  
+  if (orderNoEl) orderNoEl.textContent = order.order_number;
+  if (deviceSubEl) deviceSubEl.textContent = `${order.brand} ${order.model} (${order.device_type === 'phone' ? (isBn ? 'স্মার্টফোন' : 'Smartphone') : (isBn ? 'ট্যাবলেট' : 'Tablet')})`;
+
+  const createdDate = new Date(order.created_at).toLocaleString(isBn ? 'bn-BD' : 'en-US', {
+    dateStyle: 'medium',
+    timeStyle: 'short'
+  });
+  if (createdEl) createdEl.textContent = `📅 অর্ডার তৈরির সময়: ${createdDate}`;
+
+  const statusList = [
+    { val: 'PENDING_PICKUP', label: isBn ? '⏳ পিকআপ বাকি' : '⏳ Pending Pickup', color: 'bg-amber-100 text-amber-900 border-amber-300' },
+    { val: 'PICKUP_ASSIGNED', label: isBn ? '🚴 রাইডার নিযুক্ত' : '🚴 Rider Assigned', color: 'bg-blue-100 text-blue-900 border-blue-300' },
+    { val: 'COLLECTED', label: isBn ? '📦 ল্যাবে আসছে' : '📦 In Transit', color: 'bg-indigo-100 text-indigo-900 border-indigo-300' },
+    { val: 'DIAGNOSING', label: isBn ? '🔬 টেস্ট চলছে' : '🔬 Diagnosing', color: 'bg-purple-100 text-purple-900 border-purple-300' },
+    { val: 'QUOTE_PENDING', label: isBn ? '⚠️ কোটেশন বাকি' : '⚠️ Quote Pending', color: 'bg-orange-100 text-orange-900 border-orange-300' },
+    { val: 'QUOTE_APPROVED', label: isBn ? '✅ অনুমোদিত' : '✅ Quote Approved', color: 'bg-emerald-100 text-emerald-900 border-emerald-300' },
+    { val: 'IN_REPAIR', label: isBn ? '🛠️ মেরামত চলছে' : '🛠️ In Repair', color: 'bg-cyan-100 text-cyan-900 border-cyan-300' },
+    { val: 'OUT_FOR_DELIVERY', label: isBn ? '🚚 ডেলিভারিতে' : '🚚 Out for Delivery', color: 'bg-teal-100 text-teal-900 border-teal-300' },
+    { val: 'COMPLETED', label: isBn ? '🎉 সম্পন্ন' : '🎉 Completed', color: 'bg-emerald-200 text-emerald-950 border-emerald-400' },
+    { val: 'CANCELLED', label: isBn ? '❌ বাতিল' : '❌ Cancelled', color: 'bg-rose-100 text-rose-900 border-rose-300' }
+  ];
+  const curSt = statusList.find(s => s.val === order.status) || { label: order.status, color: 'bg-slate-100 text-slate-800 border-slate-300' };
+
+  // Parse attachments
+  let attList = [];
+  try {
+    if (order.attachments) {
+      attList = typeof order.attachments === 'string' ? JSON.parse(order.attachments) : order.attachments;
+    }
+  } catch (e) {}
+  if (!Array.isArray(attList)) attList = [];
+  if (order.photo_url && !attList.find(a => a.type === 'photo')) attList.push({ type: 'photo', url: order.photo_url, fileName: 'ডিভাইসের ছবি' });
+  if (order.video_url && !attList.find(a => a.type === 'video')) attList.push({ type: 'video', url: order.video_url, fileName: 'সমস্যার ভিডিও' });
+  if (order.voice_url && !attList.find(a => a.type === 'voice')) attList.push({ type: 'voice', url: order.voice_url, fileName: 'ভয়েস রেকর্ড' });
+
+  let mediaHtml = '';
+  if (attList.length > 0) {
+    mediaHtml = `
+      <div class="space-y-3 mt-2.5">
+        ${attList.map(item => {
+          if (item.type === 'photo') {
+            return `
+              <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-2xs space-y-2">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                    <span>📷</span> <span>গ্রাহকের পাঠানো ডিভাইসের ছবি</span>
+                  </span>
+                  <a href="${item.url}" target="_blank" download class="text-[11px] font-bold text-[#0f766e] bg-teal-50 hover:bg-teal-100 px-2.5 py-1 rounded-lg border border-teal-200 transition">🔍 বড় করে দেখুন / ডাউনলোড</a>
+                </div>
+                <div class="rounded-xl overflow-hidden max-h-60 bg-slate-50 flex items-center justify-center p-1 border border-slate-100">
+                  <img src="${item.url}" alt="Device photo" class="max-h-60 w-auto object-contain rounded-lg">
+                </div>
+              </div>
+            `;
+          } else if (item.type === 'video') {
+            return `
+              <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-2xs space-y-2">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                    <span>🎥</span> <span>ডিভাইসের সমস্যার ভিডিও</span>
+                  </span>
+                  <a href="${item.url}" target="_blank" download class="text-[11px] font-bold text-purple-700 bg-purple-50 hover:bg-purple-100 px-2.5 py-1 rounded-lg border border-purple-200 transition">⬇️ ডাউনলোড</a>
+                </div>
+                <video src="${item.url}" controls class="w-full max-h-60 rounded-xl bg-black"></video>
+              </div>
+            `;
+          } else if (item.type === 'voice') {
+            return `
+              <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-2xs space-y-2">
+                <span class="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                  <span>🎙️</span> <span>গ্রাহকের ভয়েস রেকর্ড</span>
+                </span>
+                <audio src="${item.url}" controls class="w-full"></audio>
+              </div>
+            `;
+          }
+          return '';
+        }).join('')}
+      </div>
+    `;
+  } else {
+    mediaHtml = `<div class="p-3 bg-white rounded-xl border border-slate-200 text-center text-xs text-slate-400 italic">কোনো ছবি, ভিডিও বা ভয়েস রেকর্ড সংযুক্ত নেই।</div>`;
+  }
+
+  // Quote Status badge
+  let quoteBadge = '';
+  if (order.status === 'QUOTE_PENDING' || order.quote_status === 'PENDING') {
+    quoteBadge = `<span class="px-2.5 py-1 rounded-lg text-xs font-bold bg-amber-100 text-amber-900 border border-amber-300">⚠️ গ্রাহকের অনুমোদনের অপেক্ষায়</span>`;
+  } else if (order.quote_status === 'APPROVED') {
+    quoteBadge = `<span class="px-2.5 py-1 rounded-lg text-xs font-bold bg-emerald-100 text-emerald-900 border border-emerald-300">✅ গ্রাহক সম্মতি দিয়েছেন</span>`;
+  } else if (order.quote_status === 'REJECTED') {
+    quoteBadge = `<span class="px-2.5 py-1 rounded-lg text-xs font-bold bg-rose-100 text-rose-900 border border-rose-300">❌ গ্রাহক বাতিল করেছেন</span>`;
+  } else {
+    quoteBadge = `<span class="px-2.5 py-1 rounded-lg text-xs font-bold bg-slate-100 text-slate-600 border border-slate-200">মূল্য নির্ধারণ করা হয়নি</span>`;
+  }
+
+  const issuesList = Array.isArray(order.issues) ? order.issues : [order.issues];
+  const fullAddressText = `${order.address}, ${order.area}, ${order.city || 'ঢাকা'}`;
+
+  const container = document.getElementById('order-details-content');
+  if (container) {
+    container.innerHTML = `
+      <!-- Top Live Status & Direct Controller -->
+      <div class="p-4 bg-slate-50 border border-slate-200 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs">
+        <div class="flex items-center gap-2">
+          <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">বর্তমান অবস্থা:</span>
+          <span class="px-3 py-1 rounded-xl text-xs font-black border ${curSt.color} shadow-2xs">
+            ${curSt.label}
+          </span>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <select id="modal-quick-status-select" class="text-xs font-bold py-1.5 px-3 rounded-xl border border-slate-300 bg-white text-slate-800 focus:ring-1 focus:ring-teal-500 cursor-pointer shadow-2xs">
+            ${statusList.map(s => `
+              <option value="${s.val}" ${s.val === order.status ? 'selected' : ''}>${s.label}</option>
+            `).join('')}
+          </select>
+          <button onclick="updateStatusFromDetailsModal(${order.id})" class="px-3 py-1.5 rounded-xl bg-[#0f766e] hover:bg-teal-700 text-white font-bold text-xs transition shadow-2xs cursor-pointer whitespace-nowrap">
+            ✓ স্ট্যাটাস পরিবর্তন
+          </button>
+        </div>
+      </div>
+
+      <!-- 1. CUSTOMER FULL A TO Z CONTACT & ADDRESS -->
+      <div class="bg-gradient-to-br from-teal-50/60 via-white to-slate-50 p-5 rounded-2xl border border-teal-200/90 shadow-2xs space-y-4">
+        <div class="flex items-center justify-between border-b border-teal-100 pb-2.5">
+          <h4 class="text-xs font-extrabold uppercase tracking-wider text-[#0f766e] flex items-center gap-2">
+            <span>👤</span> <span>গ্রাহকের সম্পূর্ণ ব্যক্তিগত ও যোগাযোগের তথ্য (A to Z Info)</span>
+          </h4>
+          <div class="flex items-center gap-2">
+            <a href="tel:${order.customer_phone}" class="px-2.5 py-1 rounded-lg bg-teal-50 hover:bg-teal-100 text-[#0f766e] text-xs font-bold border border-teal-200 transition flex items-center gap-1 shadow-2xs">
+              <span>📞</span> <span>কল করুন</span>
+            </a>
+            <a href="https://wa.me/88${order.customer_phone}?text=${encodeURIComponent(`Assalamu Alaikum ${order.customer_name}, Repair Seba থেকে আপনার অর্ডার ${order.order_number} এর ব্যাপারে যোগাযোগ করছি।`)}" target="_blank" class="px-2.5 py-1 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-xs font-bold border border-emerald-200 transition flex items-center gap-1 shadow-2xs">
+              <span>💬</span> <span>WhatsApp</span>
+            </a>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
+          <div>
+            <span class="text-slate-500 font-medium block">গ্রাহকের নাম:</span>
+            <span class="font-black text-slate-900 text-sm mt-0.5 block">${order.customer_name}</span>
+          </div>
+          <div>
+            <span class="text-slate-500 font-medium block">মূল মোবাইল নম্বর:</span>
+            <span class="font-mono font-black text-slate-900 text-sm mt-0.5 block">${order.customer_phone}</span>
+          </div>
+          <div>
+            <span class="text-slate-500 font-medium block">বিকল্প মোবাইল:</span>
+            <span class="font-mono font-bold text-slate-700 text-sm mt-0.5 block">${order.customer_alt_phone || 'দেওয়া হয়নি'}</span>
+          </div>
+        </div>
+
+        <div class="pt-3 border-t border-teal-100/80">
+          <div class="flex items-center justify-between mb-1.5">
+            <span class="text-xs font-bold text-slate-700 uppercase tracking-wider">📍 সম্পূর্ণ বিস্তারিত পিকআপ ঠিকানা:</span>
+            <div class="flex items-center gap-2">
+              <button onclick="copyToClipboard('${fullAddressText.replace(/'/g, "\\'")}', 'ঠিকানা কপি করা হয়েছে!')" class="px-2.5 py-0.5 rounded-lg bg-white hover:bg-slate-100 border border-slate-300 text-[11px] font-bold text-slate-700 transition flex items-center gap-1 shadow-2xs cursor-pointer">
+                <span>📋</span> <span>ঠিকানা কপি করুন</span>
+              </button>
+              <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(fullAddressText)}" target="_blank" class="px-2.5 py-0.5 rounded-lg bg-white hover:bg-slate-100 border border-slate-300 text-[11px] font-bold text-cyan-700 transition flex items-center gap-1 shadow-2xs">
+                <span>🗺️</span> <span>গুগল ম্যাপে দেখুন</span>
+              </a>
+            </div>
+          </div>
+          <div class="p-3 bg-white rounded-xl border border-teal-200 font-bold text-slate-900 text-xs leading-relaxed shadow-2xs">
+            ${order.address}
+          </div>
+          <div class="grid grid-cols-2 gap-3 mt-2 text-xs text-slate-600 font-medium">
+            <div>এলাকা / থানা: <strong class="text-slate-900 font-bold">${order.area}</strong></div>
+            <div>জেলা / শহর: <strong class="text-slate-900 font-bold">${order.city || 'ঢাকা'}</strong></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. DEVICE, ISSUES & PICKUP SCHEDULE -->
+      <div class="p-5 bg-white rounded-2xl border border-slate-200 shadow-2xs space-y-4">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-2.5">
+          <h4 class="text-xs font-extrabold uppercase tracking-wider text-slate-800 flex items-center gap-2">
+            <span>📱</span> <span>ডিভাইস, চিহ্নিত সমস্যা ও পিকআপ শিডিউল</span>
+          </h4>
+          <span class="text-xs font-bold px-2.5 py-0.5 rounded-md bg-slate-100 text-slate-700 uppercase">
+            ${order.device_type}
+          </span>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+          <div>
+            <span class="text-slate-500 font-medium block">ব্র্যান্ড ও মডেল:</span>
+            <span class="font-black text-slate-900 text-base mt-0.5 block">${order.brand} - ${order.model}</span>
+          </div>
+          <div>
+            <span class="text-slate-500 font-medium block">পছন্দের পিকআপ শিডিউল:</span>
+            <span class="font-bold text-slate-900 text-xs mt-0.5 block">
+              🗓️ ${order.preferred_date || 'যেকোনো দিন'} &nbsp;|&nbsp; ⏰ ${order.preferred_time_slot || 'যেকোনো সময়'}
+            </span>
+          </div>
+        </div>
+
+        <div>
+          <span class="text-slate-500 font-medium text-xs block mb-1.5">চিহ্নিত সমস্যাসমূহ:</span>
+          <div class="flex flex-wrap gap-1.5">
+            ${issuesList.map(iss => `
+              <span class="px-2.5 py-1 rounded-lg text-xs font-bold bg-amber-50 text-amber-900 border border-amber-200 shadow-2xs">
+                ⚠️ ${iss}
+              </span>
+            `).join('')}
+          </div>
+        </div>
+
+        <div>
+          <span class="text-slate-500 font-medium text-xs block mb-1">গ্রাহকের দেওয়া সমস্যার বিবরণ:</span>
+          <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 text-xs text-slate-800 leading-relaxed font-medium">
+            ${order.issue_description && order.issue_description.trim() ? order.issue_description : 'গ্রাহক কোনো অতিরিক্ত লিখিত বিবরণ দেননি।'}
+          </div>
+        </div>
+
+        <div class="pt-2 border-t border-slate-100">
+          <span class="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5 mb-1.5">
+            <span>📎</span> <span>গ্রাহকের সংযুক্ত ছবি, ভিডিও ও ভয়েস:</span>
+          </span>
+          ${mediaHtml}
+        </div>
+      </div>
+
+      <!-- 3. LABORATORY DIAGNOSIS & QUOTATION -->
+      <div class="p-5 bg-gradient-to-br from-amber-50/70 to-slate-50 rounded-2xl border border-amber-300 shadow-2xs space-y-3.5">
+        <div class="flex items-center justify-between border-b border-amber-200/80 pb-2.5">
+          <h4 class="text-xs font-extrabold uppercase tracking-wider text-amber-900 flex items-center gap-2">
+            <span>🔬</span> <span>ল্যাব টেস্ট রিপোর্ট ও খরচের কোটেশন (Quotation)</span>
+          </h4>
+          ${quoteBadge}
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
+          <div>
+            <span class="text-slate-500 font-medium block">প্রস্তাবিত মোট খরচ:</span>
+            <span class="font-black text-emerald-700 text-lg mt-0.5 block">৳ ${order.estimated_cost ? order.estimated_cost.toLocaleString() : '0'}</span>
+          </div>
+          <div>
+            <span class="text-slate-500 font-medium block">চূড়ান্ত বিল:</span>
+            <span class="font-black text-slate-900 text-lg mt-0.5 block">৳ ${order.final_cost ? order.final_cost.toLocaleString() : (order.estimated_cost || 0)}</span>
+          </div>
+          <div>
+            <span class="text-slate-500 font-medium block">সার্ভিস ওয়ারেন্টি:</span>
+            <span class="font-bold text-slate-800 text-sm mt-0.5 block">🛡️ ${order.warranty_days || 90} দিন</span>
+          </div>
+        </div>
+
+        <div>
+          <span class="text-slate-500 font-medium text-xs block mb-1">টেকনিশিয়ানের ডায়াগনোসিস ফাইন্ডিংস:</span>
+          <div class="p-3 bg-white rounded-xl border border-amber-200 text-xs text-slate-800 font-medium">
+            ${order.diagnosis_notes && order.diagnosis_notes.trim() ? order.diagnosis_notes : 'টেকনিশিয়ান এখনো ডায়াগনোসিস নোট এন্ট্রি করেননি।'}
+          </div>
+        </div>
+
+        ${order.customer_decision_notes ? `
+          <div class="p-2.5 bg-emerald-50 rounded-xl border border-emerald-200 text-xs text-emerald-900">
+            <strong>গ্রাহকের সিদ্ধান্ত নোট:</strong> ${order.customer_decision_notes}
+          </div>
+        ` : ''}
+      </div>
+
+      <!-- 4. RIDERS & PAYMENT -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div class="p-4 bg-white rounded-2xl border border-slate-200 shadow-2xs space-y-2 text-xs">
+          <h5 class="font-bold uppercase tracking-wider text-slate-700 text-[11px] flex items-center gap-1.5">
+            <span>🚴</span> <span>রাইডার ও লজিস্টিকস</span>
+          </h5>
+          <div>পিকআপ রাইডার: <strong class="text-slate-900">${order.pickup_agent_name || 'নির্ধারিত হয়নি'}</strong> ${order.pickup_agent_phone ? `(${order.pickup_agent_phone})` : ''}</div>
+          <div>ডেলিভারি রাইডার: <strong class="text-slate-900">${order.delivery_agent_name || 'নির্ধারিত হয়নি'}</strong> ${order.delivery_agent_phone ? `(${order.delivery_agent_phone})` : ''}</div>
+        </div>
+
+        <div class="p-4 bg-white rounded-2xl border border-slate-200 shadow-2xs space-y-2 text-xs">
+          <h5 class="font-bold uppercase tracking-wider text-slate-700 text-[11px] flex items-center gap-1.5">
+            <span>💳</span> <span>পেমেন্ট ও ইন্টারনাল নোট</span>
+          </h5>
+          <div>পেমেন্ট অবস্থা: <strong class="${order.payment_status === 'PAID' ? 'text-emerald-700' : 'text-amber-700'} font-bold">${order.payment_status}</strong> (${order.payment_method || 'CASH'})</div>
+          <div>টেক নোট: <span class="text-slate-600">${order.technician_notes || 'কোনো ইন্টারনাল নোট নেই'}</span></div>
+        </div>
+      </div>
+
+      <!-- Modal Footer Actions -->
+      <div class="pt-4 border-t border-slate-200 flex flex-wrap items-center justify-between gap-3">
+        <button onclick="openEditModal(${order.id}); closeOrderDetailsModal();" class="px-4 py-2 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 font-bold text-xs transition flex items-center gap-1.5 shadow-2xs cursor-pointer">
+          <span>✏️</span> <span>কোটেশন ও বিবরণ এডিট করুন</span>
+        </button>
+
+        <div class="flex items-center gap-2">
+          <button onclick="printAdminJobSheet(${order.id})" class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs transition flex items-center gap-1.5 shadow-2xs cursor-pointer">
+            <span>🖨️</span> <span>অফিসিয়াল জব শিট প্রিন্ট</span>
+          </button>
+          <button onclick="closeOrderDetailsModal()" class="px-5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs transition shadow-2xs cursor-pointer">
+            ✕ বন্ধ করুন
+          </button>
+        </div>
+      </div>
+    `;
+  }
+
+  const modal = document.getElementById('order-details-modal');
+  if (modal) modal.classList.remove('hidden');
+}
+
+function closeOrderDetailsModal() {
+  const modal = document.getElementById('order-details-modal');
+  if (modal) modal.classList.add('hidden');
+  currentViewOrderId = null;
+}
+
+function printCurrentOrderFromModal() {
+  if (currentViewOrderId) printAdminJobSheet(currentViewOrderId);
+}
+
+async function updateStatusFromDetailsModal(orderId) {
+  const select = document.getElementById('modal-quick-status-select');
+  if (!select) return;
+  const newStatus = select.value;
+  await quickUpdateOrderStatus(orderId, newStatus);
+  setTimeout(() => {
+    openOrderDetailsModal(orderId);
+  }, 200);
+}
+
+function copyToClipboard(text, msg = 'কপি করা হয়েছে!') {
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(() => {
+      alert(msg);
+    }).catch(() => {
+      prompt('কপি করতে Ctrl+C চাপুন:', text);
+    });
+  } else {
+    prompt('কপি করতে Ctrl+C চাপুন:', text);
+  }
+}
+
+window.openOrderDetailsModal = openOrderDetailsModal;
+window.closeOrderDetailsModal = closeOrderDetailsModal;
+window.printCurrentOrderFromModal = printCurrentOrderFromModal;
+window.updateStatusFromDetailsModal = updateStatusFromDetailsModal;
+window.copyToClipboard = copyToClipboard;
+
+// -------------------------------------------------------------
 // EDIT ORDER & QUOTATION MANAGEMENT MODAL
 // -------------------------------------------------------------
 function openEditModal(orderId) {
@@ -902,6 +1292,26 @@ function openEditModal(orderId) {
 
   document.getElementById('edit-order-id').value = order.id;
   document.getElementById('modal-edit-orderno').textContent = `${order.order_number} (${order.brand} ${order.model})`;
+
+  // Populate Customer details summary
+  const nameEl = document.getElementById('modal-edit-cust-name');
+  const phoneEl = document.getElementById('modal-edit-cust-phone');
+  const altPhoneEl = document.getElementById('modal-edit-cust-alt-phone');
+  const slotEl = document.getElementById('modal-edit-pickup-slot');
+  const addressEl = document.getElementById('modal-edit-cust-address');
+  const actionLinksEl = document.getElementById('modal-edit-action-links');
+
+  if (nameEl) nameEl.textContent = order.customer_name || 'নাম নেই';
+  if (phoneEl) phoneEl.textContent = order.customer_phone || '';
+  if (altPhoneEl) altPhoneEl.textContent = order.customer_alt_phone || 'নেই';
+  if (slotEl) slotEl.textContent = `${order.preferred_date || 'যেকোনো দিন'} • ${order.preferred_time_slot || 'যেকোনো সময়'}`;
+  if (addressEl) addressEl.textContent = `${order.address}, ${order.area}, ${order.city || 'ঢাকা'}`;
+  if (actionLinksEl) {
+    actionLinksEl.innerHTML = `
+      <a href="tel:${order.customer_phone}" class="px-2.5 py-1 rounded-lg bg-teal-50 hover:bg-teal-100 text-[#0f766e] text-xs font-bold border border-teal-200 transition shadow-2xs">📞 কল</a>
+      <a href="https://wa.me/88${order.customer_phone}?text=${encodeURIComponent(`Assalamu Alaikum ${order.customer_name}, Repair Seba থেকে আপনার অর্ডার ${order.order_number} এর ব্যাপারে যোগাযোগ করছি।`)}" target="_blank" class="px-2.5 py-1 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-xs font-bold border border-emerald-200 transition shadow-2xs">💬 WhatsApp</a>
+    `;
+  }
 
   // Populate Customer Reported Issue & Attachments (Photo, Video, Voice)
   const customerDescEl = document.getElementById('modal-customer-desc');
@@ -1056,6 +1466,29 @@ async function handleOrderUpdate() {
       alert('অর্ডার সফলভাবে আপডেট হয়েছে!');
       closeEditModal();
       loadAdminDashboardData();
+
+      // Realtime cross-tab sync
+      try {
+        if (typeof BroadcastChannel !== 'undefined') {
+          const bc = new BroadcastChannel('repair_seba_realtime_orders');
+          bc.postMessage({
+            type: 'ORDER_UPDATED',
+            order_id: id,
+            order_number: data.order?.order_number,
+            status: payload.status,
+            order: data.order
+          });
+          bc.close();
+        }
+      } catch (_) {}
+      try {
+        localStorage.setItem('repair_seba_status_ping', JSON.stringify({
+          time: Date.now(),
+          order_id: id,
+          order_number: data.order?.order_number,
+          status: payload.status
+        }));
+      } catch (_) {}
     } else {
       alert(data.error || 'আপডেট ব্যর্থ হয়েছে।');
     }
@@ -1246,31 +1679,70 @@ function startAdminLivePolling() {
   livePollingTimer = setInterval(pollNewOrdersQuietly, 3500);
 }
 
+// Real-time synchronization with SSE, BroadcastChannel, and storage events
+function initAdminRealtimeSync() {
+  // 1. Server-Sent Events (SSE) for instant push from server
+  try {
+    const es = new EventSource('/api/events');
+    es.onmessage = async (evt) => {
+      try {
+        const data = JSON.parse(evt.data);
+        if (data.type === 'NEW_ORDER') {
+          playNewOrderChime();
+          if (data.order) showAdminLiveToast(data.order);
+          await loadAdminStats();
+          await loadOverviewOrders();
+          await loadAdminOrders();
+          if (typeof loadAdminCustomers === 'function') loadAdminCustomers();
+        } else if (data.type === 'ORDER_UPDATED') {
+          await loadAdminStats();
+          await loadOverviewOrders();
+          await loadAdminOrders();
+          if (currentViewOrderId && data.order && data.order.id === currentViewOrderId) {
+            openOrderDetailsModal(currentViewOrderId);
+          }
+        }
+      } catch (_) {}
+    };
+  } catch (_) {}
+}
+
 // Cross-tab zero-latency sync with BroadcastChannel and storage events
 try {
   if (typeof BroadcastChannel !== 'undefined') {
     const bc = new BroadcastChannel('repair_seba_realtime_orders');
     bc.onmessage = async (evt) => {
-      if (evt.data && evt.data.type === 'NEW_ORDER') {
-        const order = evt.data.order;
-        playNewOrderChime();
-        if (order) showAdminLiveToast(order);
-        await loadAdminStats();
-        await loadOverviewOrders();
-        await loadAdminOrders();
-        if (typeof loadAdminCustomers === 'function') loadAdminCustomers();
+      if (evt.data) {
+        if (evt.data.type === 'NEW_ORDER') {
+          const order = evt.data.order;
+          playNewOrderChime();
+          if (order) showAdminLiveToast(order);
+          await loadAdminStats();
+          await loadOverviewOrders();
+          await loadAdminOrders();
+          if (typeof loadAdminCustomers === 'function') loadAdminCustomers();
+        } else if (evt.data.type === 'ORDER_UPDATED') {
+          await loadAdminStats();
+          await loadOverviewOrders();
+          await loadAdminOrders();
+          if (currentViewOrderId && evt.data.order && evt.data.order.id === currentViewOrderId) {
+            openOrderDetailsModal(currentViewOrderId);
+          }
+        }
       }
     };
   }
 } catch (_) {}
 
 window.addEventListener('storage', async (e) => {
-  if (e.key === 'repair_seba_last_order_ping') {
+  if (e.key === 'repair_seba_last_order_ping' || e.key === 'repair_seba_status_ping') {
     try {
       const parsed = JSON.parse(e.newValue || '{}');
-      playNewOrderChime();
-      if (parsed.order_number) {
-        showAdminLiveToast({ order_number: parsed.order_number, customer_name: parsed.customer_name });
+      if (e.key === 'repair_seba_last_order_ping') {
+        playNewOrderChime();
+        if (parsed.order_number) {
+          showAdminLiveToast({ order_number: parsed.order_number, customer_name: parsed.customer_name });
+        }
       }
     } catch (_) {}
     await loadAdminStats();

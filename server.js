@@ -156,6 +156,20 @@ function generateCustomerToken(user) {
   return token;
 }
 
+// Global set of SSE clients for real-time live updates across admin & user portals
+const sseClients = new Set();
+
+function broadcastRealtime(eventData) {
+  const payload = `data: ${JSON.stringify(eventData)}\n\n`;
+  for (const client of sseClients) {
+    try {
+      client.res.write(payload);
+    } catch (_) {
+      sseClients.delete(client);
+    }
+  }
+}
+
 // Authentication middleware
 function getAuthenticatedAdmin(req) {
   const authHeader = req.headers['authorization'];
@@ -244,6 +258,23 @@ const server = http.createServer(async (req, res) => {
       // 1. Health check
       if (pathname === '/api/health' && method === 'GET') {
         return jsonResponse(res, 200, { status: 'ok', name: 'Repair Seba API', time: new Date().toISOString() });
+      }
+
+      // Real-time Server-Sent Events (SSE) Stream
+      if (pathname === '/api/events' && method === 'GET') {
+        res.writeHead(200, {
+          'Content-Type': 'text/event-stream; charset=utf-8',
+          'Cache-Control': 'no-cache, no-transform',
+          'Connection': 'keep-alive',
+          'Access-Control-Allow-Origin': '*'
+        });
+        res.write(`data: ${JSON.stringify({ type: 'CONNECTED', time: Date.now() })}\n\n`);
+        const clientObj = { res, id: Date.now() };
+        sseClients.add(clientObj);
+        req.on('close', () => {
+          sseClients.delete(clientObj);
+        });
+        return;
       }
 
       // 2. Public Services
@@ -481,25 +512,51 @@ const server = http.createServer(async (req, res) => {
         }
 
         // Auto-register or link customer profile if not already present
+        let customerToken = null;
+        let userProfile = null;
         try {
-          let existingUser = db.prepare('SELECT id, address, area FROM users WHERE phone = ?').get(cleanPhone);
+          let existingUser = db.prepare('SELECT * FROM users WHERE phone = ?').get(cleanPhone);
           if (!existingUser) {
-            db.prepare('INSERT INTO users (phone, name, email, avatar, address, area, city, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)')
+            const info = db.prepare('INSERT INTO users (phone, name, email, avatar, address, area, city, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)')
               .run(cleanPhone, customer_name.trim(), '', '', address.trim(), area.trim(), city.trim() || 'Dhaka', now, now);
-          } else if (!existingUser.address) {
-            db.prepare('UPDATE users SET address = ?, area = ?, updated_at = ? WHERE id = ?')
-              .run(address.trim(), area.trim(), now, existingUser.id);
+            existingUser = db.prepare('SELECT * FROM users WHERE id = ?').get(info.lastInsertRowid);
+          } else {
+            // Update name or address if empty
+            if (!existingUser.address || !existingUser.name || existingUser.name === 'সম্মানিত গ্রাহক') {
+              db.prepare('UPDATE users SET name = ?, address = ?, area = ?, updated_at = ? WHERE id = ?')
+                .run(customer_name.trim(), address.trim(), area.trim(), now, existingUser.id);
+              existingUser = db.prepare('SELECT * FROM users WHERE id = ?').get(existingUser.id);
+            }
           }
+          userProfile = {
+            id: existingUser.id,
+            phone: existingUser.phone,
+            name: existingUser.name,
+            email: existingUser.email || '',
+            avatar: existingUser.avatar || '',
+            address: existingUser.address || '',
+            area: existingUser.area || '',
+            city: existingUser.city || 'Dhaka'
+          };
+          customerToken = generateCustomerToken(existingUser);
         } catch (e) {
-          console.warn('Auto user profile link:', e.message);
+          console.warn('Auto user profile link error:', e.message);
         }
+
+        // Broadcast to realtime SSE clients (admin and users)
+        broadcastRealtime({
+          type: 'NEW_ORDER',
+          order: newOrder
+        });
 
         return jsonResponse(res, 201, {
           success: true,
           message_bn: 'আপনার রিপেয়ার অর্ডারটি সফলভাবে গ্রহণ করা হয়েছে! আমাদের প্রতিনিধি শীঘ্রই আপনার সাথে যোগাযোগ করবেন।',
           message_en: 'Your repair request has been successfully submitted! Our team will contact you shortly.',
           order_number: orderNumber,
-          order: newOrder
+          order: newOrder,
+          customer_token: customerToken,
+          user: userProfile
         });
       }
 
@@ -584,6 +641,18 @@ const server = http.createServer(async (req, res) => {
         if (updatedOrder && updatedOrder.issues) {
           try { updatedOrder.issues = JSON.parse(updatedOrder.issues); } catch {}
         }
+        if (updatedOrder && updatedOrder.attachments) {
+          try { updatedOrder.attachments = JSON.parse(updatedOrder.attachments); } catch {}
+        }
+
+        // Broadcast realtime update to both admin and customer portals
+        broadcastRealtime({
+          type: 'ORDER_UPDATED',
+          order_id: order.id,
+          order_number: order.order_number,
+          status: newStatus,
+          order: updatedOrder
+        });
 
         return jsonResponse(res, 200, {
           success: true,
@@ -1071,6 +1140,18 @@ const server = http.createServer(async (req, res) => {
         if (updated && updated.issues) {
           try { updated.issues = JSON.parse(updated.issues); } catch {}
         }
+        if (updated && updated.attachments) {
+          try { updated.attachments = JSON.parse(updated.attachments); } catch {}
+        }
+
+        // Broadcast realtime update to both admin and customer portals
+        broadcastRealtime({
+          type: 'ORDER_UPDATED',
+          order_id: orderId,
+          order_number: updated.order_number,
+          status: updated.status,
+          order: updated
+        });
 
         return jsonResponse(res, 200, {
           success: true,

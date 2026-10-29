@@ -19,7 +19,10 @@ document.addEventListener('DOMContentLoaded', () => {
   // 6. Initialize Customer Phone Auth & Profile
   initCustomerAuth();
 
-  // 6. Check URL params for direct tracking (e.g. ?track=RS-841920)
+  // 7. Initialize Real-time Live Status Sync & Notifications
+  initCustomerRealtimeSync();
+
+  // 8. Check URL params for direct tracking (e.g. ?track=RS-841920)
   const urlParams = new URLSearchParams(window.location.search);
   const trackId = urlParams.get('track');
   if (trackId) {
@@ -1023,6 +1026,17 @@ async function handleOrderSubmit(form) {
     const data = await res.json();
 
     if (data.success) {
+      // Auto-authenticate customer if token was returned so user account is ready immediately
+      if (data.customer_token && data.user) {
+        try {
+          customerToken = data.customer_token;
+          currentCustomer = data.user;
+          localStorage.setItem('repair_seba_customer_token', customerToken);
+          localStorage.setItem('repair_seba_customer_profile', JSON.stringify(data.user));
+          updateNavUserUI(true);
+        } catch (_) {}
+      }
+
       // Broadcast to admin panel for zero-latency instant live update
       try {
         if (typeof BroadcastChannel !== 'undefined') {
@@ -2299,6 +2313,228 @@ function handleUserLogout() {
   updateNavUserUI(false);
   alert('আপনি সফলভাবে লগআউট হয়েছেন।');
 }
+
+// -------------------------------------------------------------
+// REAL-TIME LIVE STATUS SYNCHRONIZATION FOR CUSTOMERS
+// -------------------------------------------------------------
+let customerOrdersStatusCache = {}; // order_number -> last known status
+
+function getStatusLabel(statusKey) {
+  const isBn = (window.currentLang || 'bn') === 'bn';
+  if (typeof STATUS_MAP !== 'undefined' && STATUS_MAP[statusKey]) {
+    return isBn ? STATUS_MAP[statusKey].bn : STATUS_MAP[statusKey].en;
+  }
+  return statusKey;
+}
+
+function initCustomerRealtimeSync() {
+  // 1. Server-Sent Events (SSE) for instant zero-latency push
+  try {
+    const es = new EventSource('/api/events');
+    es.onmessage = (event) => {
+      try {
+        const data = JSON.parse(event.data);
+        handleCustomerRealtimeEvent(data);
+      } catch (_) {}
+    };
+    es.onerror = () => {
+      // Reconnects automatically, polling heartbeat provides uninterrupted fallback
+    };
+  } catch (_) {}
+
+  // 2. BroadcastChannel for instant cross-tab sync in same browser
+  try {
+    if (typeof BroadcastChannel !== 'undefined') {
+      const bc = new BroadcastChannel('repair_seba_realtime_orders');
+      bc.onmessage = (e) => {
+        if (e.data) handleCustomerRealtimeEvent(e.data);
+      };
+    }
+  } catch (_) {}
+
+  // 3. Storage event listener (cross-tab status ping)
+  window.addEventListener('storage', (e) => {
+    if (e.key === 'repair_seba_status_ping' && e.newValue) {
+      try {
+        const ping = JSON.parse(e.newValue);
+        handleCustomerRealtimeStatusPing(ping);
+      } catch (_) {}
+    }
+  });
+
+  // 4. Polling heartbeat every 4 seconds as safety net
+  setInterval(() => {
+    pollCustomerLiveStatus();
+  }, 4000);
+}
+
+function handleCustomerRealtimeEvent(data) {
+  if (data.type === 'ORDER_UPDATED' && data.order) {
+    const updatedOrder = data.order;
+    const isBn = (window.currentLang || 'bn') === 'bn';
+    const statusText = getStatusLabel(updatedOrder.status);
+
+    // 1. If customer is currently tracking this specific order in #track-section
+    if (currentTrackedOrder && currentTrackedOrder.order_number === updatedOrder.order_number) {
+      const previousStatus = currentTrackedOrder.status;
+      currentTrackedOrder = updatedOrder;
+      renderTrackedOrder(updatedOrder);
+
+      if (previousStatus !== updatedOrder.status) {
+        showLiveStatusToast(
+          isBn 
+            ? `🔔 লাইভ আপডেট: আপনার অর্ডার <strong>${updatedOrder.order_number}</strong> এর বর্তমান অবস্থা: <strong>${statusText}</strong>`
+            : `🔔 Live Update: Your order <strong>${updatedOrder.order_number}</strong> status changed to: <strong>${statusText}</strong>`,
+          updatedOrder.order_number
+        );
+      }
+    }
+
+    // 2. If logged in customer owns this order, live update their account dashboard
+    if (currentCustomer && (updatedOrder.customer_phone === currentCustomer.phone || updatedOrder.customer_alt_phone === currentCustomer.phone)) {
+      const container = document.getElementById('user-orders-list-container');
+      if (container && !container.closest('.hidden')) {
+        loadCustomerOrders();
+      }
+
+      // Show toast if not already shown via trackOrder
+      if (!currentTrackedOrder || currentTrackedOrder.order_number !== updatedOrder.order_number) {
+        showLiveStatusToast(
+          isBn
+            ? `🔔 লাইভ আপডেট: আপনার অর্ডার <strong>${updatedOrder.order_number}</strong> এর স্ট্যাটাস: <strong>${statusText}</strong>`
+            : `🔔 Live Update: Your order <strong>${updatedOrder.order_number}</strong> status: <strong>${statusText}</strong>`,
+          updatedOrder.order_number
+        );
+      }
+    }
+  }
+}
+
+function handleCustomerRealtimeStatusPing(ping) {
+  if (!ping || !ping.order_number) return;
+  // If user is currently tracking this order
+  if (currentTrackedOrder && currentTrackedOrder.order_number === ping.order_number) {
+    trackOrder(ping.order_number);
+  }
+  // If user is logged in
+  if (currentCustomer) {
+    const container = document.getElementById('user-orders-list-container');
+    if (container && !container.closest('.hidden')) {
+      loadCustomerOrders();
+    }
+  }
+}
+
+async function pollCustomerLiveStatus() {
+  // If user is tracking an order on screen
+  if (currentTrackedOrder && currentTrackedOrder.order_number) {
+    try {
+      const res = await fetch(`/api/orders/track?q=${encodeURIComponent(currentTrackedOrder.order_number)}`);
+      const data = await res.json();
+      if (data.success && data.orders && data.orders.length > 0) {
+        const fresh = data.orders[0];
+        if (fresh.status !== currentTrackedOrder.status || fresh.quote_status !== currentTrackedOrder.quote_status) {
+          const oldSt = currentTrackedOrder.status;
+          currentTrackedOrder = fresh;
+          renderTrackedOrder(fresh);
+          const isBn = (window.currentLang || 'bn') === 'bn';
+          showLiveStatusToast(
+            isBn
+              ? `🔔 লাইভ আপডেট: অর্ডার <strong>${fresh.order_number}</strong> স্ট্যাটাস পরিবর্তিত হয়ে <strong>${getStatusLabel(fresh.status)}</strong> হয়েছে`
+              : `🔔 Live Update: Order <strong>${fresh.order_number}</strong> is now <strong>${getStatusLabel(fresh.status)}</strong>`,
+            fresh.order_number
+          );
+        }
+      }
+    } catch (_) {}
+  }
+
+  // If customer is logged in, check their orders
+  if (currentCustomer && customerToken) {
+    try {
+      const res = await fetch('/api/user/orders', {
+        headers: { 'Authorization': `Bearer ${customerToken}` }
+      });
+      const data = await res.json();
+      if (data.success && data.orders) {
+        let hasChange = false;
+        data.orders.forEach(o => {
+          const prev = customerOrdersStatusCache[o.order_number];
+          if (prev && prev !== o.status) {
+            hasChange = true;
+            const isBn = (window.currentLang || 'bn') === 'bn';
+            showLiveStatusToast(
+              isBn
+                ? `🔔 লাইভ আপডেট: আপনার অর্ডার <strong>${o.order_number}</strong> এর স্ট্যাটাস: <strong>${getStatusLabel(o.status)}</strong>`
+                : `🔔 Live Update: Order <strong>${o.order_number}</strong> is now <strong>${getStatusLabel(o.status)}</strong>`,
+              o.order_number
+            );
+          }
+          customerOrdersStatusCache[o.order_number] = o.status;
+        });
+
+        if (hasChange) {
+          const container = document.getElementById('user-orders-list-container');
+          if (container && !container.closest('.hidden')) {
+            loadCustomerOrders();
+          }
+        }
+      }
+    } catch (_) {}
+  }
+}
+
+// Sleek floating Toast Notification for Real-time Status updates
+function showLiveStatusToast(htmlMessage, orderNumber = '') {
+  let toast = document.getElementById('live-status-toast-bubble');
+  if (!toast) {
+    toast = document.createElement('div');
+    toast.id = 'live-status-toast-bubble';
+    toast.className = 'fixed bottom-5 right-5 z-50 max-w-sm sm:max-w-md bg-slate-900/95 text-white p-4 rounded-2xl shadow-2xl border border-teal-400/50 flex items-start gap-3 backdrop-blur-md transition-all duration-300 transform translate-y-24 opacity-0 pointer-events-auto';
+    document.body.appendChild(toast);
+  }
+
+  toast.innerHTML = `
+    <div class="w-9 h-9 rounded-xl bg-teal-500/20 text-teal-400 border border-teal-500/30 flex items-center justify-center text-lg shrink-0">
+      ⚡
+    </div>
+    <div class="flex-1 text-xs leading-relaxed">
+      <div class="font-bold text-teal-300 text-[11px] uppercase tracking-wider mb-0.5">রিয়েলটাইম আপডেট (Live Update)</div>
+      <div class="text-slate-100">${htmlMessage}</div>
+      ${orderNumber ? `
+        <button onclick="trackDirectOrder('${orderNumber}'); hideLiveStatusToast();" class="mt-2 inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-teal-600 hover:bg-teal-500 text-white font-bold text-[11px] transition shadow-2xs">
+          <span>🔍</span> <span>এখনই লাইভ ট্র্যাক দেখুন</span>
+        </button>
+      ` : ''}
+    </div>
+    <button onclick="hideLiveStatusToast()" class="text-slate-400 hover:text-white p-1 text-base font-bold leading-none">
+      ✕
+    </button>
+  `;
+
+  // Animate in
+  setTimeout(() => {
+    toast.classList.remove('translate-y-24', 'opacity-0');
+    toast.classList.add('translate-y-0', 'opacity-100');
+  }, 50);
+
+  // Auto hide after 7 seconds
+  if (window._liveToastTimer) clearTimeout(window._liveToastTimer);
+  window._liveToastTimer = setTimeout(() => {
+    hideLiveStatusToast();
+  }, 7000);
+}
+
+function hideLiveStatusToast() {
+  const toast = document.getElementById('live-status-toast-bubble');
+  if (toast) {
+    toast.classList.remove('translate-y-0', 'opacity-100');
+    toast.classList.add('translate-y-24', 'opacity-0');
+  }
+}
+
+window.showLiveStatusToast = showLiveStatusToast;
+window.hideLiveStatusToast = hideLiveStatusToast;
 
 
 

@@ -1145,6 +1145,43 @@
     </div>
   </div>
 
+  <!-- ============================================================= -->
+  <!-- A TO Z COMPREHENSIVE ORDER DETAILS MODAL (VIEW EVERYTHING) -->
+  <!-- ============================================================= -->
+  <div id="order-details-modal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs hidden flex items-center justify-center p-3 sm:p-4">
+    <div class="bg-white border border-slate-200 rounded-3xl max-w-3xl w-full p-6 sm:p-8 shadow-2xl overflow-y-auto max-h-[92vh] animate-fade-in text-slate-800">
+      
+      <!-- Modal Header -->
+      <div class="flex items-start justify-between pb-4 border-b border-slate-200 mb-6 gap-3">
+        <div>
+          <div class="flex items-center gap-2 mb-1">
+            <span class="text-xs uppercase font-extrabold tracking-wider px-2.5 py-0.5 rounded-md bg-teal-100 text-[#0f766e]">
+              A to Z Order Details
+            </span>
+            <span id="view-modal-created-at" class="text-xs text-slate-500 font-medium"></span>
+          </div>
+          <h3 id="view-modal-orderno" class="text-2xl font-black text-slate-900 tracking-tight"></h3>
+          <p id="view-modal-device-sub" class="text-xs font-semibold text-slate-600 mt-0.5"></p>
+        </div>
+        
+        <div class="flex items-center gap-2">
+          <button onclick="printCurrentOrderFromModal()" class="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition flex items-center gap-1 shadow-2xs" title="অফিসিয়াল জব শিট প্রিন্ট করুন">
+            <span>🖨️</span> <span>প্রিন্ট</span>
+          </button>
+          <button onclick="closeOrderDetailsModal()" class="w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-800 flex items-center justify-center text-lg transition font-bold">
+            ✕
+          </button>
+        </div>
+      </div>
+
+      <!-- Content Container (Rendered dynamically by openOrderDetailsModal in admin.js) -->
+      <div id="order-details-content" class="space-y-6">
+        <!-- Rendered by admin.js -->
+      </div>
+
+    </div>
+  </div>
+
   <!-- ORDER MANAGEMENT MODAL (For Updating Diagnosis, Quote, Status & Rider) -->
   <div id="order-edit-modal" class="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs hidden flex items-center justify-center p-4">
     <div class="bg-white border border-slate-200 rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl overflow-y-auto max-h-[90vh] animate-fade-in text-slate-800">
@@ -1162,6 +1199,38 @@
 
       <form id="order-edit-form" class="space-y-6">
         <input type="hidden" id="edit-order-id">
+
+        <!-- CUSTOMER DETAILS SUMMARY (NAME, PHONE, FULL ADDRESS) -->
+        <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-2.5">
+          <div class="flex items-center justify-between border-b border-slate-200/80 pb-2">
+            <span class="text-xs font-bold uppercase tracking-wider text-[#0f766e] flex items-center gap-1.5">
+              <span>👤</span> <span>গ্রাহকের তথ্য ও পিকআপ ঠিকানা (A to Z Info)</span>
+            </span>
+            <div id="modal-edit-action-links" class="flex items-center gap-2"></div>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+            <div>
+              <span class="text-slate-500 font-medium">নাম:</span>
+              <span id="modal-edit-cust-name" class="font-bold text-slate-900 ml-1"></span>
+            </div>
+            <div>
+              <span class="text-slate-500 font-medium">মোবাইল:</span>
+              <span id="modal-edit-cust-phone" class="font-mono font-bold text-slate-900 ml-1"></span>
+            </div>
+            <div>
+              <span class="text-slate-500 font-medium">বিকল্প ফোন:</span>
+              <span id="modal-edit-cust-alt-phone" class="font-mono text-slate-700 ml-1"></span>
+            </div>
+            <div>
+              <span class="text-slate-500 font-medium">পছন্দের পিকআপ সময়:</span>
+              <span id="modal-edit-pickup-slot" class="font-semibold text-slate-800 ml-1"></span>
+            </div>
+          </div>
+          <div class="pt-2 border-t border-slate-200/80 text-xs">
+            <span class="text-slate-500 font-medium">সম্পূর্ণ ঠিকানা:</span>
+            <div id="modal-edit-cust-address" class="font-semibold text-slate-900 mt-0.5 bg-white p-2.5 rounded-xl border border-slate-200"></div>
+          </div>
+        </div>
 
         <!-- CUSTOMER REPORTED PROBLEM & MEDIA ATTACHMENTS (PHOTO, VIDEO, VOICE) -->
         <div class="bg-gradient-to-r from-teal-50/70 to-slate-50 p-4 sm:p-5 rounded-2xl border border-teal-200/90 space-y-3.5">
