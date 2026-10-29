@@ -404,62 +404,81 @@
             <!-- Orders Table Card with Full Management Options -->
             <div class="bg-white border border-slate-200/90 rounded-2xl shadow-sm overflow-hidden">
               
-              <!-- Card Header Toolbar -->
-              <div class="p-4 sm:p-5 border-b border-slate-200/80 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+              <!-- Card Header Toolbar (Modern Professional Redesign) -->
+              <div class="p-4 sm:p-5 border-b border-slate-200/80 flex flex-col xl:flex-row xl:items-center justify-between gap-4 bg-gradient-to-r from-white via-slate-50/50 to-white">
                 
-                <!-- Title & Count Badge -->
-                <div class="flex items-center gap-2.5">
-                  <h3 class="text-base font-bold text-slate-900" data-i18n="admin_orders_table_title">
-                    সকল অর্ডার আবেদন তালিকা
-                  </h3>
-                  <span id="badge-table-total" class="px-2.5 py-0.5 text-xs font-bold rounded-md bg-slate-100 text-slate-600 border border-slate-200">
-                    লোড হচ্ছে...
-                  </span>
+                <!-- Title & Live Counter Badge -->
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 rounded-xl bg-teal-50 border border-teal-200/80 text-[#0f766e] flex items-center justify-center text-lg shadow-2xs shrink-0 font-bold">
+                    📦
+                  </div>
+                  <div>
+                    <div class="flex items-center gap-2">
+                      <h3 class="text-base font-extrabold text-slate-900 tracking-tight" data-i18n="admin_orders_table_title">
+                        সকল অর্ডার আবেদন তালিকা
+                      </h3>
+                      <span id="badge-table-total" class="px-2.5 py-0.5 text-xs font-black rounded-full bg-teal-50 text-[#0f766e] border border-teal-200 shadow-2xs">
+                        লোড হচ্ছে...
+                      </span>
+                    </div>
+                    <p class="text-[11px] text-slate-500 font-medium mt-0.5 flex items-center gap-1.5">
+                      <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                      <span>রিয়েলটাইম ডোরস্টেপ সিঙ্ক সক্রিয়</span>
+                    </p>
+                  </div>
                 </div>
 
-                <!-- Right Actions: Filters + Search -->
-                <div class="flex flex-wrap items-center gap-2">
+                <!-- Right Actions: Filter Segment Pills + Search -->
+                <div class="flex flex-wrap items-center gap-2.5">
                   
-                  <!-- Filter Pills -->
-                  <div class="flex items-center gap-1 bg-slate-100 p-1 rounded-xl border border-slate-200 text-xs">
-                    <button onclick="filterOrders('ALL')" class="order-status-tab active px-2.5 py-1 rounded-lg font-bold bg-[#0f766e] text-white shadow-2xs transition" data-i18n="admin_filter_all">সকল</button>
-                    <button onclick="filterOrders('PENDING_PICKUP')" class="order-status-tab px-2.5 py-1 rounded-lg text-slate-700 hover:text-slate-900 transition font-medium" data-i18n="admin_filter_pending">অপেক্ষমাণ</button>
-                    <button onclick="filterOrders('QUOTE_APPROVED')" class="order-status-tab px-2.5 py-1 rounded-lg text-slate-700 hover:text-slate-900 transition font-medium" data-i18n="admin_filter_approved">অনুমোদিত</button>
-                    <button onclick="filterOrders('IN_REPAIR')" class="order-status-tab px-2.5 py-1 rounded-lg text-slate-700 hover:text-slate-900 transition font-medium" data-i18n="admin_filter_in_repair">মেরামত</button>
-                    <button onclick="filterOrders('COMPLETED')" class="order-status-tab px-2.5 py-1 rounded-lg text-slate-700 hover:text-slate-900 transition font-medium" data-i18n="admin_filter_completed">সম্পন্ন</button>
+                  <!-- Filter Pills Bar -->
+                  <div class="flex items-center gap-1 bg-slate-100/90 p-1 rounded-2xl border border-slate-200 text-xs overflow-x-auto max-w-full">
+                    <button onclick="filterOrders('ALL')" class="order-status-tab active px-3 py-1.5 rounded-xl font-extrabold bg-[#0f766e] text-white shadow-2xs transition whitespace-nowrap" data-i18n="admin_filter_all">সকল</button>
+                    <button onclick="filterOrders('PENDING_PICKUP')" class="order-status-tab px-3 py-1.5 rounded-xl text-slate-700 hover:text-slate-900 transition font-bold whitespace-nowrap" data-i18n="admin_filter_pending">⏳ পিকআপ বাকি</button>
+                    <button onclick="filterOrders('QUOTE_PENDING')" class="order-status-tab px-3 py-1.5 rounded-xl text-orange-800 bg-orange-50/80 hover:bg-orange-100 border border-orange-200/80 transition font-bold whitespace-nowrap">⚠️ কোটেশন বাকি</button>
+                    <button onclick="filterOrders('QUOTE_APPROVED')" class="order-status-tab px-3 py-1.5 rounded-xl text-slate-700 hover:text-slate-900 transition font-bold whitespace-nowrap" data-i18n="admin_filter_approved">✅ অনুমোদিত</button>
+                    <button onclick="filterOrders('IN_REPAIR')" class="order-status-tab px-3 py-1.5 rounded-xl text-slate-700 hover:text-slate-900 transition font-bold whitespace-nowrap" data-i18n="admin_filter_in_repair">🛠️ মেরামত</button>
+                    <button onclick="filterOrders('OUT_FOR_DELIVERY')" class="order-status-tab px-3 py-1.5 rounded-xl text-slate-700 hover:text-slate-900 transition font-bold whitespace-nowrap">🚚 ডেলিভারিতে</button>
+                    <button onclick="filterOrders('COMPLETED')" class="order-status-tab px-3 py-1.5 rounded-xl text-slate-700 hover:text-slate-900 transition font-bold whitespace-nowrap" data-i18n="admin_filter_completed">🎉 সম্পন্ন</button>
                   </div>
 
-                  <!-- Search Input -->
+                  <!-- Modern Search Box with Clear Button -->
                   <div class="relative">
-                    <input type="text" id="order-search-input" placeholder="অর্ডার আইডি, ফোন বা নাম..." data-i18n-placeholder="admin_order_search_placeholder" class="w-48 sm:w-56 pl-8 pr-3 py-1.5 text-xs rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:outline-none focus:ring-1 focus:ring-teal-500 transition">
-                    <span class="absolute left-2.5 top-1.5 text-slate-400 text-xs">🔍</span>
+                    <input type="text" id="order-search-input" placeholder="অর্ডার আইডি, ফোন বা নাম..." data-i18n-placeholder="admin_order_search_placeholder" class="w-52 sm:w-60 pl-8 pr-7 py-1.5 text-xs rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/50 focus:border-teal-600 transition shadow-2xs font-medium">
+                    <span class="absolute left-2.5 top-2 text-slate-400 text-xs">🔍</span>
+                    <button onclick="document.getElementById('order-search-input').value=''; loadAdminOrders();" class="absolute right-2 top-2 text-slate-400 hover:text-slate-600 text-xs font-bold" title="মুছে ফেলুন">✕</button>
                   </div>
+
+                  <!-- Quick Refresh -->
+                  <button onclick="loadAdminOrders(); loadAdminStats();" class="w-8 h-8 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-600 hover:text-slate-900 border border-slate-200 flex items-center justify-center text-xs transition shadow-2xs" title="রিফ্রেশ করুন">
+                    🔄
+                  </button>
 
                 </div>
 
               </div>
 
-              <!-- Orders Management Table: Fixed 100% width, No Horizontal Scrollbar -->
-              <div class="w-full overflow-hidden">
-                <table class="w-full text-left text-xs table-fixed">
+              <!-- Orders Management Table: Fluid Responsive Container -->
+              <div class="w-full overflow-x-auto">
+                <table class="w-full text-left text-xs min-w-[1080px]">
                   <colgroup>
-                    <col style="width: 13%;">
-                    <col style="width: 17%;">
-                    <col style="width: 20%;">
+                    <col style="width: 14%;">
+                    <col style="width: 19%;">
+                    <col style="width: 21%;">
                     <col style="width: 15%;">
-                    <col style="width: 10%;">
-                    <col style="width: 18%;">
-                    <col style="width: 7%;">
+                    <col style="width: 11%;">
+                    <col style="width: 12%;">
+                    <col style="width: 8%;">
                   </colgroup>
-                  <thead class="bg-slate-50/80 text-slate-600 font-bold uppercase tracking-wider border-b border-slate-200/90">
+                  <thead class="bg-gradient-to-r from-slate-50 via-teal-50/30 to-slate-50 text-slate-700 font-extrabold uppercase tracking-wider border-b border-slate-200 text-[11px]">
                     <tr>
-                      <th class="py-2.5 px-3" data-i18n="admin_th_tracking_id">ট্র্যাকিং আইডি</th>
-                      <th class="py-2.5 px-3" data-i18n="admin_th_customer_name">গ্রাহকের নাম</th>
-                      <th class="py-2.5 px-3" data-i18n="admin_th_device_issue">ডিভাইস ও সমস্যা</th>
-                      <th class="py-2.5 px-3" data-i18n="admin_th_mobile">মোবাইল</th>
-                      <th class="py-2.5 px-3" data-i18n="admin_th_date">তারিখ</th>
-                      <th class="py-2.5 px-3" data-i18n="admin_th_status">বর্তমান অবস্থা</th>
-                      <th class="py-2.5 px-2 text-center" data-i18n="admin_th_action">অ্যাকশন</th>
+                      <th class="py-3.5 px-3.5"><div class="flex items-center gap-1.5"><span>🔖</span> <span>ট্র্যাকিং আইডি</span></div></th>
+                      <th class="py-3.5 px-3.5"><div class="flex items-center gap-1.5"><span>👤</span> <span>গ্রাহক ও এলাকা</span></div></th>
+                      <th class="py-3.5 px-3.5"><div class="flex items-center gap-1.5"><span>📱</span> <span>ডিভাইস ও সমস্যা</span></div></th>
+                      <th class="py-3.5 px-3.5"><div class="flex items-center gap-1.5"><span>📞</span> <span>মোবাইল ও যোগাযোগ</span></div></th>
+                      <th class="py-3.5 px-3"><div class="flex items-center gap-1.5"><span>💰</span> <span>কোটেশন ও বিল</span></div></th>
+                      <th class="py-3.5 px-3.5"><div class="flex items-center gap-1.5"><span>⚡</span> <span>বর্তমান অবস্থা</span></div></th>
+                      <th class="py-3.5 px-2 text-center"><div class="flex items-center justify-center gap-1"><span>⚙️</span> <span>অ্যাকশন</span></div></th>
                     </tr>
                   </thead>
                   <tbody id="orders-table-body" class="divide-y divide-slate-100 text-slate-800">
