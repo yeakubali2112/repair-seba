@@ -458,27 +458,21 @@
 
               </div>
 
-              <!-- Orders Management Table: Fluid Responsive Container -->
-              <div class="w-full overflow-x-auto">
-                <table class="w-full text-left text-xs min-w-[1080px]">
+              <!-- Orders Management Table: Exactly 4 Columns, 100% Contained, Zero Overflow -->
+              <div class="w-full overflow-hidden">
+                <table class="w-full text-left text-xs table-fixed">
                   <colgroup>
-                    <col style="width: 14%;">
-                    <col style="width: 19%;">
-                    <col style="width: 21%;">
-                    <col style="width: 15%;">
-                    <col style="width: 11%;">
-                    <col style="width: 12%;">
-                    <col style="width: 8%;">
+                    <col style="width: 27%;">
+                    <col style="width: 29%;">
+                    <col style="width: 22%;">
+                    <col style="width: 22%;">
                   </colgroup>
                   <thead class="bg-gradient-to-r from-slate-50 via-teal-50/30 to-slate-50 text-slate-700 font-extrabold uppercase tracking-wider border-b border-slate-200 text-[11px]">
                     <tr>
-                      <th class="py-3.5 px-3.5"><div class="flex items-center gap-1.5"><span>🔖</span> <span>ট্র্যাকিং আইডি</span></div></th>
-                      <th class="py-3.5 px-3.5"><div class="flex items-center gap-1.5"><span>👤</span> <span>গ্রাহক ও এলাকা</span></div></th>
-                      <th class="py-3.5 px-3.5"><div class="flex items-center gap-1.5"><span>📱</span> <span>ডিভাইস ও সমস্যা</span></div></th>
-                      <th class="py-3.5 px-3.5"><div class="flex items-center gap-1.5"><span>📞</span> <span>মোবাইল ও যোগাযোগ</span></div></th>
-                      <th class="py-3.5 px-3"><div class="flex items-center gap-1.5"><span>💰</span> <span>কোটেশন ও বিল</span></div></th>
-                      <th class="py-3.5 px-3.5"><div class="flex items-center gap-1.5"><span>⚡</span> <span>বর্তমান অবস্থা</span></div></th>
-                      <th class="py-3.5 px-2 text-center"><div class="flex items-center justify-center gap-1"><span>⚙️</span> <span>অ্যাকশন</span></div></th>
+                      <th class="py-3.5 px-4"><div class="flex items-center gap-1.5"><span>🔖</span> <span>ট্র্যাকিং আইডি</span></div></th>
+                      <th class="py-3.5 px-4"><div class="flex items-center gap-1.5"><span>👤</span> <span>গ্রাহক ও এলাকা</span></div></th>
+                      <th class="py-3.5 px-4"><div class="flex items-center gap-1.5"><span>📞</span> <span>মোবাইল ও যোগাযোগ</span></div></th>
+                      <th class="py-3.5 px-4 text-center"><div class="flex items-center justify-center gap-1.5"><span>⚙️</span> <span>অ্যাকশন</span></div></th>
                     </tr>
                   </thead>
                   <tbody id="orders-table-body" class="divide-y divide-slate-100 text-slate-800">

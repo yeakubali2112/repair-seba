@@ -644,7 +644,7 @@ async function loadAdminOrders() {
 
   tbody.innerHTML = `
     <tr>
-      <td colspan="7" class="text-center py-12 px-4">
+      <td colspan="4" class="text-center py-12 px-4">
         <div class="flex flex-col items-center justify-center gap-2 text-slate-400">
           <div class="w-7 h-7 border-2 border-teal-600 border-t-transparent rounded-full animate-spin"></div>
           <span class="text-xs font-bold text-slate-600">${isBn ? 'অর্ডার তালিকা লোড হচ্ছে...' : 'Loading orders...'}</span>
@@ -670,11 +670,11 @@ async function loadAdminOrders() {
         adminLogout();
         return;
       }
-      tbody.innerHTML = `<tr><td colspan="7" class="text-center py-8 text-rose-500 font-medium">${data.error}</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="4" class="text-center py-8 text-rose-500 font-medium">${data.error}</td></tr>`;
     }
   } catch (err) {
     console.error('Error loading admin orders:', err);
-    tbody.innerHTML = `<tr><td colspan="7" class="text-center py-8 text-rose-500 font-medium">${isBn ? 'অর্ডার লোড করতে সমস্যা হয়েছে।' : 'Failed to load orders.'}</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="4" class="text-center py-8 text-rose-500 font-medium">${isBn ? 'অর্ডার লোড করতে সমস্যা হয়েছে।' : 'Failed to load orders.'}</td></tr>`;
   }
 }
 
@@ -791,7 +791,7 @@ function renderAdminOrdersTable(orders) {
   if (orders.length === 0) {
     tbody.innerHTML = `
       <tr>
-        <td colspan="7" class="text-center py-12 px-4">
+        <td colspan="4" class="text-center py-12 px-4">
           <div class="max-w-xs mx-auto text-center space-y-2.5">
             <div class="w-12 h-12 mx-auto rounded-2xl bg-teal-50 border border-teal-200 text-[#0f766e] flex items-center justify-center text-2xl shadow-2xs">📦</div>
             <h4 class="text-sm font-extrabold text-slate-800">${isBn ? 'কোনো অর্ডার পাওয়া যায়নি' : 'No Orders Found'}</h4>
@@ -820,7 +820,7 @@ function renderAdminOrdersTable(orders) {
   ];
 
   tbody.innerHTML = orders.map(o => {
-    const curStatus = statusList.find(s => s.val === o.status) || { color: 'bg-slate-50 text-slate-800 border-slate-300' };
+    const curStatus = statusList.find(s => s.val === o.status) || { label: o.status, color: 'bg-slate-50 text-slate-800 border-slate-300' };
     const dateFormatted = new Date(o.created_at).toLocaleDateString(isBn ? 'bn-BD' : 'en-US', {
       month: 'short',
       day: 'numeric'
@@ -828,71 +828,49 @@ function renderAdminOrdersTable(orders) {
 
     const initials = getAdminCustomerInitials(o.customer_name);
     const avatarGradient = getAdminAvatarGradient(o.customer_name);
-    const cost = Number(o.final_cost || o.estimated_cost || 0);
-
-    let quoteStatusPill = '';
-    if (o.quote_status === 'APPROVED') {
-      quoteStatusPill = `<span class="inline-flex items-center gap-0.5 px-1.5 py-0.2 rounded-full text-[9px] font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-200">✅ ${isBn ? 'সম্মত' : 'Approved'}</span>`;
-    } else if (o.quote_status === 'REJECTED') {
-      quoteStatusPill = `<span class="inline-flex items-center gap-0.5 px-1.5 py-0.2 rounded-full text-[9px] font-extrabold bg-rose-100 text-rose-800 border border-rose-200">❌ ${isBn ? 'বাতিল' : 'Rejected'}</span>`;
-    } else if (o.quote_status === 'QUOTE_PENDING' || o.quote_status === 'PENDING') {
-      quoteStatusPill = `<span class="inline-flex items-center gap-0.5 px-1.5 py-0.2 rounded-full text-[9px] font-extrabold bg-amber-100 text-amber-900 border border-amber-200 animate-pulse">⚠️ ${isBn ? 'সম্মতির অপেক্ষা' : 'Pending'}</span>`;
-    } else {
-      quoteStatusPill = `<span class="inline-flex items-center gap-0.5 px-1.5 py-0.2 rounded-full text-[9px] font-medium bg-slate-100 text-slate-500 border border-slate-200">${isBn ? 'কোটেশন নেই' : 'No Quote'}</span>`;
-    }
-
-    const paymentPill = o.payment_status === 'PAID'
-      ? `<span class="inline-flex items-center text-[9px] font-black text-emerald-700 bg-emerald-50 px-1.5 py-0.2 rounded border border-emerald-200">💳 ${isBn ? 'পেইড' : 'Paid'}</span>`
-      : `<span class="inline-flex items-center text-[9px] font-bold text-slate-500 bg-slate-50 px-1.5 py-0.2 rounded border border-slate-200">⏳ ${isBn ? 'বাকি' : 'Unpaid'}</span>`;
 
     return `
       <tr class="hover:bg-teal-50/20 transition-all duration-150 text-slate-800 text-xs border-b border-slate-100 group">
         
-        <!-- Col 1: Tracking ID & Capsule -->
-        <td class="py-3 px-3.5 align-middle">
-          <button onclick="openOrderDetailsModal(${o.id})" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-teal-50 hover:bg-teal-100 text-[#0f766e] font-mono font-black text-xs border border-teal-200/90 shadow-2xs hover:shadow-xs transition group-hover:border-teal-300 cursor-pointer text-left" title="${isBn ? 'ক্লিক করে A to Z বিস্তারিত দেখুন' : 'Click to view full dossier'}">
-            <span>🏷️</span>
-            <span class="underline-offset-2 hover:underline tracking-tight">${o.order_number}</span>
-          </button>
-          <div class="flex items-center gap-1.5 mt-1 text-[11px] text-slate-500 font-medium whitespace-nowrap">
-            <span>${o.device_type === 'tablet' ? '💻 ট্যাব' : '📱 ফোন'}</span>
+        <!-- Col 1: 🔖 ট্র্যাকিং আইডি (Tracking ID + Live Status + Device) -->
+        <td class="py-3 px-4 align-middle">
+          <div class="flex items-center gap-1.5 flex-wrap">
+            <button onclick="openOrderDetailsModal(${o.id})" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-teal-50 hover:bg-teal-100 text-[#0f766e] font-mono font-black text-xs border border-teal-200/90 shadow-2xs hover:shadow-xs transition group-hover:border-teal-300 cursor-pointer text-left" title="${isBn ? 'ক্লিক করে A to Z বিস্তারিত দেখুন' : 'Click to view full dossier'}">
+              <span>🏷️</span>
+              <span class="underline-offset-2 hover:underline tracking-tight">${o.order_number}</span>
+            </button>
+            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-extrabold border ${curStatus.color}">
+              ${curStatus.label}
+            </span>
+          </div>
+          <div class="flex items-center gap-1.5 mt-1 text-[11px] text-slate-500 font-medium truncate">
+            <span class="font-bold text-slate-700 truncate">${o.brand} ${o.model}</span>
             <span class="text-slate-300">•</span>
-            <span>🕒 ${dateFormatted}</span>
+            <span class="shrink-0">🕒 ${dateFormatted}</span>
           </div>
         </td>
 
-        <!-- Col 2: Customer & Area Profile -->
-        <td class="py-3 px-3.5 align-middle">
+        <!-- Col 2: 👤 গ্রাহক ও এলাকা (Customer Name + Avatar + Address) -->
+        <td class="py-3 px-4 align-middle">
           <div class="flex items-center gap-2.5">
             <div class="w-9 h-9 rounded-xl bg-gradient-to-br ${avatarGradient} flex items-center justify-center font-black text-xs shadow-2xs shrink-0 select-none ring-2 ring-white">
               ${initials}
             </div>
-            <div class="min-w-0">
+            <div class="min-w-0 flex-1">
               <div onclick="openOrderDetailsModal(${o.id})" class="font-extrabold text-slate-900 truncate hover:text-[#0f766e] cursor-pointer text-xs" title="${o.customer_name}">
                 ${o.customer_name}
               </div>
               <div class="flex items-center gap-1 text-[10px] text-slate-500 mt-0.5 truncate">
                 <span class="truncate">📍 ${o.area || (isBn ? 'ঢাকা' : 'Dhaka')}</span>
-                <span class="px-1 py-0.2 rounded text-[9px] font-bold bg-teal-50 text-[#0f766e] shrink-0 border border-teal-100">${isBn ? 'ডোরস্টেপ' : 'Doorstep'}</span>
+                <span class="px-1.5 py-0.2 rounded text-[9px] font-bold bg-teal-50 text-[#0f766e] shrink-0 border border-teal-100">${isBn ? 'ডোরস্টেপ' : 'Doorstep'}</span>
               </div>
             </div>
           </div>
         </td>
 
-        <!-- Col 3: Device & Diagnosed Issues -->
-        <td class="py-3 px-3.5 align-middle">
-          <div onclick="openOrderDetailsModal(${o.id})" class="font-black text-slate-900 truncate hover:text-[#0f766e] cursor-pointer text-xs" title="${o.brand} ${o.model}">
-            ${o.brand} ${o.model}
-          </div>
-          <div class="flex flex-wrap items-center gap-1 mt-1">
-            ${formatAdminIssueBadges(o.issues, isBn)}
-          </div>
-          ${renderOrderMediaBadges(o)}
-        </td>
-
-        <!-- Col 4: Mobile & Direct Contact -->
-        <td class="py-3 px-3.5 align-middle font-mono">
-          <div class="text-slate-900 text-xs font-bold tracking-tight">${o.customer_phone}</div>
+        <!-- Col 3: 📞 মোবাইল ও যোগাযোগ (Phone + Direct WhatsApp + Call) -->
+        <td class="py-3 px-4 align-middle font-mono">
+          <div class="text-slate-900 text-xs font-bold tracking-tight truncate">${o.customer_phone}</div>
           <div class="flex items-center gap-1.5 mt-1 font-sans">
             <a href="https://wa.me/88${o.customer_phone}?text=${encodeURIComponent(`Assalamu Alaikum ${o.customer_name}, Repair Seba থেকে আপনার অর্ডার ${o.order_number} (${o.brand} ${o.model}) এর ব্যাপারে যোগাযোগ করছি।`)}" target="_blank" class="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-[10px] font-extrabold border border-emerald-200/90 shadow-2xs transition hover:scale-105 shrink-0" title="WhatsApp Chat">
               <span>💬</span> <span>WhatsApp</span>
@@ -903,49 +881,41 @@ function renderAdminOrdersTable(orders) {
           </div>
         </td>
 
-        <!-- Col 5: Quotation & Bill -->
-        <td class="py-3 px-3 align-middle">
-          ${cost > 0 
-            ? `<div class="text-xs font-black text-slate-900 font-mono tracking-tight">৳ ${cost.toLocaleString(isBn ? 'bn-BD' : 'en-US')}</div>`
-            : `<div class="text-[11px] text-slate-400 italic font-medium">${isBn ? 'নির্ধারণ বাকি' : 'Pending'}</div>`
-          }
-          <div class="mt-1 flex flex-col gap-0.5">
-            <div>${quoteStatusPill}</div>
-            <div>${paymentPill}</div>
-          </div>
-        </td>
-
-        <!-- Col 6: Current Live Status Selector -->
-        <td class="py-3 px-3.5 align-middle">
-          <div class="relative">
-            <select onchange="quickUpdateOrderStatus(${o.id}, this.value)" class="text-[11px] font-extrabold py-1.5 pl-2.5 pr-6 rounded-xl border cursor-pointer transition focus:outline-none focus:ring-2 focus:ring-teal-500 shadow-2xs w-full appearance-none ${curStatus.color}" title="${isBn ? 'সরাসরি স্ট্যাটাস পরিবর্তন করুন' : 'Change Status'}">
-              ${statusList.map(s => `
-                <option value="${s.val}" ${s.val === o.status ? 'selected' : ''}>${s.label}</option>
-              `).join('')}
-            </select>
-            <div class="pointer-events-none absolute inset-y-0 right-2 flex items-center text-xs opacity-60">
-              ▾
+        <!-- Col 4: ⚙️ অ্যাকশন (1-Click Status Dropdown + Action Icons) -->
+        <td class="py-3 px-4 align-middle">
+          <div class="flex flex-col gap-1.5 items-end justify-center">
+            
+            <!-- Quick Status Dropdown -->
+            <div class="relative w-full max-w-[155px]">
+              <select onchange="quickUpdateOrderStatus(${o.id}, this.value)" class="text-[10px] font-extrabold py-1 pl-2 pr-5 rounded-lg border cursor-pointer transition focus:outline-none focus:ring-1 focus:ring-teal-500 shadow-2xs w-full appearance-none ${curStatus.color}" title="${isBn ? 'সরাসরি স্ট্যাটাস পরিবর্তন করুন' : 'Change Status'}">
+                ${statusList.map(s => `
+                  <option value="${s.val}" ${s.val === o.status ? 'selected' : ''}>${s.label}</option>
+                `).join('')}
+              </select>
+              <div class="pointer-events-none absolute inset-y-0 right-1.5 flex items-center text-[10px] opacity-60">
+                ▾
+              </div>
             </div>
+
+            <!-- 4 Action Buttons -->
+            <div class="flex items-center gap-1 justify-end">
+              <button onclick="openOrderDetailsModal(${o.id})" class="w-7 h-7 rounded-lg bg-teal-50 hover:bg-teal-100 text-[#0f766e] border border-teal-200/90 flex items-center justify-center text-xs transition shadow-2xs hover:scale-105 cursor-pointer" title="${isBn ? 'অর্ডারের A to Z সম্পূর্ণ বিস্তারিত বিবরণ দেখুন' : 'View Full Details'}">
+                👁️
+              </button>
+              <button onclick="openEditModal(${o.id})" class="w-7 h-7 rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200/90 flex items-center justify-center text-xs transition shadow-2xs hover:scale-105 cursor-pointer" title="${isBn ? 'কোটেশন প্রাইস ও বিবরণ এডিট করুন' : 'Edit Quotation'}">
+                ✏️
+              </button>
+              <button onclick="printAdminJobSheet(${o.id})" class="w-7 h-7 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200/90 flex items-center justify-center text-xs transition shadow-2xs hover:scale-105 cursor-pointer" title="${isBn ? 'জব শিট / রিসিট প্রিন্ট করুন' : 'Print Job Sheet'}">
+                🖨️
+              </button>
+              <button onclick="deleteAdminOrder(${o.id}, '${o.order_number}')" class="w-7 h-7 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200/90 flex items-center justify-center text-xs transition shadow-2xs hover:scale-105 cursor-pointer" title="${isBn ? 'অর্ডার ডিলিট করুন' : 'Delete Order'}">
+                🗑️
+              </button>
+            </div>
+
           </div>
         </td>
 
-        <!-- Col 7: Actions Toolbar -->
-        <td class="py-3 px-2 align-middle text-center whitespace-nowrap">
-          <div class="flex items-center justify-center gap-1">
-            <button onclick="openOrderDetailsModal(${o.id})" class="w-7 h-7 rounded-lg bg-teal-50 hover:bg-teal-100 text-[#0f766e] border border-teal-200/90 flex items-center justify-center text-xs transition shadow-2xs hover:scale-105 cursor-pointer" title="${isBn ? 'অর্ডারের A to Z সম্পূর্ণ বিস্তারিত বিবরণ দেখুন' : 'View Full Details'}">
-              👁️
-            </button>
-            <button onclick="openEditModal(${o.id})" class="w-7 h-7 rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200/90 flex items-center justify-center text-xs transition shadow-2xs hover:scale-105 cursor-pointer" title="${isBn ? 'কোটেশন প্রাইস ও বিবরণ এডিট করুন' : 'Edit Quotation'}">
-              ✏️
-            </button>
-            <button onclick="printAdminJobSheet(${o.id})" class="w-7 h-7 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200/90 flex items-center justify-center text-xs transition shadow-2xs hover:scale-105 cursor-pointer" title="${isBn ? 'জব শিট / রিসিট প্রিন্ট করুন' : 'Print Job Sheet'}">
-              🖨️
-            </button>
-            <button onclick="deleteAdminOrder(${o.id}, '${o.order_number}')" class="w-7 h-7 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200/90 flex items-center justify-center text-xs transition shadow-2xs hover:scale-105 cursor-pointer" title="${isBn ? 'অর্ডার ডিলিট করুন' : 'Delete Order'}">
-              🗑️
-            </button>
-          </div>
-        </td>
       </tr>
     `;
   }).join('');
